@@ -1,0 +1,789 @@
+recycler_id,cpcb_registration_id,company_name,registered_address,state,latitude,longitude,permitted_capacity_mta,authorization_status,materials_accepted,pickup_available,min_pickup_weight_kg,service_radius_km,total_pickups_booked,total_pickups_completed,cancellation_rate,fulfillment_score,avg_payout_delay_hours,contact_phone
+REC_EXC_001,CPCB/EXC/2023/001,M/s. Green Waves Environmental Solution,"Sy. No. 43/1, Mindi (V), Gajuwaka (M), Visakhapatnam District. 480",Andhra Pradesh,15.7874,80.1907,480.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,104,95,0.087,0.915,2.3,+91-9993664919
+REC_EXC_002,CPCB/EXC/2023/002,M/s. Apna Bhoomi E-Waste Management Services,"Sy. No. 119, Near Bharat Junction, Kusalapuram (V), Etcherla (M), Srikakulam District. - 532005 300",Andhra Pradesh,16.0638,79.2964,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,190,170,0.105,0.896,0.5,+91-9199052376
+REC_EXC_003,CPCB/EXC/2023/003,M/s. Veera Waste Management Systems,"Plot
+No. 42, Block-D Extension, IDA, Autonagar Visakhapatnam District.-530012, 5820",Andhra Pradesh,15.7041,79.8519,5820.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,219,208,0.05,0.95,1.6,+91-9496917567
+REC_EXC_004,CPCB/EXC/2023/004,M/s. Binbag Recycling Services Pvt. Ltd,Anatapur District 300,Andhra Pradesh,15.8797,80.0999,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,89,82,0.079,0.923,1.4,+91-9519498548
+REC_EXC_005,CPCB/EXC/2023/005,M/s. Clean Earth Green Earth Solutions,Krishna District 22.5,Andhra Pradesh,15.6438,79.481,22.5,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,110,98,0.109,0.893,2.8,+91-9852288765
+REC_EXC_006,CPCB/EXC/2023/006,M/s. E-Parisaraa Pvt. Ltd,"Plot No. 42A/4, Sy. No. 285 Part And Sy. No. 288 (P), Gollapuam (V), Hindupuram (M), Annathapuramu Distirct 300 44002.5",Andhra Pradesh,15.933,79.7867,44002.5,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,50.0,219,212,0.032,0.968,3.3,+91-9480072391
+REC_EXC_007,CPCB/EXC/2023/007,M/s. World Scrap Recycling Solutions (P) Ltd Plot No 50,Chittor District 6900,Andhra Pradesh,15.9833,79.7608,6900.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,140,134,0.043,0.958,3.4,+91-9559708603
+REC_EXC_008,CPCB/EXC/2023/008,M/s World Scrap Recycling Solutions Pvt Ltd.,"Shed No 10 11 12,Chittor District 18000",Andhra Pradesh,15.9556,79.3809,18000.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,100,91,0.09,0.912,1.1,+91-9123717335
+REC_EXC_009,CPCB/EXC/2023/009,M/s. Sungeel India Recycling Pvt. Ltd.,"Plot No. 59C & 59D, APIIC Industrial Park, Gollapuram (V), Hindupur (M), Anantapur District-515211 10380",Andhra Pradesh,15.427,79.4388,10380.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,70,67,0.043,0.958,2.4,+91-9447454369
+REC_EXC_010,CPCB/EXC/2023/010,M/s. Ramky ARM Recycling Pvt. Ltd.,"Plot No. 84/A & B, Road, No. 20/5, JNPC, Parawada, Visakhapatnam District- 531019 1500",Andhra Pradesh,15.5083,79.6108,1500.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,75.0,64,58,0.094,0.909,3.4,+91-9524831618
+REC_EXC_011,CPCB/EXC/2023/011,M/s. United Global Trust,"F-5, Zoo Road, S enduri Ali Path, Guwahati, Dist. Kamrup (M) Assam 120 120",Assam,26.4614,92.9989,120.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,44,38,0.136,0.87,0.8,+91-9234987326
+REC_EXC_012,CPCB/EXC/2023/012,M/s. ADV Metal Combine Pvt. Ltd.,"Shed No. - 25, Borai Industrial Growth Center, Rasmada, Dist.- Durg (C.G) 750 6750",Chhattisgarh,21.6745,81.8415,6750.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,172,163,0.052,0.948,3.3,+91-9524623942
+REC_EXC_013,CPCB/EXC/2023/013,M/s. Star E-Processors,"Village-Baktara, P.O.-Godi, Tehsil-Arung, District- Raipur, Chhattisgarh 6000",Chhattisgarh,21.0685,81.5273,6000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,163,149,0.086,0.915,1.1,+91-9712286237
+REC_EXC_014,CPCB/EXC/2023/014,M/s Fozia Traders,"Khasra No.13/1, Saboli Mandoli
+Industrial Area, Delhi-110093 90",Chhattisgarh,21.662,81.6904,90.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,158,140,0.114,0.887,0.5,+91-9540529868
+REC_EXC_015,CPCB/EXC/2023/015,M/s Muskan Technologies,"B-96,Okhla Industrial Area,Phase-1,Delhi- 110020 600",Chhattisgarh,21.6394,81.3731,600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,80,71,0.113,0.89,3.3,+91-9414404213
+REC_EXC_016,CPCB/EXC/2023/016,M/s. Shivnath Computers,"E-47/2, 1st Floor, Okhla Phase-2, Delhi- 110019 450 1989",Delhi,28.4229,77.1606,1989.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,215,209,0.028,0.972,2.6,+91-9318520688
+REC_EXC_017,CPCB/EXC/2023/017,M/s. Techchef E-Waste Solutions Private Limited,"C-61, Top Floor, DDA Shed Okhla
+Industrial Area, Delhi-110020 99",Delhi,28.3522,77.6002,99.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,158,140,0.114,0.887,2.1,+91-9949472217
+REC_EXC_018,CPCB/EXC/2023/018,"M/s. Greenscape Eco Management Private
+Ltd.","348, Patparganj Industrial Area, Delhi-110020 450",Delhi,29.1898,76.8446,450.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,67,60,0.104,0.899,3.5,+91-9739196117
+REC_EXC_019,CPCB/EXC/2023/019,M/s. Shree Raman E-Waste,"Plot No. 7, Khasra No. 487, Peeragarhi Industrial Area, Peeragarhi
+Village, Delhi -110087 300",Delhi,28.7399,76.6928,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,32,29,0.094,0.912,1.2,+91-9151939266
+REC_EXC_020,CPCB/EXC/2023/020,M/s. E-coli Waste Management P. Ltd,Plot No.-90 TO 92 Sabar Industrial Park Pvt. Ltd Vill-Asal Ta-Bhiloda Dist-Sabar kantha 7227 158604.92,Gujarat,22.5682,71.0411,158604.92,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,50.0,133,116,0.128,0.874,2.7,+91-9997955761
+REC_EXC_021,CPCB/EXC/2023/021,M/s. Mangalam ECS Environment Ltd,"ECS House, 11-12 Garden View, Opp. Auda Garden, Sindhu Bhawan road, Off SG Highway-Pakwan Circle, Bodakdev, Ahmedabad 38",Gujarat,22.6834,71.5697,4999.92,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,89,79,0.112,0.89,0.8,+91-9732286859
+REC_EXC_022,CPCB/EXC/2023/022,M/s. Pruthavi E-Recycle Pvt. Ltd.,Plot No.-31/32 Golden Industries Area Near Rolex Industries Vill- Kothariya Rajkot -360002 3000,Gujarat,22.317,71.575,3000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,177,171,0.034,0.966,3.2,+91-9533484403
+REC_EXC_023,CPCB/EXC/2023/023,M/s. E-Process House,"Plot No. 136/F-1. 2nd Phase, GIDC, Dist Valsad VAPI 396195 277",Gujarat,21.8428,70.854,277.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,128,125,0.023,0.977,1.0,+91-9309310033
+REC_EXC_024,CPCB/EXC/2023/024,M/s. Earth E-Waste Management Pvt. Ltd.,"Block No. 63, Sagun Ind. Estate, Type-A Paiky 11-A, Plot No. 1 to 5 & 10-D, Plot No. 1 to 5, Vill-Altodara, Tal. Opad, D",Gujarat,22.2443,71.1408,6000.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,97,86,0.113,0.889,1.0,+91-9600229623
+REC_EXC_025,CPCB/EXC/2023/025,M/s.  Recotech E-Waste Management,"Plot No. 36-37, Aashirwad Industrial Estate, Udhana-Sachin Road, GIDC Naka, Sachine, Surat 307",Gujarat,22.4083,71.5416,307.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,148,131,0.115,0.887,3.4,+91-9714600044
+REC_EXC_026,CPCB/EXC/2023/026,M/s. E-Front Line Recyclling Pvt. Ltd.,"Shed No. C1B-905\9, GIDC, Panoli, Tal: Ankleshwar, Distt: Bharuch, Gujarat- 394116 2700",Gujarat,22.2454,71.5985,2700.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,90,82,0.089,0.913,0.6,+91-9724798768
+REC_EXC_027,CPCB/EXC/2023/027,M/s. Dron E-Waste Solution,"Plot No. 56, G.I.D.C., Gozariya, Tal & Distt; Mehsana, Gujarat- 382825 975",Gujarat,21.8023,71.687,975.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,153,131,0.144,0.858,1.5,+91-9326623789
+REC_EXC_028,CPCB/EXC/2023/028,M/s. Eximo Recycling Pvt. Ltd.,"Plot No. 5/3, Raj Industrial Estate, Tal: Savli, Vadodara 900",Gujarat,22.7254,71.656,900.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,190,170,0.105,0.896,1.6,+91-9721445097
+REC_EXC_029,CPCB/EXC/2023/029,M/s. Galaxy Recycling,"Sr. No. 36/P1, P2, 37/P2, 38/P2, Plot No. 52 &53, Near Tirth Agro. Pvt. Ltd., At: Bharudi, Tal: Gondal, Rajkot 521",Gujarat,22.6949,71.3884,521.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,61,57,0.066,0.937,0.9,+91-9178725274
+REC_EXC_030,CPCB/EXC/2023/030,M/s. Basant Clean Enviro Ltd.,"Plot No. 67, G.I.D.C., Kadi, Distt: Mehsana, Gujarat- 382715 5400",Gujarat,22.054,71.015,5400.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,205,189,0.078,0.923,2.9,+91-9358185058
+REC_EXC_031,CPCB/EXC/2023/031,M/s. Eco Green Recycling,"Plot No. 4, Near-Dynamic Textile, Ozar Road, Mota Ponda, Kapaada, Distt: Valsad, Gujarat 500",Gujarat,22.0149,71.3039,500.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,65,62,0.046,0.955,0.7,+91-9730431725
+REC_EXC_032,CPCB/EXC/2023/032,M/s. Unicare E-Waste Recycler,"Plot No. 9/1, Raj Industrial Park-III, Jarod-Savali Road, Karachiya, Tal: Savli, Distt: Vadodara- 391520 1500",Gujarat,22.5545,71.5824,1500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,115,103,0.104,0.897,2.1,+91-9256943484
+REC_EXC_033,CPCB/EXC/2023/033,M/s. Surbine Recycling (P) Ltd.,"Plot No. 765, GIDC Phase-II, Dared- 361004, Distt: Jamnagar 1500",Gujarat,22.5976,71.5528,1500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,44,39,0.114,0.891,1.5,+91-9434444807
+REC_EXC_034,CPCB/EXC/2023/034,M/s. Greentech Recycling,"Plot No. 5&6, Maharaja Estate, B/H: Ananad hotel, Sarkhej-sanand Road, Ahmedabad 702",Gujarat,22.5287,70.9082,702.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,138,121,0.123,0.879,2.1,+91-9690256950
+REC_EXC_035,CPCB/EXC/2023/035,M/s. Dinesh Appliances,"Plot No: 10, R. K. Ind Estate, Rakhiyal, Ahmedabad 360",Gujarat,21.8971,70.8251,360.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,149,132,0.114,0.887,2.7,+91-9103695961
+REC_EXC_036,CPCB/EXC/2023/036,M/s. Mahammad Salim & Brothers Near Umiya Weigh Bridge,"GIDC- Sachin, Tal: Chorasi, Dist: Sachin-394230 600",Gujarat,21.7841,71.655,600.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,87,84,0.034,0.966,1.3,+91-9311426941
+REC_EXC_037,CPCB/EXC/2023/037,M/s. Electro Waste Solutions Plot no: 631,"GIDC-Halol, Dist: Panchmahal 480",Gujarat,21.8526,70.8753,480.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,98,91,0.071,0.93,0.6,+91-9383627673
+REC_EXC_038,CPCB/EXC/2023/038,M/s. Felix Industries Pvt Ltd,"Plot No:123, Devraj
+Industrial Park, 200 ft Ring Road, Piplaj-Pirana Road, Piplaj- 382405, Dist: Ahmedabad 375",Gujarat,22.1147,71.4502,375.0,SUSPENDED,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,98,39,0.602,0.41,0.6,+91-9552949741
+REC_EXC_039,CPCB/EXC/2023/039,M/s. Ecotime Industries,"Plot No: 98 & 99, Sparkle Industrial Estate, Tal: Jalalpor, Dist: Navsari396436 144",Gujarat,22.7382,70.8677,144.0,SUSPENDED,"PCB,BATTERY,CABLE",True,20.0,75.0,129,51,0.605,0.405,1.9,+91-9743273060
+REC_EXC_040,CPCB/EXC/2023/040,M/s. Sharda Copper,"Plot No: SME-06, Bardoli-2,
+(Miyawadi) Industrial Estate, Bardoli, Surat-394601 300",Gujarat,22.1572,71.3083,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,167,156,0.066,0.935,2.0,+91-9269124855
+REC_EXC_041,CPCB/EXC/2023/041,M/s. Bharuch Enviro Infrastructure Ltd (Beil),"Plot no: 9701-16, 9801-28, 9901-28, 9601-04, 10001-
+10008, G-7 & 8, 7924- 27, 9401-9412, 9501-9506,
+7905 E to H, GIDC, A",Gujarat,22.4174,70.8553,700.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,113,104,0.08,0.922,2.2,+91-9651904800
+REC_EXC_042,CPCB/EXC/2023/042,M/s. Star Recycling,"Survey no: 44 P1P1 44P1P2 & 46, Plot no: 45, R K Industrial Zone-09, Kuwadva-     Wankaner Road, Ranpur360023, Tal & Dis",Gujarat,22.217,71.238,629.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,72,63,0.125,0.878,1.1,+91-9646573613
+REC_EXC_043,CPCB/EXC/2023/043,M/s. R Planet Integrated Solution Pvt. Ltd Pl,"202 (old block no. 264,265 paiki 1), Village
+: Zak-382330, Tal : Dahegam, Dist : Gandhinagar 11450",Gujarat,21.7769,70.7868,11450.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,37,33,0.108,0.897,0.6,+91-9376890017
+REC_EXC_044,CPCB/EXC/2023/044,M/s. Payas Recyclers,"Survey No.2139, Plot No.28, Parshwa Industrial Park, B/H. Sandvik Asia, Ahmedabad-Mehsana Highway, Rajpur-382740, Tal:Ka",Gujarat,22.0194,71.1884,1158.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,149,141,0.054,0.947,3.4,+91-9306037667
+REC_EXC_045,CPCB/EXC/2023/045,M/s. ID Technocom,"Plot No.C1-414/P, GIDC Estate
+Mansa, Visnagar Road, Vill-Mansa, Mansa382845, Dist : Gandhinagar 240",Gujarat,21.9361,71.443,240.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,125,112,0.104,0.898,2.2,+91-9868773488
+REC_EXC_046,CPCB/EXC/2023/046,M/s. Unity E-Recycling Co,"Sr. No: 310/p, Plot No: 4, Danilimda, Ahmedabad-380028 383",Gujarat,22.4385,71.4323,383.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,113,108,0.044,0.957,1.4,+91-9529431826
+REC_EXC_047,CPCB/EXC/2023/047,M/s. Mahaarana Industries Pvt. Ltd.,"Survey No. 466 & 475, Village: Timba, Ta: Daskroi, Dist; Ahmedabad 16585",Gujarat,22.1479,70.7032,16585.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,57,55,0.035,0.966,1.9,+91-9666236526
+REC_EXC_048,CPCB/EXC/2023/048,M/s GL Recycling LLP,"Survey No. 108, Village: Soliya, Ta.:Kotda Sangani, Dist.: Rajkot-360030 14500",Gujarat,21.842,70.7841,14500.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,180,171,0.05,0.951,0.8,+91-9347212966
+REC_EXC_049,CPCB/EXC/2023/049,"M/s. Electro Alloys Recycling And
+Transformation HUB","Plot No. 301/13 , GIDC Palej-392220, Bharuch 780",Gujarat,22.7546,70.7483,780.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,105,98,0.067,0.935,2.4,+91-9534318588
+REC_EXC_050,CPCB/EXC/2023/050,M/s. Reart Recycling Private Limited.,"Plot No.365, Survey No.111p1, Golden Green Industrial Park (phase-D), Khambha-360311,
+Tal:Lodhika, Dist:Rajkot 300",Gujarat,22.5972,71.1185,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,34,31,0.088,0.917,3.5,+91-9633738991
+REC_EXC_051,CPCB/EXC/2023/051,M/s. Tvarita Phones Pvt. Ltd.,"Plot No.171, Survey No. 846, N. H. 8, Vapi, Valsad-396191 600",Gujarat,22.6218,71.5728,600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,188,172,0.085,0.916,2.2,+91-9848277850
+REC_EXC_052,CPCB/EXC/2023/052,M/s. Kalpana E-Recyclers,"Plot No. 2486, Madhuban Industrial Park, Village: Kuha, Ta: Daskroi, Dist: Ahmedabad 876",Gujarat,22.0074,71.0227,876.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,87,82,0.057,0.944,0.9,+91-9740853352
+REC_EXC_053,CPCB/EXC/2023/053,M/s. Enviro Green Recycling,"Survey/Block No. 736/737, Village:
+Tarsadi., Ta: Mangrol, Dist: Surat -394125 12775",Gujarat,22.5029,71.3734,12775.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,85,78,0.082,0.92,3.4,+91-9152203051
+REC_EXC_054,CPCB/EXC/2023/054,M/s. Liberty Recycling,"Survey No.1439, Old Survey
+No.256/1/5, Near Balda Industrial Park, Village: Balda, Tal: Pardi, Dist: Valsad 893",Gujarat,22.7366,71.2484,893.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,193,178,0.078,0.923,0.7,+91-9813889838
+REC_EXC_055,CPCB/EXC/2023/055,M/s. Green Earth Management Company,"Plot No. 13, Supreme – 3 Industrial Park, Near Vibrant weighbridge, Zak- Kadadara Road, Vill.: Kadadara, Tal- Dahegam, G",Gujarat,22.3881,71.3881,893.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,75.0,173,164,0.052,0.949,1.3,+91-9960760799
+REC_EXC_056,CPCB/EXC/2023/056,M/s. Gujarat Green Recycling,"Plot No. MSME-500, Sanand-II,
+Engineering Industrial Estate, GIDC Sanand-II, Dist:Ahmedabad 375",Gujarat,21.8166,71.0869,375.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,165,148,0.103,0.898,1.3,+91-9573928548
+REC_EXC_057,CPCB/EXC/2023/057,M/s. New India Sales Corporation,"Plot No. C1B-1915, GIDC Panoli,
+Dist: Ankleshwar-394116 300",Gujarat,22.7331,71.6786,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,186,162,0.129,0.872,3.0,+91-9958134097
+REC_EXC_058,CPCB/EXC/2023/058,M/s Technogreen Recycling Private Limited,"Survey No.367-377, Village - Modasar. Tal-Sanand .Distt.Ahmedabad-382481 14400",Gujarat,22.1753,71.2736,14400.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,59,56,0.051,0.951,1.0,+91-9792585463
+REC_EXC_059,CPCB/EXC/2023/059,M/s. Evergreen E Waste Management Pvt. Ltd.,"Plot No.: 30, 31, Kamla Amrut Industrial Park, At: Budasan kadi, Taluka & Dist.: Mehsana –
+382715 12000",Gujarat,22.1352,71.503,12000.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,114,108,0.053,0.948,3.4,+91-9495647770
+REC_EXC_060,CPCB/EXC/2023/060,M/s. Egnus Ewaste Solution Private Limited.,"Plot No.31, Village: Motwan, Tal: Ankleshwar, Dist.: Bharuch- 393020 30000",Gujarat,22.3278,70.7559,30000.0,SUSPENDED,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,178,71,0.601,0.406,0.7,+91-9923407067
+REC_EXC_061,CPCB/EXC/2023/061,M/s Global E Waste Management Systems Plot No: Shop No 729/s-1 to,Sonum Township Nessai Salcete – Goa 103 153,Goa,15.6122,74.6237,153.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,194,184,0.052,0.949,1.2,+91-9961330509
+REC_EXC_062,CPCB/EXC/2023/062,M/s. Group Ten Plus,"H. No. 8/5, Abreovaddo , Saligao, Bardez, Goa 50",Goa,15.0043,73.8754,50.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,142,135,0.049,0.951,1.6,+91-9587726151
+REC_EXC_063,CPCB/EXC/2023/063,M/s Honey Disposal Store,"Plot No. 67-68
+Jarrout Road, Village Mandour Industrial Area Ambala city. 300 157187.67",Haryana,28.581,76.0838,157187.67,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,83,81,0.024,0.976,3.1,+91-9759203896
+REC_EXC_064,CPCB/EXC/2023/064,M/s. Thapar Disposal Industries,"902A/5/6, Chara Mandi Road, Ambala City 1825",Haryana,29.1488,76.0656,1825.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,104,92,0.115,0.887,2.4,+91-9532020261
+REC_EXC_065,CPCB/EXC/2023/065,M/s. Mittal Battery,"plot No. 349, Indl-Area, Ph-1, Panchkula. (Not available on website) 3600",Haryana,29.1669,76.2222,3600.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,81,74,0.086,0.916,2.9,+91-9729396475
+REC_EXC_066,CPCB/EXC/2023/066,M/s. Exigo Recycling Pvt. Ltd.,"G. T. Road, Samalkha Panipat 6000",Haryana,28.8568,76.1092,6000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,103,98,0.049,0.952,1.9,+91-9618856453
+REC_EXC_067,CPCB/EXC/2023/067,M/s. Exigo Recycling (P) Ltd.,"Barsat Road, Panipat 18000",Haryana,29.0514,75.9144,18000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,144,133,0.076,0.925,0.9,+91-9752417118
+REC_EXC_068,CPCB/EXC/2023/068,M/s. Adinath Recyclotronix (P) Ltd.,"Plot
+No.#361, Industrial Estate, HSIIDC, Panipat(Not available on website) 1080",Haryana,28.9591,76.2833,1080.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,125,114,0.088,0.913,3.4,+91-9537809212
+REC_EXC_069,CPCB/EXC/2023/069,M/s Earth Waste Management Pvt. Ltd. Vill-Ismaila,Distt. Rohtak 600,Haryana,28.7511,75.6265,600.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,178,164,0.079,0.922,1.9,+91-9986196569
+REC_EXC_070,CPCB/EXC/2023/070,M/s. Giriraj Metal,"P. No. 39 HSIIDC, IE, Kutana, Rohtak 300",Haryana,29.453,75.7143,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,76,71,0.066,0.936,2.0,+91-9774213994
+REC_EXC_071,CPCB/EXC/2023/071,M/s. Green World International,"Pvt. Ltd., GR 60-61 Ganpati Industrial Dham Industrial Area Bahadugarh Haryana 5000",Haryana,29.4797,75.6467,5000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,209,184,0.12,0.882,3.3,+91-9607900377
+REC_EXC_072,CPCB/EXC/2023/072,M/s Renu Recycling Company,"Plot No. 1257, MIE-B, Bahadurgarh 1800",Haryana,29.3188,76.1169,1800.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,216,192,0.111,0.89,2.6,+91-9505619606
+REC_EXC_073,CPCB/EXC/2023/073,M/s AMN E-Waste Management Pvt Ltd.,"Plot No. 171, Sector-59, Industrial Area, Faridabad (Not available on website) 290",Haryana,29.0705,76.1177,290.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,44,38,0.136,0.87,1.6,+91-9186205129
+REC_EXC_074,CPCB/EXC/2023/074,M/s Endeavor Re-processor and Recyclers India,"Plot no. 323, Sec-24, industrial Area, Faridabad  (Not available on website) 365",Haryana,29.1228,76.4263,365.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,42,39,0.071,0.932,1.6,+91-9739189224
+REC_EXC_075,CPCB/EXC/2023/075,M/s E-waste Solutions,"Industrial Shed, 1A, Industrial Estate, Sec-6, Faridabad 1000",Haryana,29.0572,75.6725,1000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,71,63,0.113,0.89,3.2,+91-9561946175
+REC_EXC_076,CPCB/EXC/2023/076,M/s V S Enterprises,"Plot no. 9, Pragati Vihar, Sector-59, Faridabad (Not available on website) 300",Haryana,29.1296,75.9417,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,179,158,0.117,0.884,1.2,+91-9790121219
+REC_EXC_077,CPCB/EXC/2023/077,M/s Dotline Informatics Pvt. Ltd.,"Plot No. 302, Ph-V, HSIIDC, Indl. Estate, Rai, Distt. Sonipat 350",Haryana,29.4096,75.6735,350.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,166,144,0.133,0.869,0.6,+91-9945943012
+REC_EXC_078,CPCB/EXC/2023/078,M/s RBH E-Waste Recycle Hub Pvt. Ltd. (old name M/s Satellite Vis,"Plot No. 130,
+HSIIDC, Rai, Distt. Sonipat 912.5",Haryana,29.5412,75.6976,912.5,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,50.0,147,130,0.116,0.886,2.7,+91-9404347709
+REC_EXC_079,CPCB/EXC/2023/079,M/s Global Waste Solution,"Village Ram Nagar, Tehsil Ganaur, Distt. Sonipat 9490",Haryana,29.4882,76.1424,9490.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,183,164,0.104,0.897,1.1,+91-9228161931
+REC_EXC_080,CPCB/EXC/2023/080,M/s Global Waste Solution Unit-II,"Village Dhaturi Tehsil Ganaur, Distt. Sonipat 8249",Haryana,28.6736,76.1962,8249.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,129,115,0.109,0.893,0.7,+91-9471962545
+REC_EXC_081,CPCB/EXC/2023/081,M/s Tes Amm (India) Pvt. Ltd.,"Village Wazidpur Saboli, Distt. Sonepat 12000",Haryana,29.0131,76.1342,12000.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,197,188,0.046,0.955,0.9,+91-9111643208
+REC_EXC_082,CPCB/EXC/2023/082,M/s Bluenvir,"81, HSIIDC, Rai, Distt. Sonipat 435",Haryana,29.319,76.1812,435.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,78,75,0.038,0.963,3.4,+91-9633852493
+REC_EXC_083,CPCB/EXC/2023/083,M/s. EARTH SENSE RECYCLE PVT LTD,"Plot
+No. 100, Sector - 5, IMT Manesar, Gurgaon 2160",Haryana,29.4917,76.5765,2160.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,89,85,0.045,0.956,3.0,+91-9102155748
+REC_EXC_084,CPCB/EXC/2023/084,M/s. Nirvana Recycling Pvt. Ltd.,"Plot No. D-6, Udyog, Vihar, Phase-VI, Sector-37, Gurugram 6030",Haryana,28.7604,75.7493,6030.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,183,177,0.033,0.968,3.1,+91-9711797080
+REC_EXC_085,CPCB/EXC/2023/085,M/s. Green Vortex Waste Management Pvt Ltd.Plot No 177,"Sector 7, IMT Manesar 1500",Haryana,29.2418,76.0375,1500.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,126,119,0.056,0.945,2.2,+91-9552528272
+REC_EXC_086,CPCB/EXC/2023/086,M/s. SMS ENTERPRISES,"Plot No. 544- D, First
+Floor, Sector -37, Pace City - II, Gurgaon (Haryana) 360",Haryana,29.4584,75.9695,360.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,208,189,0.091,0.91,2.4,+91-9464666823
+REC_EXC_087,CPCB/EXC/2023/087,M/s. Apicem Recyclers Pvt. Ltd.,"Plot No. 359, Sector-8, IMT Manesar, Gurugram, Haryana 510",Haryana,29.2525,75.7523,510.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,184,175,0.049,0.952,2.8,+91-9988974332
+REC_EXC_088,CPCB/EXC/2023/088,M/s. KM Global E-Waste Private Limited,"Ground Floor Plot no. -359, Sector-8, IMT Manesar, Gurugram, Haryana 510",Haryana,28.8073,76.3295,510.0,SUSPENDED,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,152,60,0.605,0.403,1.5,+91-9406047781
+REC_EXC_089,CPCB/EXC/2023/089,M/s  3 R Recycler,"Plot No. 392, Sector-8, IMT Manesar Gurgaon 2994",Haryana,29.0953,75.9644,2994.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,30.0,165,144,0.127,0.874,1.7,+91-9193982380
+REC_EXC_090,CPCB/EXC/2023/090,M/s. Deshwal Waste Management Pvt Ltd,"plot No-292, Sec-7, IMT Manesar, Gurgaon, Haryana 10000
+1800",Haryana,29.2788,76.2267,28.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,98,94,0.041,0.96,3.2,+91-9458165029
+REC_EXC_091,CPCB/EXC/2023/091,M/s. Deshwal Waste Management Pvt Ltd,"Plot No. -116, Sec-8, IMT Manesar, Gurgaon, Haryana 4652.1",Haryana,28.7862,76.0092,4652.1,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,133,122,0.083,0.919,1.3,+91-9624518203
+REC_EXC_092,CPCB/EXC/2023/092,M/s. Namo E-Waste Management Ltd.,"14/1, Mathura Road, Faridabad Haryana 5796",Haryana,29.1518,75.6878,5796.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,135,128,0.052,0.949,2.3,+91-9847885557
+REC_EXC_093,CPCB/EXC/2023/093,M/s. E Waste Recyclers India,Shed no. 15 Roz Ka Meo Industrial Area Nuh. 667,Haryana,28.6361,75.6898,667.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,130,127,0.023,0.977,1.1,+91-9475770070
+REC_EXC_094,CPCB/EXC/2023/094,M/s Radhey Steel Traders,"Vill. PatviBarara Road, Shahabad, Distt. Kurukshetra 600",Haryana,29.4796,76.4555,600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,82,73,0.11,0.893,2.9,+91-9545480601
+REC_EXC_095,CPCB/EXC/2023/095,M/s Pegasus Waste Management Pvt. Ltd.,"Village -Bhora Kalan, Gurugram 13134",Haryana,28.8923,75.9838,13134.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,191,185,0.031,0.969,1.2,+91-9969471083
+REC_EXC_096,CPCB/EXC/2023/096,M/s. 3 R Zero Waste Pvt. Ltd.,"Plot No.-62,Sector-8, IMT Manesar 500",Haryana,29.4715,75.8338,500.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,117,104,0.111,0.891,2.2,+91-9668070805
+REC_EXC_097,CPCB/EXC/2023/097,M/s. Ecoverva Waste Recycling Private Limited,"Plot No. 350
+Block C Village Pathreri Ansal Pioneer Industrial Park,
+Distt. Gurgaon 353.0708",Haryana,28.7789,75.7983,353.0708,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,177,161,0.09,0.911,2.1,+91-9892261991
+REC_EXC_098,CPCB/EXC/2023/098,M/s. Naturevolt Recyclers India Pvt Ltd,"Plot No. 323, Part-IV, Sector-24,Faridabad 5400",Haryana,29.061,76.181,5400.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,75.0,91,80,0.121,0.882,2.4,+91-9648578780
+REC_EXC_099,CPCB/EXC/2023/099,M/s. AV Green Soluti ons Pvt Ltd.,"Plot No. 274, Sector-24 , Industrial Area,Faridabad 381",Haryana,29.0309,76.1504,381.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,142,128,0.099,0.903,2.8,+91-9542302083
+REC_EXC_100,CPCB/EXC/2023/100,M/s. Re Chakra Waste Management LLP.,"Plot No. -18, Sector-6, Faridabad 8931",Haryana,28.7407,76.4474,8931.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,75.0,139,128,0.079,0.922,0.6,+91-9770670299
+REC_EXC_101,CPCB/EXC/2023/101,M/s. CLG Projects LLP,Plot no 75-76 sector 59 pragati vihar Ballabgarh faridabad 450,Haryana,29.3986,76.4526,450.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,216,198,0.083,0.917,0.8,+91-9314387950
+REC_EXC_102,CPCB/EXC/2023/102,M/s. SSL E Waste Management LLP,"Plot No. 410, Sector- 68, IMT, Faridabad 423",Haryana,29.1282,76.4731,423.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,61,58,0.049,0.952,3.4,+91-9934983411
+REC_EXC_103,CPCB/EXC/2023/103,M/s Shunty Disposal Store,"Manmohan Nagar,
+G.T Road, Ambala city 900",Haryana,29.2269,75.7906,900.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,36,34,0.056,0.947,0.6,+91-9879259260
+REC_EXC_104,CPCB/EXC/2023/104,M/s. Green Wealth Solutions Pvt. Ltd. Plot No. 109,"IE,
+Kutana, HSIIDC, Hissar Road, Rohtak 690",Haryana,29.4352,76.2285,690.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,159,143,0.101,0.901,1.3,+91-9633215492
+REC_EXC_105,CPCB/EXC/2023/105,M/s. Endeavor Recyclers India Private Limited,"71//14/2/2, 71//15/1, Village-Hassangarh,Tehsil- Sampla, District- Rohtak,
+Haryana-124404 28350",Haryana,28.904,76.3594,28350.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,115,109,0.052,0.949,3.1,+91-9720847085
+REC_EXC_106,CPCB/EXC/2023/106,M/s. Shivalik Solid Waste Management Ltd.,"(Unit –II), Village-Shabowal, Tehsil Nalagarh, District-Solan HP 1000 1500",Himachal Pradesh,31.0759,76.8555,1500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,54,48,0.111,0.893,2.4,+91-9837462765
+REC_EXC_107,CPCB/EXC/2023/107,M/s Ortech India Corporations,"Plot No. 67-B, Industrial Estate, Lodhi Majra, Baddi, 500",Himachal Pradesh,31.5892,77.1991,500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,175,161,0.08,0.921,2.2,+91-9203316389
+REC_EXC_108,CPCB/EXC/2023/108,M/s. VRG Groups,Gangyal 135 705,Jammu & Kashmir,33.3454,76.4814,705.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,115,100,0.13,0.872,1.3,+91-9518386087
+REC_EXC_109,CPCB/EXC/2023/109,M/s. Bashir Ahmad Babdemb,Srinagar 285,Jammu & Kashmir,33.5289,76.7093,285.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,219,201,0.082,0.919,1.6,+91-9996046901
+REC_EXC_110,CPCB/EXC/2023/110,M/s. Bashir Enterprises Noorbagh,Srinagar 285,Jammu & Kashmir,34.0162,76.159,285.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,178,170,0.045,0.956,1.6,+91-9302386214
+REC_EXC_111,CPCB/EXC/2023/111,M/s. Meliorate Lubes Pvt Ltd,"Plot No. 606/A, Ward No. 4/34, Vikas Nagar, hesal Piska More, Ranchi Jharkhand - 834005 300 660",Jharkhand,23.7206,85.7292,660.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,85,75,0.118,0.885,2.1,+91-9795844306
+REC_EXC_112,CPCB/EXC/2023/112,M/s. Simran Infotech,"Vill & P.O Kanak Chas,
+P.S. Chandan Kiari dist. Kokaro Jharkhand-828134 360",Jharkhand,23.7053,84.8313,360.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,183,167,0.087,0.914,0.7,+91-9799192960
+REC_EXC_113,CPCB/EXC/2023/113,M/s. Sriram Eco Raksha Computer Services Pvt. Ltd. No. B-29,"KSSIDC Indl. Estate, Bommasandra, Hosur Road, Anekal Taluk, Bangalore – 560 099 360 126015.48",Karnataka,12.9671,77.783,126015.48,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,160,139,0.131,0.87,2.6,+91-9195112669
+REC_EXC_114,CPCB/EXC/2023/114,M/s. E-Friendly Waste Recyclers,"First Floor, No. 17 1st, Cross, Azeez Sait Industrial Town, Nayandahalli, Bangalore-560039 300",Karnataka,12.4769,77.1977,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,46,44,0.043,0.958,2.1,+91-9472396043
+REC_EXC_115,CPCB/EXC/2023/115,M/s. Eco Globe E-Waste Recyclers,"Plot No. 87, 2nd Phase, 2nd Sector, Bidadi Industrial Area, Bidadi Hobli, Ramanagra Taluk and District 1200",Karnataka,13.0135,77.9675,1200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,147,137,0.068,0.933,1.2,+91-9729921035
+REC_EXC_116,CPCB/EXC/2023/116,M/s. E-Hasiru,"No. 168/B, 1st Floor, 7th Main Road, 3rd Phase, Peenya Industrial Area, Bangalore – 558 300",Karnataka,12.6928,78.0823,300.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,39,36,0.077,0.927,1.0,+91-9391822548
+REC_EXC_117,CPCB/EXC/2023/117,M/s. Green Enabled IT Solutions Pvt. Ltd.,"No. 2/1, 27th Cross, Behind Krishna Grand Hotel, Banashankari 2nd Stage, Bengaluru 600",Karnataka,12.9448,77.4075,600.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,88,85,0.034,0.967,2.7,+91-9335719027
+REC_EXC_118,CPCB/EXC/2023/118,M/s. Coral Waters,"No. 8E, KIADB Industrial Area, Hoskote Taluk, Banglaore Rural District 720",Karnataka,13.3161,77.4137,720.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,188,169,0.101,0.9,0.9,+91-9430511457
+REC_EXC_119,CPCB/EXC/2023/119,M/s. Royal Touch,"No. 3/2, 2nd Cross, Ezakiel Industrial Estate, K. G Halli, Nagawara Main
+Road, Banglaore 360",Karnataka,13.3566,77.6249,360.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,75.0,149,137,0.081,0.921,2.5,+91-9640699345
+REC_EXC_120,CPCB/EXC/2023/120,M/s. Pharmateck Consultancy,"Sy. No. 40/1, Mangammanapalya, Bommanahalli 300",Karnataka,12.9918,77.5214,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,63,54,0.143,0.862,1.1,+91-9675370513
+REC_EXC_121,CPCB/EXC/2023/121,M/s. Cerebra Integrated Technologies Ltd.,"Plot No. 41 to 46, Appasandra village, KIADB Indl. Area, Narasapura Hobli, kolar Taluk and District 39000",Karnataka,13.4107,77.8934,39000.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,91,83,0.088,0.914,2.2,+91-9193144811
+REC_EXC_122,CPCB/EXC/2023/122,M/s. AGK Enterprises,"Unit-I, No 33/A,
+Industrial “A” Layout, Bannimantap, Mysore - 570015 360",Karnataka,13.4557,77.8629,360.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,206,179,0.131,0.87,1.4,+91-9541616369
+REC_EXC_123,CPCB/EXC/2023/123,M/s. Aptus Recycling Pvt. Ltd.,"Sy No. 241/4B, Magnur Village, Kirgavalu Hobli, Malavalli Taluk Mandya District- 571430 300",Karnataka,12.7679,77.3282,300.0,SUSPENDED,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,102,40,0.608,0.404,1.7,+91-9871579223
+REC_EXC_124,CPCB/EXC/2023/124,M/s. E-Parisara Pvt. Ltd.,"No. 30-P3, Dabaspet Bangalore 9288",Karnataka,12.596,78.051,9288.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,213,205,0.038,0.963,1.9,+91-9587098188
+REC_EXC_125,CPCB/EXC/2023/125,M/s. Tech Logic,"Unit-2, Shed No. 36, 2nd  Main, Ranganathapura, Bangalore - 560 044 360",Karnataka,13.4608,77.838,360.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,83,77,0.072,0.929,0.9,+91-9301628778
+REC_EXC_126,CPCB/EXC/2023/126,M/s. E-Scrapy Recyclers,"No.106, Andrahalli Main Road, Byreshwara Industrial Area, Peenya
+2nd stage, Bangalore - 560 058 720",Karnataka,12.6481,77.3151,720.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,34,31,0.088,0.917,3.2,+91-9863440226
+REC_EXC_127,CPCB/EXC/2023/127,M/s. KH E-Waste Recyclers,"No. 104, 1st Main Road, 4th Cross, Azeez Sait Industrial Area,
+Nayandahalli, Bangalore – 39 360",Karnataka,13.0689,77.6196,360.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,174,152,0.126,0.875,1.9,+91-9628012044
+REC_EXC_128,CPCB/EXC/2023/128,M/s. RPN Industries,"Plot No B2, KSSIDC Industrial Area, Kumbalgodu, Mysore Road,
+Bangalore-74 312",Karnataka,12.6954,77.6316,312.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,75.0,134,121,0.097,0.904,0.9,+91-9695918472
+REC_EXC_129,CPCB/EXC/2023/129,M/s. I Seven,"# 9/4, Kachohalli Industrial Estate Kachohalli, Near Saibaba Temple, Laxmipura
+Post, Bengaluru- 562123 300",Karnataka,12.516,77.9468,300.0,SUSPENDED,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,168,67,0.601,0.406,1.3,+91-9111377787
+REC_EXC_130,CPCB/EXC/2023/130,M/s. Greenscape Eco Management Pvt. Ltd.,"Plot No. R-12, Veerasandra Indl Area, Anekal Tq,
+Bangalore Urban District – 100 600",Karnataka,12.8443,77.3544,600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,89,77,0.135,0.868,0.7,+91-9534680400
+REC_EXC_131,CPCB/EXC/2023/131,M/s. Trishyirya Recycling India Pvt. Ltd.,"No.
+315, 4th Phase, Peenya Industrial Estate, Bangalore - 560 058 360",Karnataka,12.5331,77.9775,360.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,69,64,0.072,0.93,2.7,+91-9191312343
+REC_EXC_132,CPCB/EXC/2023/132,M/s. E Pragathi Recycling Plot No. 66,"Road No. 18, Anthaasanahalli Indl. Area, IInd Phase,
+Tumkur 3600",Karnataka,13.269,77.7531,3600.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,136,120,0.118,0.884,2.5,+91-9609431998
+REC_EXC_133,CPCB/EXC/2023/133,M/s. Ingram Micro India Pvt. Ltd.,"I Floor, Plot No. 1-4, Sy No. 5/2, 15th Km, Singasandra Post, Baretena Agrahara, NH-7, Hosur Main Road,
+Bangalore- 56010",Karnataka,13.1706,77.2838,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,60,57,0.05,0.952,3.0,+91-9781616934
+REC_EXC_134,CPCB/EXC/2023/134,M/s. Vans Chemistry,"Plot No. 94/5, Shed NO. 13R14, SRRLayout, Kannalli Village, Bangalore-
+560094 1440",Karnataka,12.6324,77.9126,1440.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,42,39,0.071,0.932,2.2,+91-9597545575
+REC_EXC_135,CPCB/EXC/2023/135,M/s. Moogambigai Metal Refineries,"Unit (3), Plot No. 174, Industrial Area, Baikampady
+Mangalore- 575011 1248",Karnataka,12.7314,77.7286,1248.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,75.0,187,161,0.139,0.862,3.4,+91-9494587966
+REC_EXC_136,CPCB/EXC/2023/136,M/s. Sogo Synergy Private Limited,"Shed No. A-57, KSSIDC Industrial Estate, Bommasandra, Hosur Road, Anekal Taluk, Bangalore Urban
+District – 560099 1296",Karnataka,12.8638,77.2741,1296.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,75.0,46,43,0.065,0.938,2.2,+91-9511814592
+REC_EXC_137,CPCB/EXC/2023/137,M/s. MKK E-Waste Enterprises,"Shed No. 292, Belur Industrial Area, Belur, Dharwad Dist-
+580011 360",Karnataka,12.5295,77.1693,360.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,193,180,0.067,0.933,2.8,+91-9205600006
+REC_EXC_138,CPCB/EXC/2023/138,M/s. BSMR Metals,"No. R. O 7, KSSIDC Industrial Estate, Veerasandra II stage, Attibele Hobli,
+Bangalore Urban District 360",Karnataka,12.5372,77.9161,360.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,55,48,0.127,0.877,3.5,+91-9856692944
+REC_EXC_139,CPCB/EXC/2023/139,M/s. Mak Technology Industrial,"Shed No. SP-5, Veerasandra KSSIDC Industrial Estate, Phase 0-11, 3rd Cross, Huskur Min Road, Electronic City
+Post, Benga",Karnataka,12.5738,77.9488,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,204,192,0.059,0.942,0.9,+91-9607039426
+REC_EXC_140,CPCB/EXC/2023/140,M/s. Earth Sense Recycle Pvt. Ltd.,"Printech  Park Cluster 1st Phase, Plot No. A17, Kanakapura Taluk, KIADB Industrial Area Harohally Village
+Han, Harohalli",Karnataka,13.4225,77.2457,1200.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,113,102,0.097,0.904,1.8,+91-9366081786
+REC_EXC_141,CPCB/EXC/2023/141,M/s. 4R Recycling Pvt Ltd,"Shed No A-5, Industrial Estate, Peenya 3rd Stage Industrial area, Nallakadirenahalli Village, Yeshwanthpur
+Hobli, Bangal",Karnataka,12.8809,77.9887,900.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,93,89,0.043,0.958,1.6,+91-9591164942
+REC_EXC_142,CPCB/EXC/2023/142,M/s. Prakruthi Recycling Pvt. Ltd.,"Sy No. 22, Flat No. 103, 5th Block, 5th Cross, SSI Area,
+Rajajinagar, Bangalore- 560010 999.6",Karnataka,12.9431,77.6378,999.6,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,122,116,0.049,0.952,1.9,+91-9230371121
+REC_EXC_143,CPCB/EXC/2023/143,M/s. Elxion Pvt. Ltd.,"P. No. 24, 23rd A. Main Road, J.P Nagar 2nd Phase Indl Bangalore-560078 360",Karnataka,13.2326,77.7208,360.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,89,86,0.034,0.967,2.9,+91-9105290717
+REC_EXC_144,CPCB/EXC/2023/144,M/s. K. G. Nandini Enterprises,"No. 46/4, 46/5, Billakempanahalli Village, Bidadi Hobli, Ramanagaram District. 7200",Karnataka,12.5889,77.2198,7200.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,217,188,0.134,0.868,1.5,+91-9487680641
+REC_EXC_145,CPCB/EXC/2023/145,M/s. Eco Bird Recycling Company Pvt. Ltd.,"No. 185, Azeez Sait industrial Area, Nayandahalli, Mysore Road, Bangalore -39 360",Karnataka,13.2692,77.405,360.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,47,44,0.064,0.939,1.9,+91-9529584990
+REC_EXC_146,CPCB/EXC/2023/146,M/s. Afeefa Spectro Alloys,"Sy No. 289/1, Nagaragere village, Gauribidnur Tq. 290",Karnataka,13.1935,77.7516,290.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,208,181,0.13,0.871,0.8,+91-9404532525
+REC_EXC_147,CPCB/EXC/2023/147,M/s. Rashi E-Waste Solutions Pvt. Ltd.,"SW-51, Shed No. 26, Phase II, Apparel Park, Doddaballapura, Bangalore Rural District 300",Karnataka,12.6141,77.5935,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,50.0,126,116,0.079,0.922,3.1,+91-9454371485
+REC_EXC_148,CPCB/EXC/2023/148,M/s. Coral Communication and Networks Pvt. Ltd.,"No. 52, Hoskote Industrial area,
+Bangalore Rural District 8916",Karnataka,12.5048,77.1732,8916.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,132,116,0.121,0.881,2.9,+91-9959638753
+REC_EXC_149,CPCB/EXC/2023/149,M/s. Ash Recyclers,"No. 3, KSSIDC Ind Estate, Hoskote, Bangalore Rural District 120",Karnataka,12.5128,77.765,120.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,152,131,0.138,0.864,2.3,+91-9585091550
+REC_EXC_150,CPCB/EXC/2023/150,M/s. E Pragathi Recycling,"Plot No. 66, Road No. 18, Antharasanahalli Indl Area, IInd Phase,
+Tumkur 3600",Karnataka,13.0129,77.8037,3600.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,50.0,140,134,0.043,0.958,2.5,+91-9327639503
+REC_EXC_151,CPCB/EXC/2023/151,M/s Sheltron Digital systems Pvt.Ltd No.27,"maney estate, Sy.no.121, Kumbalgodu,
+Bengaluru-560074 360",Karnataka,13.0192,77.9119,360.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,43,37,0.14,0.867,2.3,+91-9745508619
+REC_EXC_152,CPCB/EXC/2023/152,M/s Tes-Amm,"India pvt. Ltd.  Sy. No. 118, Site. No. 8, Mookambika  Temple Road, Machodalli
+Forest Gate, Magadi Road, Bangalore 3240",Karnataka,12.6311,77.9664,3240.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,148,134,0.095,0.907,2.0,+91-9337784657
+REC_EXC_153,CPCB/EXC/2023/153,M/s Sonal Metacop,"No.5, Sy No.5/1, Kachohalli
+Industrial Estate, Kachohalli, Laxmipura Post, Bangalore-562123 720",Karnataka,12.4925,77.7479,720.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,185,163,0.119,0.882,1.2,+91-9823271605
+REC_EXC_154,CPCB/EXC/2023/154,M/s E-Ward & Co.  No.11,"Mutthachari
+Industrial area, Nayandahalli, Mysore road, Bangalore-560039 300",Karnataka,12.5023,77.3523,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,218,209,0.041,0.959,1.5,+91-9619857515
+REC_EXC_155,CPCB/EXC/2023/155,M/s. Swadesh Recyclers LIP,"Sy. No. 216, KIADB Industrial Area, Koorandahalli Village, Malur
+Taluk Kolar District 7800",Karnataka,13.2393,77.5994,7800.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,146,132,0.096,0.905,3.1,+91-9747259553
+REC_EXC_156,CPCB/EXC/2023/156,M/s. FR E-Waste Enterprises,"Shed No. 120, Katha No 120/B, 52120/C, 5th Cross, Azeez Saig Industrial Area, Nayandahalli, Ward No 131,
+BBMP RR Nagar Z",Karnataka,13.2646,77.7496,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,47,43,0.085,0.918,1.2,+91-9211670041
+REC_EXC_157,CPCB/EXC/2023/157,M/s. Amara metals enterprises,"No V20/1, 4th
+main, 2nd stage, Peenya Industrial Area, Bengaluru -560058 1080",Karnataka,13.1874,78.0036,1080.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,107,98,0.084,0.917,3.1,+91-9903869224
+REC_EXC_158,CPCB/EXC/2023/158,M/s. Sri sai company # R-15,"Katha
+No.320/322/29, Chikkanagamangala, Sarjapura Hobli, Anekal Taluk, Bengaluru 360",Karnataka,12.7188,77.9653,360.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,99,92,0.071,0.931,3.4,+91-9134932801
+REC_EXC_159,CPCB/EXC/2023/159,M/s. Global E-waste Management Services,"P-21, Hebbal Industrial area, Hebbal I Phase,
+Mysuru 360",Karnataka,13.3296,77.1036,360.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,76,67,0.118,0.885,0.7,+91-9829104653
+REC_EXC_160,CPCB/EXC/2023/160,M/s. Echakra Innovations Pvt Ltd SB/47,"1st
+Cross, Peenya Ind Estate-Stage-1, Bengaluru 318",Karnataka,12.8025,77.5434,318.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,162,144,0.111,0.89,3.3,+91-9110856760
+REC_EXC_161,CPCB/EXC/2023/161,M/s. HMG Eco care Recycling,"C-22 3rd cross, Kumbalagodu, Bangalore560074 300",Karnataka,12.6386,77.2622,300.0,SUSPENDED,"PCB,BATTERY,CABLE",True,20.0,30.0,78,31,0.603,0.412,2.6,+91-9943396919
+REC_EXC_162,CPCB/EXC/2023/162,M/s. Npewaste Private limited,"Plot No. 96, Koorgalli Industrial Area, Belavadi Post, Mysuru
+-570018 1200",Karnataka,13.057,77.9629,1200.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,143,139,0.028,0.972,2.1,+91-9901465363
+REC_EXC_163,CPCB/EXC/2023/163,M/s. Earth Care E-waste Private Limited.,"Plot No.15,KIADB Industrial Area, 155, Kumbalgodu, KIADB Industrial Area, Kumbalgodu Village, Kengeri Hobli, Bengaluru S",Karnataka,12.5233,77.7346,300.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,88,79,0.102,0.9,2.3,+91-9908346635
+REC_EXC_164,CPCB/EXC/2023/164,M/s. E-Plant Recycling,"Plot No. 242/A, 2"" Phase, Narasapura Industrial Area, Kolar Tq &
+District 300",Karnataka,12.6199,78.0812,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,79,77,0.025,0.975,1.9,+91-9166984430
+REC_EXC_165,CPCB/EXC/2023/165,M/s. Greens Recology,"Plot No. 415, KIADB, Vasanthanarapura Industrial Area, Tumakuru
+Taluk and District 300",Karnataka,12.9933,77.4373,300.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,155,139,0.103,0.898,3.3,+91-9844886646
+REC_EXC_166,CPCB/EXC/2023/166,M/s. India Best Way Recycling,"Shed No. 08 (Mane Industrial Estate), Sy. No. 155, Kumbalgodu Village, Kengeri Hobli, Bengaluru
+South Taluk, Bengaluru U",Karnataka,12.634,77.2829,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,131,126,0.038,0.962,1.3,+91-9794205632
+REC_EXC_167,CPCB/EXC/2023/167,M/s. Eco Trend recyclers #81 A & 82A Kachohalli Industrial Estate,"Dasanpura Hobli, Bengaluru 300",Karnataka,13.3097,78.0392,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,165,159,0.036,0.964,0.6,+91-9877168711
+REC_EXC_168,CPCB/EXC/2023/168,M/s. Extract,"Plot No. 14/A, KIADB, Attibele Indl. Area, Anekal Taluk, Bengaluru 650.04",Karnataka,13.2671,78.0133,650.04,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,77,72,0.065,0.937,1.5,+91-9784134337
+REC_EXC_169,CPCB/EXC/2023/169,M/s. Gopalan reprocessors India Pvt Ltd  No.131,"A Main Road, Industrial Suburb, Peenya
+Ii Stage, Bengaluru 600",Karnataka,13.471,77.1428,600.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,106,94,0.113,0.889,3.1,+91-9762027644
+REC_EXC_170,CPCB/EXC/2023/170,M/s. IKON Recyclers .,"Plot No.5, Ground & 2"" Floor, 2nd Cross, 2"" Main Road, Magadi Road,
+Bengaluru -560079 300",Karnataka,13.2368,78.0203,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,52,47,0.096,0.907,1.6,+91-9301302013
+REC_EXC_171,CPCB/EXC/2023/171,M/s. E-Scrappy Recyclers,"No. 106, Adrahalli main road, Byreshwara industrialEstate, Peenya
+2nd stage, Bengaluru -560091 360",Karnataka,13.0161,77.1004,360.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,75.0,178,161,0.096,0.906,1.8,+91-9296223711
+REC_EXC_172,CPCB/EXC/2023/172,M/s. Global Tech RecyclersNo-8/5,"2nd Building, 1st Cross,,Kachohalli Village &Kachohalli
+Industrial Estate,Lakshmipura Post, Dasanapura 300",Karnataka,12.8449,77.3219,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,50.0,103,97,0.058,0.943,1.6,+91-9586764313
+REC_EXC_173,CPCB/EXC/2023/173,M/s. GRKMS Private Limited,"1st Stage, Sompura,Bharathipura Dabaspet,Bengaluru-
+562111 4099.92",Karnataka,13.4231,77.9418,4099.92,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,77,71,0.078,0.924,1.9,+91-9720044330
+REC_EXC_174,CPCB/EXC/2023/174,M/s. Communication Test Design,"India Private Limited Plot No 48, Near Balaji Temple, Peenya
+II Phase, Bengaluru -560058, 1008",Karnataka,13.2365,77.9076,1008.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,180,164,0.089,0.912,2.4,+91-9735786363
+REC_EXC_175,CPCB/EXC/2023/175,M/s. JSA Web solutions,"Plot No. 93 A-4, Phase II, Jigani Industrial Area, Jigani Hobli, Anekal
+Taluk Bengaluru 360",Karnataka,13.4263,77.7493,360.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,170,153,0.1,0.901,1.0,+91-9604021955
+REC_EXC_176,CPCB/EXC/2023/176,M/s. Recycler India MGT LLP,"Plot No.679 to
+689, KIADB industrial area , Harohalli 3rd phase Kanakapura Taluk, Ramanagara District 5071.92",Karnataka,12.7284,77.3795,5071.92,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,193,182,0.057,0.944,1.3,+91-9802438019
+REC_EXC_177,CPCB/EXC/2023/177,M/s. Trishyiraya Recycling India pvt Ltd,"SW51, Apparel park, indl area, Bashettihalli & part of Arehalli, Shed no.10, Doddballapura, Bengaluru-
+561203 360",Karnataka,13.2948,77.6171,360.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,188,177,0.059,0.942,2.9,+91-9895550140
+REC_EXC_178,CPCB/EXC/2023/178,M/s. Envirotech IT Solutions No.136,"1st Floor, Shiva Farm, Magadi Main
+Road,Vrushabhavathinagar, Bengaluru -560079 312",Karnataka,12.7282,78.0575,312.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,135,117,0.133,0.869,2.3,+91-9397163893
+REC_EXC_179,CPCB/EXC/2023/179,M/s. Ace Recyclers,"Plot No. C29, KSSIDC, Industrial Estate, Hoskote Taluk, Bengaluru -
+562114 312",Karnataka,12.9868,77.6881,312.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,154,149,0.032,0.968,1.6,+91-9124245082
+REC_EXC_180,CPCB/EXC/2023/180,M/s. E-Pragathi Recycling Pvt. Ltd. Plot No. 564,"Sy.No.55 & 52, Yelladadlu Village, Vasanthanarsapura, Industrial Area, 2nd Stage,
+Kara, Hobli, Tumkur -572128 3240",Karnataka,13.2521,77.3694,3240.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,175,166,0.051,0.949,1.9,+91-9471980529
+REC_EXC_181,CPCB/EXC/2023/181,M/s. Best E-waste Recyclers Pvt Ltd.,"Plot No.459, Vasantha Narasapura Indl Area, 2nd
+Phase, Tumkur- 572138 600",Karnataka,12.6246,77.3298,600.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,179,154,0.14,0.862,1.2,+91-9985562822
+REC_EXC_182,CPCB/EXC/2023/182,M/s. E2E Recycling Buisness Pvt Ltd No.550,"Sy No.102(p)Beeragondanahalli, Village, SIA 2nd stage,Nelamangala, Bengaluru 432",Karnataka,13.0183,77.3265,432.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,31,27,0.129,0.879,2.6,+91-9762794050
+REC_EXC_183,CPCB/EXC/2023/183,M/s. Return lab Recyclers pvt ltd. P.no.68,"Sw-51, Phase-2, Doddabalapura Apparel park,
+Bengaluru-561203 360",Karnataka,12.9143,77.5404,360.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,53,46,0.132,0.873,2.3,+91-9474637669
+REC_EXC_184,CPCB/EXC/2023/184,M/s. Think Recycling Pvt Ltd Plot No b-77 KSSIDC dustrialarea,"Bommasand ra Bengaluru -
+560099 600",Karnataka,13.05,77.3688,600.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,126,117,0.071,0.93,1.5,+91-9501839173
+REC_EXC_185,CPCB/EXC/2023/185,M/s. Kerala Enviro Infrastructure Ltd,"Infrastructure Ltd E Waste Dismantling Facility, Common TSDF project, Inside Fact-CD Campus,
+Ambalamedu, Kochi 682303 12",Kerala,10.7055,75.8405,1200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,34,29,0.147,0.861,2.1,+91-9658685413
+REC_EXC_186,CPCB/EXC/2023/186,M/s. Arihant E Recycling Pvt Ltd,"Gut No.307/1, Shahada Road, Dondaicha, Tal-Sinkheda, Dist-
+Dhule. 2000 118031.5",Maharashtra,19.8443,75.894,118031.5,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,159,155,0.025,0.975,1.6,+91-9943326934
+REC_EXC_187,CPCB/EXC/2023/187,M/s. Eco-Recycling Ltd.,"Eco-House, Near Top Glass Enclave, Bhoipada,
+Near Range Office, Sativali Road, Vasai (E), Dist.
+Palghar 7200",Maharashtra,19.7167,75.274,7200.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,60,57,0.05,0.952,2.1,+91-9515222205
+REC_EXC_188,CPCB/EXC/2023/188,M/s. E-Incarnation Recycling Pvt. Ltd.  Plot ,"MIDC Area, Tarapur, Boiser, Dist: Palgar,
+Maharashtra - 401506. 950",Maharashtra,19.6742,76.0357,950.0,SUSPENDED,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,50.0,52,20,0.615,0.407,3.4,+91-9186012533
+REC_EXC_189,CPCB/EXC/2023/189,M/s. Evergreen Recyclekaro India Pvt. Ltd.,"Gut. No. 113/A, Village Pali,
+Tal. Wada, Dist. Palghar 7500",Maharashtra,20.244,76.1409,7500.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,179,155,0.134,0.867,3.1,+91-9565945588
+REC_EXC_190,CPCB/EXC/2023/190,M/s. Hi-Tech Recycling (I) Pvt. Ltd,"Property No.193, Gat No. 89, Pune-Satara Road, Shindewadi, Tal:
+Bhor, Dist:- Pune 1410",Maharashtra,20.0776,75.9959,1410.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,180,160,0.111,0.89,1.6,+91-9513698817
+REC_EXC_191,CPCB/EXC/2023/191,M/s. Justdispose Recycling Pvt Ltd. (Unit-II),"S.No. 42/5,Kaddu Industrial Estate, Sativali
+Phata,Vasai (E), Tal-Vasai,Dist- Palghar. 1200",Maharashtra,20.1885,75.7677,1200.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,84,73,0.131,0.872,2.0,+91-9385939003
+REC_EXC_192,CPCB/EXC/2023/192,M/s. Pranam Enterprises,"Sr. No. 286/116, Next to Badhe, Vill. Urali Deveshi, Tal. Haveli, Dist. Pune 1000",Maharashtra,20.1029,75.4224,1000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,111,103,0.072,0.929,3.1,+91-9607049629
+REC_EXC_193,CPCB/EXC/2023/193,M/s. Techeco E-Waste Namo LLP,"Gat No. 155 B/2, Village Dhakambe, Tal. Dindori, Dist. Nashik 9360",Maharashtra,19.9729,75.3552,9360.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,192,169,0.12,0.881,1.2,+91-9990445005
+REC_EXC_194,CPCB/EXC/2023/194,M/s. Threco Recycling LLP,"Survey No. 153-3 & 149-1,
+Hedavli, Dist- Raigad. 3000",Maharashtra,20.2271,75.8549,3000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,83,74,0.108,0.894,2.0,+91-9556352877
+REC_EXC_195,CPCB/EXC/2023/195,M/s. WE-The Recycling Company,"H. No. 2212, Sr. No. 9-1 N, Behind Essar Petrol Pump, Village
+Borpada, Tal. Bhiwandi, Dist. Thane 800",Maharashtra,20.1498,76.0432,800.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,170,153,0.1,0.901,1.9,+91-9126231747
+REC_EXC_196,CPCB/EXC/2023/196,M/s. ECO RESET PRIVATE LIMITED PLOT NO. 19/1,"MOUZA BHOWARI, KAMPTEE, NAGPUR,
+MAHARASHTRA - 441001 10200",Maharashtra,19.3867,76.177,10200.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,107,103,0.037,0.963,0.8,+91-9704844421
+REC_EXC_197,CPCB/EXC/2023/197,M/s. ECO Friend Industries,"Plot No. A-205, TTC Industrial Area, MIDC Pawane, Navi Mumbai,
+Tal. & Dist. Thane 1000
+240",Maharashtra,19.2518,75.2316,12.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,34,32,0.059,0.944,1.1,+91-9118268849
+REC_EXC_198,CPCB/EXC/2023/198,M/s. A. S. ENTERPRISES SHOP NO 4 SHANKAR TEMP,"Chembur,Mumbai Suburban -
+400089 500",Maharashtra,19.3093,75.9089,500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,128,111,0.133,0.869,1.4,+91-9533988466
+REC_EXC_199,CPCB/EXC/2023/199,M/s. AG Enterprises,"Gat No. 815 (1), Kudalwadi, Chikhli, Pune 411062 365",Maharashtra,19.4293,75.9055,365.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,132,117,0.114,0.888,2.4,+91-9216142203
+REC_EXC_200,CPCB/EXC/2023/200,M/s. Aman Trading Co. F/1,"Annasagr Market, Behind Farooqi Hotel, Kurla Andheri Road, Jarimari, Kurla (W), Mumbai 400072 100",Maharashtra,20.0995,75.9382,100.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,36,33,0.083,0.921,3.0,+91-9688748796
+REC_EXC_201,CPCB/EXC/2023/201,M/s. Ambar Enterprises Awutade,"Handewadi, Tal. Haveli, Dist. Pune 411028 250",Maharashtra,20.0208,75.2249,250.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,50.0,108,100,0.074,0.927,0.9,+91-9251655846
+REC_EXC_202,CPCB/EXC/2023/202,M/s. Amiable Electroning Pvt. Ltd. Plot No. D,"Shirawane, TTC Industrial Area, MIDC Shiewane, Nerul, Navi Mumbai 750",Maharashtra,19.8704,75.5374,750.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,202,174,0.139,0.863,0.8,+91-9305984443
+REC_EXC_203,CPCB/EXC/2023/203,M/s. Anand Computer System 2160 B,"Sadashiv Peth, Swamipuram Bldg, Shop No. 7,8,9, Pune - 411030 350",Maharashtra,19.8976,75.7132,350.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,63,56,0.111,0.892,2.5,+91-9360644066
+REC_EXC_204,CPCB/EXC/2023/204,M/s. Ancus India Reprocessing Pvt. Ltd.,"shop No. 2, Bldg. No. 1, Tiwari Estate, Vill:-Dhaniv,
+Nalasopara€, Vasai 450",Maharashtra,19.6274,75.6084,450.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,134,116,0.134,0.868,1.4,+91-9908032384
+REC_EXC_205,CPCB/EXC/2023/205,M/s. Aqsa Stamping,"Plot no. 55, Rangara Industrial Estate, 33/35, Kiravali (Adivali), Tal. Panvel, Dist. Raigad. 300",Maharashtra,20.0604,75.2903,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,63,57,0.095,0.908,2.4,+91-9589341006
+REC_EXC_206,CPCB/EXC/2023/206,M/s. ARSH RECYCLING PRIVATE LIMITED GAT No. 1,"RANJANGAON GANPATI, PUNE NAGAR
+ROAD, Ranjangaon Ganpati, Pune - 412209 2400",Maharashtra,20.1409,75.6645,2400.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,201,185,0.08,0.921,0.6,+91-9263302599
+REC_EXC_207,CPCB/EXC/2023/207,M/s. Asquare Industrial Solutions Gala No. 3,"Plot No. 35, Mulgaon, MIDC Khopoli, Tal. Khopoli, Dist.
+Raigad 300",Maharashtra,19.3363,75.9302,300.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,181,156,0.138,0.863,2.7,+91-9543461433
+REC_EXC_208,CPCB/EXC/2023/208,M/s. Avis Technoways Plot No. A-58,"MIDC Osmanabad, Dist. Osmanabad 500",Maharashtra,19.7134,76.2055,500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,215,187,0.13,0.871,3.0,+91-9395119367
+REC_EXC_209,CPCB/EXC/2023/209,M/s. Baban Plastic,"Gut No. 1, At. Sajapur, Tal. & Dist. Aurangabad 401136 500",Maharashtra,19.5165,75.2348,500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,102,92,0.098,0.904,0.5,+91-9123250723
+REC_EXC_210,CPCB/EXC/2023/210,M/s. Bharat E Waste Recycling Co. Sr. No. 189,"Vill. Waliv, Vasai-Virar City (M Corp), Palghar -
+401208. 500",Maharashtra,19.8665,75.9885,500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,143,128,0.105,0.897,1.4,+91-9589440001
+REC_EXC_211,CPCB/EXC/2023/211,M/s. Bhavesh Enterprises,"Sr. No. 225/11, Hissa No. 23, Gausiya Compound, Gate No. 1, Vill. Pimpri,
+Tal. & Dist. Thane 200",Maharashtra,19.8534,75.7963,200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,39,35,0.103,0.902,2.3,+91-9508072136
+REC_EXC_212,CPCB/EXC/2023/212,M/s. BKE RECYCLING Adsul Mala,"Shivram Nagar,Uruli Devachi,URULI DEVACHI,Pune -
+412308 300",Maharashtra,19.6237,75.646,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,201,177,0.119,0.882,0.5,+91-9254218466
+REC_EXC_213,CPCB/EXC/2023/213,M/s. Bombay Metal Works,"Sr. 54, Hissa No. 4, Dahisar Road, Pimpri, Tal & Dist: Thane 1000",Maharashtra,19.923,75.5308,1000.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,178,169,0.051,0.95,3.4,+91-9348305901
+REC_EXC_214,CPCB/EXC/2023/214,M/s. Bombay Recyclers Pvt. Ltd. Gala No. P-17,"S. No. 121/2, Balaji Industrial Park, Behind
+Hindalco Co. MIDC Taloja, Panvel, Dist. Raigad 200",Maharashtra,20.0279,75.8701,200.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,51,47,0.078,0.925,1.0,+91-9665770780
+REC_EXC_215,CPCB/EXC/2023/215,M/s. Bsqaure E-Waste Recyclers,"Gala No. 800, Survey No. 69/3, Siddhivinayak Market, Mohammadia Estate, Pimpri, Thane, Dist:
+Thane,Maharashtra. 325",Maharashtra,19.9368,75.3058,325.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,51,47,0.078,0.925,2.7,+91-9580780802
+REC_EXC_216,CPCB/EXC/2023/216,M/s. CBS EWaste Recycling Industries G.No. 18,"At. Khanapur, Tal. Akole, Dist. Ahmednagar 2500",Maharashtra,19.549,75.7789,2500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,157,143,0.089,0.912,1.9,+91-9140078991
+REC_EXC_217,CPCB/EXC/2023/217,M/s. Chaudhary Metal 80/2,"Village -Waliwali Dahisar, Mori, Mumbra Panvel Road, Group
+Grampachayat, Dist. Thane - 400612 350",Maharashtra,20.0633,75.9556,350.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,127,112,0.118,0.884,2.7,+91-9379681325
+REC_EXC_218,CPCB/EXC/2023/218,M/s. Clean Tech B/8,"Gala no:  3,  Parasnath indl Estate, Anjurphata Road, vill: Val, Tal: Bhiwandi
+Dist: Thane 360",Maharashtra,19.8675,75.4019,360.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,119,114,0.042,0.959,2.7,+91-9969647373
+REC_EXC_219,CPCB/EXC/2023/219,M/s. Connect Info Solutions India Private Lim,"Saibaba Apartment, Plot No 12, Sector 9, Near Corporation Bank, Khanda Colony, New Panvel -
+410206 130",Maharashtra,20.001,75.9726,130.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,75.0,99,95,0.04,0.96,0.9,+91-9681434990
+REC_EXC_220,CPCB/EXC/2023/220,M/s. CPG Shell Mould & Casting,"Plot No. W- 39, Additional MIDC, Satara 1000",Maharashtra,19.7001,75.936,1000.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,83,78,0.06,0.941,0.6,+91-9816766125
+REC_EXC_221,CPCB/EXC/2023/221,M/s. E Clean E Green Recycling Umar Compound,"Jabar Pada, Nalasopara, Vasai-Virar City (M
+Corp), Dist. Palghar 401208. 500",Maharashtra,19.607,76.0081,500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,32,27,0.156,0.853,1.2,+91-9971635443
+REC_EXC_222,CPCB/EXC/2023/222,M/s. Earth Sense Recycle Pvt. Ltd. A7,"Gala No.1,2 & 3, Ground Floor, Prerana Complex, Val Village, Dapoda Road, Anjurphatta, Bhiwandi, District-Thane. 750",Maharashtra,19.8122,75.8174,750.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,78,73,0.064,0.938,0.7,+91-9461800812
+REC_EXC_223,CPCB/EXC/2023/223,M/s. Eco Layer E-Waste Recycling S. No. 11,"H. No. 1/1, PT-8, S. K. Indl. Estate, Choudhary
+Compound, Vasai E, Palghar 110",Maharashtra,19.9974,76.1959,110.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,30.0,123,110,0.106,0.896,1.2,+91-9621503550
+REC_EXC_224,CPCB/EXC/2023/224,M/s. Eco Tantra LLP M-365,"Raviwar Peth, Bohari Lane, Tal. & Dist. Pune 160",Maharashtra,19.4721,75.8121,160.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,190,173,0.089,0.911,2.0,+91-9865588526
+REC_EXC_225,CPCB/EXC/2023/225,M/s. Eco Tech Recycling,"C/6, (5), Sagar Industrial Estate, S. No. 46/4, Dhumal Nagar, Vasai (E),
+Tal: Vasai, Dist: Palghar. 450",Maharashtra,19.3698,75.6238,450.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,173,152,0.121,0.88,1.6,+91-9462973233
+REC_EXC_226,CPCB/EXC/2023/226,M/s. Ecostar Recycling,"Survey No.94 Hissa No.12 Mahadev Industrial, Near Ladi Company,
+Mumbra, Dist:- Thane- 400612. 275",Maharashtra,19.4168,75.9142,275.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,138,131,0.051,0.95,1.3,+91-9871620141
+REC_EXC_227,CPCB/EXC/2023/227,M/s. EMS Scrapo,"S. No. 199, Hissa No. 3, Bharat
+Market, Khan Compound, Shil-Mahape Road, Shil, Tal. & Dist. Thane 90",Maharashtra,19.477,75.5908,90.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,34,32,0.059,0.944,0.7,+91-9761052710
+REC_EXC_228,CPCB/EXC/2023/228,M/s. Envirocare Recycling Pvt. Ltd. Unit no: ,"Uchat, Road, Village
+: Magathane, Tal : Wada Dist : Thane 500",Maharashtra,19.748,75.6508,500.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,50.0,89,77,0.135,0.868,2.8,+91-9774117271
+REC_EXC_229,CPCB/EXC/2023/229,M/s. Environment Experts,"Gala No. 11, Lane, J. K. Compound, Opp. Roshan Comp. Kherani Road, Sakinaka, Mumbai 350",Maharashtra,19.7236,75.2273,350.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,115,102,0.113,0.889,1.3,+91-9259457549
+REC_EXC_230,CPCB/EXC/2023/230,M/s. E-Recon Recycling Pvt. Ltd. Gut No. 94,"Chitegaon, Tal. Paithan, Dist. Aurangabad 500",Maharashtra,19.501,75.4858,500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,73,64,0.123,0.88,0.6,+91-9369093459
+REC_EXC_231,CPCB/EXC/2023/231,M/s. E -Refine Corporation Gut No. 24,"Plot No. 2, Dargah Road, Additional Daultabad, Tal. & Dist.
+Aurangabad 260",Maharashtra,19.8712,75.7759,260.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,99,95,0.04,0.96,2.7,+91-9307535306
+REC_EXC_232,CPCB/EXC/2023/232,M/s. E-Waste Global,"Gate No. 2, Near Theur Phata, Lonikand, Pune Nagar Road, Tal. Haveli, Dist. Pune 412216 240",Maharashtra,20.2149,75.7741,240.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,149,132,0.114,0.887,2.0,+91-9128046417
+REC_EXC_233,CPCB/EXC/2023/233,M/s. E-Waste Mart Survey No.94,"Gala No.6,Umar Compound, Jahar Pada,Nalasopara, Vasai-Virar City (M Corp), District - Palghar - 401208. 500",Maharashtra,19.3965,75.9391,500.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,114,106,0.07,0.931,1.0,+91-9194640288
+REC_EXC_234,CPCB/EXC/2023/234,M/s. General Technologies India Pvt Ltd,"Plot No. MBP-2, Building No.A-1, Office No. 1213, 12th Floor, Rupa Solitaire Building, TTC Industrial Area, Mahape, Dist",Maharashtra,19.4027,75.4392,100.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,110,107,0.027,0.973,3.1,+91-9282732842
+REC_EXC_235,CPCB/EXC/2023/235,M/s. GNG Electronics Pvt. Ltd. Sr. No. 54,"Hissa No. Dahisar Rd, Pimpri, Tal. & Dist. - Thane 750",Maharashtra,19.3192,75.9217,750.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,127,116,0.087,0.915,0.9,+91-9805181717
+REC_EXC_236,CPCB/EXC/2023/236,M/s. Go Green Recycling Unit No. 75/66,"Hasti Industrial Estate, TTC Industrial Area, Mahape, Navi Mumbai 150",Maharashtra,20.1015,75.8829,150.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,115,102,0.113,0.889,2.0,+91-9342251707
+REC_EXC_237,CPCB/EXC/2023/237,M/s. Grade Infratech Pvt. Ltd.,"Gut No. 849, Near Mahindra CIE, Ambethan Chakan, Village Chakan, Tal. Khed, Dist. Pune 300",Maharashtra,19.6075,76.192,300.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,49,45,0.082,0.922,2.8,+91-9183261653
+REC_EXC_238,CPCB/EXC/2023/238,M/s. Green Enviro Services,"118/1, Wasali, Tal. Khed, Dist. Pune 700",Maharashtra,19.2694,75.3402,700.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,43,38,0.116,0.889,2.2,+91-9103133211
+REC_EXC_239,CPCB/EXC/2023/239,M/s. GREEN INDIA E-WASTE & RECYCLING OPC PVT.,"HISSA NO. 1/A, House No. 500, POST-
+DAHISAR, District - Thane. 390",Maharashtra,20.0235,75.2411,390.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,35,31,0.114,0.892,3.0,+91-9660149681
+REC_EXC_240,CPCB/EXC/2023/240,"M/s. Green IT Recycling Center Pvt Ltd
+Plot N","MIDC Ranjangaon, Dist.- Pune - 412209 365",Maharashtra,19.3449,75.655,365.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,37,33,0.108,0.897,2.8,+91-9213566180
+REC_EXC_241,CPCB/EXC/2023/241,"M/s. Green IT Recycling Centre Pvt. Ltd.
+Gat ","Plot No. 3 & 4, Near Scienunero
+Company, Near PMT Depot, Shindewadi, Tal. Bhor, Dist. Pune 1000",Maharashtra,19.8861,76.0118,1000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,89,83,0.067,0.934,1.0,+91-9587363407
+REC_EXC_242,CPCB/EXC/2023/242,M/s. GREEN PLANET RECYCLING SOLUTIONS SURVAY ,"AT BHANDARLI, DHASAR MORI, OLD MUMBRA PANVEL ROAD, TAL THANE, DIST THANE, - 400612 550",Maharashtra,20.1087,76.12,550.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,37,35,0.054,0.949,3.0,+91-9371278692
+REC_EXC_243,CPCB/EXC/2023/243,M/s. Green Tech Solution Industries Gat No. 8,"A/p. Wakhari, tal. Pandharpur, Dist. Solapur 413304 250",Maharashtra,19.6918,75.8292,250.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,148,144,0.027,0.973,2.0,+91-9625849588
+REC_EXC_244,CPCB/EXC/2023/244,M/s. Green Valley E Waste Management Pvt Ltd ,"Village-Ghosai, Saza-Met, Tal.
+Wada, Ghonsai, Palghar - 421312 596",Maharashtra,19.9194,75.8486,596.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,75.0,157,135,0.14,0.862,0.8,+91-9226118083
+REC_EXC_245,CPCB/EXC/2023/245,M/s. Greenscape Eco Management Private Limite,Pune - 410501 900,Maharashtra,19.9709,76.1042,900.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,38,36,0.053,0.95,0.8,+91-9141156155
+REC_EXC_246,CPCB/EXC/2023/246,M/s. Hari Om Scrap Traders 957/43,"K.P. 2nd Lane,
+S. P. Road, Opp. Om
+Namahshivaya Bldg. Mumbai Central, Mumbai 49.5",Maharashtra,19.5659,75.6851,49.5,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,160,154,0.037,0.963,1.0,+91-9585087387
+REC_EXC_247,CPCB/EXC/2023/247,M/s. Harshita Green Recyclers,"Gat No. 452, Urse Talegaon Dhabade, Tal. Maval, Dist.
+Pune 500",Maharashtra,20.0775,75.3145,500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,70,66,0.057,0.944,2.7,+91-9749173944
+REC_EXC_248,CPCB/EXC/2023/248,M/s. Indian Scrap Traders Survey No. 11,"Hissa No. 3/A, Ghusia Market, Gala no: 661, Vill: Pimpari, Post : Dahisar Dist: Thane 200",Maharashtra,19.687,75.7911,200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,120,112,0.067,0.934,2.7,+91-9556742817
+REC_EXC_249,CPCB/EXC/2023/249,M/s. J Choudhary & Company Sr. No. 67/3,"Pipewal Lane Mohammadiya Estate, Pimpri Old Mumbai Pune Road, pimpri, Thane 400612 500",Maharashtra,19.5766,75.9002,500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,177,157,0.113,0.888,0.7,+91-9431047551
+REC_EXC_250,CPCB/EXC/2023/250,M/s. J.S.Enterprises Gat No-132,"Khalumbre, Chakan - 410501 650",Maharashtra,19.8944,75.9081,650.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,86,77,0.105,0.898,2.8,+91-9759740643
+REC_EXC_251,CPCB/EXC/2023/251,M/s. JRS Recycling Solutions Pvt. Ltd. Gala N,"S. No. 74, Hissa No. 2A, Garib Nawaz Estate, Old Mumbai Pune Road, Dahisar, Dist. Thane 300",Maharashtra,20.1227,75.98,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,75.0,163,153,0.061,0.939,1.0,+91-9700261985
+REC_EXC_252,CPCB/EXC/2023/252,M/s. Just Dispose Recycling Pvt. Ltd. Unit No,"110,119, Arvind Industrial Estate, Navghar, Vasai (E), Dist: Thane 1200",Maharashtra,19.6986,75.6743,1200.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,59,56,0.051,0.951,1.8,+91-9280494616
+REC_EXC_253,CPCB/EXC/2023/253,M/s. K. G. N. Traders Survey No. 11,"Hissa No. 30, Gausiya Market, Village- Pimpri, Post-Dahisar, Dist. Thane - 400612 900",Maharashtra,19.6729,75.2411,900.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,112,109,0.027,0.974,2.8,+91-9335822792
+REC_EXC_254,CPCB/EXC/2023/254,M/s. Kalawishwa Electrical,"B-47 (Sub letting), MIDC Waluj, Dist. Aurangabad 431136 300",Maharashtra,20.091,76.1957,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,48,46,0.042,0.96,1.2,+91-9616457908
+REC_EXC_255,CPCB/EXC/2023/255,M/s. Kapila Enterprises,"Gat No. 46/3, At. Post. Supa, Tal. Parner, Dist:
+Ahmednagar 250",Maharashtra,19.7922,75.3104,250.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,149,133,0.107,0.894,2.3,+91-9302884834
+REC_EXC_256,CPCB/EXC/2023/256,M/s. Kohinoor E-Waste Recycling Pvt. Ltd. Gut,"Opp. Gurudatta Washing Centre, Dhekhu, Khalapur,
+Dist. Raigad 240",Maharashtra,19.4779,75.9441,240.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,37,35,0.054,0.949,2.3,+91-9711184552
+REC_EXC_257,CPCB/EXC/2023/257,M/s. KRISHNA METAL REFINERY Plot No.1-2/143,"Sapronde Village, Taluka - Wada, District-Thane - 400086 750",Maharashtra,20.2405,75.8401,750.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,40,39,0.025,0.976,2.2,+91-9782148500
+REC_EXC_258,CPCB/EXC/2023/258,M/s. Kuldeep E-Waste Disposals,"Sr. No. 50, Waghjainagar, Mabegaon Khurd, Katraj-Ambegaon Road, Katraj, Pune - 411046 90",Maharashtra,19.3151,76.0453,90.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,218,188,0.138,0.864,3.0,+91-9653960151
+REC_EXC_259,CPCB/EXC/2023/259,M/s. Lilashana Sales,"Ramdas Company, Nandra Road, khamgaon, Dist. Buldhana 360",Maharashtra,20.2073,75.239,360.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,211,192,0.09,0.911,0.9,+91-9490050450
+REC_EXC_260,CPCB/EXC/2023/260,M/s. MAC FIX STATION OFFICE NO 201,"MAKHIJA ARCADE, 35TH ROAD,
+KHAR BANDRA LINKING ROAD, Bandra,
+Mumbai Suburban - 400052 800",Maharashtra,20.144,75.6573,800.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,208,184,0.115,0.886,0.9,+91-9677721749
+REC_EXC_261,CPCB/EXC/2023/261,M/s. Mahalaxmi E- Recyclers Pvt. Ltd.Plot NO.,"Subplot No. 3A, Ramtekde Industrial Area, Hadapsar, Tal. Haveli, Dist. Pune 525",Maharashtra,20.0383,76.1847,525.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,134,123,0.082,0.919,1.7,+91-9707652053
+REC_EXC_262,CPCB/EXC/2023/262,M/s. Maharashtra Enterprises,"Plot No. 17, Rangara Industrial estate, Kiravali (Adivali), Old Thane
+Pune Road, Tal. Panvel, Dist. Raigad 500",Maharashtra,19.5059,75.5758,500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,165,146,0.115,0.886,3.4,+91-9449382748
+REC_EXC_263,CPCB/EXC/2023/263,M/s. Mahesh Traders Plot No. 316,"Shree Shahu Market Yard, Tal. Karveer, Dist. Kolhapur 107",Maharashtra,19.7245,75.8364,107.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,218,187,0.142,0.859,0.6,+91-9457844103
+REC_EXC_264,CPCB/EXC/2023/264,M/s. Manihar Enterprises,"Survey No. 74, Village Goteghar, Tal. Thane , Dist. Thane 1000",Maharashtra,19.2882,75.3219,1000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,135,120,0.111,0.891,1.3,+91-9386397783
+REC_EXC_265,CPCB/EXC/2023/265,M/s. Manish Metal Gat No 925,"Near Ashtekar Bangla, A/P- Theur, Dist- Pune - 412110 550",Maharashtra,19.3386,75.831,550.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,70,60,0.143,0.861,2.6,+91-9961557642
+REC_EXC_266,CPCB/EXC/2023/266,M/s. Map Trading Company Gat No. 670,"Villoli, Tal. & Dist. Nashik 422010 500",Maharashtra,19.383,75.4886,500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,138,128,0.072,0.929,1.4,+91-9980728166
+REC_EXC_267,CPCB/EXC/2023/267,M/s. Masstech Recycling LLP Gala no 56,"58, 59 & 82, M.J.K. Compound, Kherani Road, Sakinaka, Mumbai - 400072 - 400072 400",Maharashtra,20.2055,75.9353,400.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,187,166,0.112,0.889,0.6,+91-9622258259
+REC_EXC_268,CPCB/EXC/2023/268,M/s. Mauli  Metals,"Gut  No.  222,  At  Kadachi  Wadi, Post                                                          Chakan,
+Tal. Khed, Dist",Maharashtra,19.9381,75.3284,360.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,176,163,0.074,0.927,2.8,+91-9404975584
+REC_EXC_269,CPCB/EXC/2023/269,M/s. Mayra   Corporation,"Plot   No.   C-157,   MIDC Malegaon,
+Tal. Sinnar, Dist. Nashik 30",Maharashtra,19.6557,75.535,30.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,80,74,0.075,0.927,2.0,+91-9696447794
+REC_EXC_270,CPCB/EXC/2023/270,M/s. Mukesh Metal Sr. No. 93,"Hissa No. 1, Behind
+Deepesh   Lodge   Gotegar   Uttarshiv,   Mumbra Road, Dist. Thane 400",Maharashtra,20.1648,75.8265,400.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,30.0,31,28,0.097,0.909,2.1,+91-9710474279
+REC_EXC_271,CPCB/EXC/2023/271,M/s. Nagraj  E-Waste  Recycling  S.No.41  Vil,"Industrial Area, India",Maharashtra,20.0715,75.9088,1800.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,130,113,0.131,0.871,1.1,+91-9386573975
+REC_EXC_272,CPCB/EXC/2023/272,"M/s. National Traders
+S. No. 103/1/2","Undri-Saswad Road, Autade,
+Handewadi, Tal. Haveli, Dist. Pune 250",Maharashtra,19.9038,76.0595,250.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,148,136,0.081,0.92,2.9,+91-9943615419
+REC_EXC_273,CPCB/EXC/2023/273,M/s. National Trading Corporation,"S. No. 56/1, Plot No. 18 & 19, Old Mumbai-Panvel Road, Village Pimpri, Tal. & Dist. Thane 140",Maharashtra,19.4778,75.5981,140.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,52,46,0.115,0.889,0.5,+91-9615620858
+REC_EXC_274,CPCB/EXC/2023/274,M/s. Navkar   RecyclingSr.   No.   69,"Hissa   No.   15, Mahamadiya   Estate,   Mumbai   Panvel   Road, Post. Dahisar, Dist.Thane 1000",Maharashtra,19.8526,75.9195,1000.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,194,187,0.036,0.964,3.3,+91-9485554194
+REC_EXC_275,CPCB/EXC/2023/275,M/s. New                     Ecotech         ,"Hissa   no.   364,   At   Post   - Khaniwade,                                                 Taluka
+-Vasai, District- P",Maharashtra,19.2769,75.8597,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,75.0,155,144,0.071,0.93,2.5,+91-9554318404
+REC_EXC_276,CPCB/EXC/2023/276,M/s. New India Scrap Traders,"Plot No. 31/E, Ashok Nagar, Dist. Aurangabad 150",Maharashtra,19.7826,76.0556,150.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,138,134,0.029,0.971,0.6,+91-9123429562
+REC_EXC_277,CPCB/EXC/2023/277,M/s. New                    Shivam           ,"Gala No. 326, At. Post. Khandale, Near Suruchi Dairy, Dist. Pune 4800",Maharashtra,19.7834,75.3497,4800.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,136,123,0.096,0.906,1.7,+91-9371468805
+REC_EXC_278,CPCB/EXC/2023/278,M/s. NICHOLAS   RECYCLING   PRIVATE   LIMITED,"Sativali Road, Valiv. 500",Maharashtra,20.0077,75.6724,500.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,199,180,0.095,0.905,3.2,+91-9542136259
+REC_EXC_279,CPCB/EXC/2023/279,M/s. Noble Trading Company,"S. No. 11, Hissa No. 23, Gausiya Market, Village Pimpari, Old M. P. Road, Tal. & Dist. Thane 265",Maharashtra,20.2464,75.7593,265.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,138,134,0.029,0.971,2.1,+91-9762047908
+REC_EXC_280,CPCB/EXC/2023/280,M/s. Om                                      ,"19/2   mangalwar   peth pune., Peth, Dist. Pune 100",Maharashtra,19.7294,75.7462,100.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,116,105,0.095,0.907,3.0,+91-9997707116
+REC_EXC_281,CPCB/EXC/2023/281,M/s. OM R V Interiors,"S. N. 92, Hissa No. 3, At Pelhar, Tal. Vasai, Dist Palghar 250",Maharashtra,19.4461,75.2715,250.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,97,87,0.103,0.899,2.2,+91-9933411554
+REC_EXC_282,CPCB/EXC/2023/282,M/s. Pakeeza Traders,"Plot No. 406, 407, 408, At. Soyapur, Tal. & Dist. Aurangabad 720",Maharashtra,19.402,76.0307,720.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,50.0,133,119,0.105,0.896,2.4,+91-9964628900
+REC_EXC_283,CPCB/EXC/2023/283,M/s. Perfect E-Waste Recyclers,"Plot No. A-8/1, MIDC Chikhalthana, Tal. & Dist. Aurangabad 184",Maharashtra,19.9823,75.3619,184.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,93,86,0.075,0.926,2.7,+91-9243394476
+REC_EXC_284,CPCB/EXC/2023/284,M/s. Poona E-Waste Solutions,"1/1009, Gat No. 2334/4, Wagholi, Pune 412207 250",Maharashtra,19.71,75.2519,250.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,213,190,0.108,0.893,0.6,+91-9739073808
+REC_EXC_285,CPCB/EXC/2023/285,M/s. Prabhunath Traders,"Sr. No. 314, H. No. 2, uril Devachi, Tal. Haveli, Dist. Pune 1680",Maharashtra,20.2006,75.7268,1680.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,212,191,0.099,0.902,2.1,+91-9369344701
+REC_EXC_286,CPCB/EXC/2023/286,M/s. Process Recycling Gala No,"2, S.No 302, Richard Compound Near Maharashtra Vajan Kata,
+umang pharma road vasai phata, Dist. Palghar 125",Maharashtra,20.0133,75.6004,125.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,208,201,0.034,0.967,1.7,+91-9432941234
+REC_EXC_287,CPCB/EXC/2023/287,"M/s. Progressive Recycler LLP. MIDC Chakan
+In","D-45, Tal:- khed, Dist:-Pune 295",Maharashtra,19.8536,75.8053,295.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,101,97,0.04,0.961,2.4,+91-9308026336
+REC_EXC_288,CPCB/EXC/2023/288,M/s. Pune Greens Electronic Waste Recycler Pv,"B-4/1, Handewadi Road,
+Hadapsar, Pune 500",Maharashtra,20.1446,75.2764,500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,218,211,0.032,0.968,2.8,+91-9869904661
+REC_EXC_289,CPCB/EXC/2023/289,M/s. R T Corporation,"S.No.377, H.No.2, Ambisi Ganeshpuri Road, Village- Palsai, Tal: Wada, Dist-Palghar. 3000",Maharashtra,19.9392,75.9366,3000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,155,145,0.065,0.936,2.9,+91-9223522711
+REC_EXC_290,CPCB/EXC/2023/290,M/s. R.K.E-Recycling International LLP Gala n,"Tirupati Industrial Park, Sativali Road, Vasai East- 401208 130",Maharashtra,19.9846,75.7425,130.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,142,123,0.134,0.868,0.5,+91-9494202403
+REC_EXC_291,CPCB/EXC/2023/291,M/s. Recycling Future,"S. No. 169, Bhangarpada, Post Kundevahll, Tal. Panvel. Dist. Raigad 500",Maharashtra,20.0856,75.9544,500.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,156,150,0.038,0.962,2.3,+91-9480554343
+REC_EXC_292,CPCB/EXC/2023/292,M/s. Regreen Recycling FLT 205,"POCKET 5, GANESHWADI CHS LTD., BLDG 5, BHIM NAGAR
+MIDC ANDHERI EAST, Mumbai Suburban -
+400093 120",Maharashtra,19.6506,75.937,120.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,104,93,0.106,0.896,2.4,+91-9430887116
+REC_EXC_293,CPCB/EXC/2023/293,M/s. Reteck Envirotech Pvt. Ltd. Plot No. 4 A,"MIDC Taloja, Tal. Panvel, Dist. Raigad 2500",Maharashtra,20.1992,75.2862,2500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,148,142,0.041,0.96,2.6,+91-9315719099
+REC_EXC_294,CPCB/EXC/2023/294,M/s. Right E-waste Recycle,"S. No. 40/2/C, 40/3, Nashik Highway, Kalyan Sape Road, Tal.
+Bhiwandi. Dist. Thane 400",Maharashtra,19.3967,75.924,400.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,63,56,0.111,0.892,1.4,+91-9754250615
+REC_EXC_295,CPCB/EXC/2023/295,M/s. Rolex Entrprises,"Survey No. 218, Hissa No. 4/1, Dahisar, Navi Mumbai 500",Maharashtra,19.6566,76.12,500.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,187,182,0.027,0.974,1.1,+91-9813486098
+REC_EXC_296,CPCB/EXC/2023/296,M/s. Royal Scrap Traders,"Gut No. 23, Plot No. 8, Mayurnagar, Naregaon, Dist. Aurangabad 230",Maharashtra,19.8993,75.3368,230.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,39,37,0.051,0.951,0.7,+91-9884335007
+REC_EXC_297,CPCB/EXC/2023/297,M/s. S. S. E-Waste Recyclers,"Gut No. 442, Village Usar, Kondla Road, Tal. Wada, Dist. Palghar
+421312 1500",Maharashtra,19.7778,75.6771,1500.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,59,54,0.085,0.918,3.3,+91-9191952593
+REC_EXC_298,CPCB/EXC/2023/298,M/s. S.K. Enterprises Plot No: 134 Paiki Sub ,"Ahmednagar Industrial Estate Co-Op. Society Ltd, Nagpur-Pune Road, Ta & Dist -
+Ahmedanagar-414005. 5000",Maharashtra,19.6529,75.3725,5000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,134,127,0.052,0.949,0.8,+91-9911918576
+REC_EXC_299,CPCB/EXC/2023/299,M/s. S K Enterprises,"S. No. 77, Hissa No. 1, Hindustan Market, Dieghar, Tal. Shil, Dist. Thane 300",Maharashtra,19.7626,75.2608,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,37,31,0.162,0.846,3.3,+91-9455260223
+REC_EXC_300,CPCB/EXC/2023/300,M/s. S. N. Brothers,"S. No. 305, Dongaripada, Near Classic Company, Vasai- Virar (M. Corp.), Dist
+Palghar 180",Maharashtra,19.5678,75.3158,180.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,201,186,0.075,0.926,3.2,+91-9889489804
+REC_EXC_301,CPCB/EXC/2023/301,M/s. Saani Enterprises,"Gut No. 64, Plot No. 65, Mahal Pimpri, Dist. Aurangabad 1200",Maharashtra,19.6739,75.5912,1200.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,186,168,0.097,0.904,3.0,+91-9855260342
+REC_EXC_302,CPCB/EXC/2023/302,M/s. Sadab Traders Plot No. 1154,"Gat No. 140/2A/1, Village Vilholi, Behind Jain Temple, Tal & Dist.
+Nashik - 422010 300",Maharashtra,19.2559,75.3809,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,46,43,0.065,0.938,1.4,+91-9552538900
+REC_EXC_303,CPCB/EXC/2023/303,M/s. SAHARA ENTERPRISES GAT N0 65 DEHU ALANDI,"CHIKHALI, TAL.HAVELI DIST.PUNE -
+411062 160",Maharashtra,19.7269,75.8482,160.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,77,69,0.104,0.899,1.8,+91-9992063022
+REC_EXC_304,CPCB/EXC/2023/304,M/s. Sahara Traders,"Gala No. 1, Ground Floor,
+Kalyan Road, Temghar, Tal. Bhiwandi, Dist. Thane 700",Maharashtra,19.3625,75.8483,700.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,42,38,0.095,0.909,1.7,+91-9620385160
+REC_EXC_305,CPCB/EXC/2023/305,M/s. Sayma E-Waste Solutions,"S. No. 323, Hissa no. 3, A Plot No. B-27, Urali Devashi, Tal. Haveli, Pune 335",Maharashtra,19.9089,75.6862,335.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,138,131,0.051,0.95,1.4,+91-9686696407
+REC_EXC_306,CPCB/EXC/2023/306,M/s. Scape E Recycler Private Limited Near Bu,"Behind Hotel Chandralok,Shikshak Colony, Purna Dist. Parbhani,Purna ,Parbhani -
+431511 235",Maharashtra,20.1823,75.3396,235.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,211,196,0.071,0.93,1.4,+91-9605886946
+REC_EXC_307,CPCB/EXC/2023/307,M/s. Shabbir Traders Plot No. P/15 & 16,"Sr. No. 119/120/121, Balaji Industrial Park, Behind Hindalco, Vill. Tondre, Tal. Panvel, Dist.
+Raigad 300",Maharashtra,19.9184,76.0372,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,103,88,0.146,0.857,3.2,+91-9479096833
+REC_EXC_308,CPCB/EXC/2023/308,M/s. Shifa Traders,"Gut No. 63, Dehu Moshi Road, Kudalwadi, Chikhali, Tal. Mulshi, Dist. Pune 300",Maharashtra,19.2708,75.3383,300.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,50.0,46,44,0.043,0.958,0.5,+91-9648239768
+REC_EXC_309,CPCB/EXC/2023/309,M/s. Sigma Enterprises,"Plot No. 5 & Gut No. 54/0, Adiwali, Tal. Panvel, Raigad 350",Maharashtra,20.215,75.7329,350.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,133,116,0.128,0.874,0.9,+91-9172789684
+REC_EXC_310,CPCB/EXC/2023/310,M/s. SK E-Waste Disposal,"Gat No. 116, Fine Weight Bridge, Jadhavwadi, Chikhali, Tal: Haveli, Dist:
+Pune. 250",Maharashtra,19.3279,75.5965,250.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,164,141,0.14,0.861,1.5,+91-9177139897
+REC_EXC_311,CPCB/EXC/2023/311,M/s. SOLAPUR ECON RECYFINE PLOT NO. K-47 MIDC,"Taluka - MOHOL, Chincholikati, Solapur - 413255 750",Maharashtra,19.4748,75.8558,750.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,164,158,0.037,0.964,0.6,+91-9738062922
+REC_EXC_312,CPCB/EXC/2023/312,M/s. Spas Computers Pvt. Ltd. 7 & 12,"Hema Industrial Estate, Premises, Cos Ltd. Sarvodaya
+Nagar, Rajmata Jijai Road, Jogeshwari E 500",Maharashtra,20.0813,75.82,500.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,88,78,0.114,0.889,2.6,+91-9904784284
+REC_EXC_313,CPCB/EXC/2023/313,M/s. Star Envo Recycling (I) Private Limited,"Gala No 3, Survey No. 11, Hissa No. 1/1, Choudhary Compound, Wakanpada, Pelhar, Waliv, Vasai
+(E), Tal. Vasai, Dist. Palg",Maharashtra,19.4981,75.698,250.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,50.0,133,129,0.03,0.97,2.1,+91-9748356819
+REC_EXC_314,CPCB/EXC/2023/314,M/s. Sultan Disposal Stores,"S. No. 28/2A/B, Undri, Opp. R Point, Pune Saswad Road, Tal. Haveli,
+Dist. Pune 411028 600",Maharashtra,19.796,76.1767,600.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,135,130,0.037,0.964,2.8,+91-9436289068
+REC_EXC_315,CPCB/EXC/2023/315,M/s. Suritex Pvt.Ltd. Plot No. B-111,"MIDC Industrial Area, Butibori, District - Nagpur. 360",Maharashtra,19.5277,76.1956,360.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,94,84,0.106,0.896,1.5,+91-9266700600
+REC_EXC_316,CPCB/EXC/2023/316,M/s. THE2BROS 70 AS KURLA ANDHERI ROAD,"OPP JARIMARI
+TEMPLE,Chandivali,Mumbai Suburban - 400072 275",Maharashtra,20.1416,75.9216,275.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,34,31,0.088,0.917,1.8,+91-9676706101
+REC_EXC_317,CPCB/EXC/2023/317,M/s. Trekomac Refurbs Pvt. Ltd. Plot No,"G-3, Five Star MIDC Kagal Hatkanangale, Tal. Kagal, Dist.
+Kolhapur 400",Maharashtra,19.6671,75.5158,400.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,75,65,0.133,0.87,3.3,+91-9146619069
+REC_EXC_318,CPCB/EXC/2023/318,M/s. Unity Enterprises,"Gut No. 1745. Ranjangaon Ganpati, Tal. Shirur, Dist. Pune 1200",Maharashtra,19.7112,75.7605,1200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,35,31,0.114,0.892,3.2,+91-9848823147
+REC_EXC_319,CPCB/EXC/2023/319,M/s. Universal Waste Management Gala No. B-10,"D.
+P. K. Compound, Khairani Road, Sakinaka,
+Mumbai – 400072 - 400072 310",Maharashtra,20.0951,76.1951,310.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,45,42,0.067,0.936,3.5,+91-9971964346
+REC_EXC_320,CPCB/EXC/2023/320,M/s. Vatsala Enterprises,"Gut. No. 183-6, Village Rajapur, Tal. Sangamner, Dist. Ahmednagar 280",Maharashtra,20.2326,75.7834,280.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,84,74,0.119,0.884,3.4,+91-9916506115
+REC_EXC_321,CPCB/EXC/2023/321,M/s. Vora Computers Pvt. Ltd. 1B,"Lara Apartments, Sadhu Vaswani Chowk, Hotel Woodland Lane,
+1/D/3, Tal. & Dist. Pune 50",Maharashtra,20.0809,75.946,50.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,30.0,109,106,0.028,0.973,1.7,+91-9547629673
+REC_EXC_322,CPCB/EXC/2023/322,M/s. Wonder Print Technologies Plot No. M-36,"MIDC Ambad, Dist. Nashik 300",Maharashtra,19.7284,75.9322,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,216,210,0.028,0.972,2.8,+91-9542657835
+REC_EXC_323,CPCB/EXC/2023/323,M/s. Yasin Scrap,"Gut No. 546, Shed No. 1, Jadhav Vasti, Village Wagholi, Tal. Haveli, Dist. Pune 200",Maharashtra,19.2636,75.2229,200.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,200,173,0.135,0.866,1.5,+91-9521087553
+REC_EXC_324,CPCB/EXC/2023/324,M/s. Unique Eco Recycle,"Plot No. 26, Industrial Area, Palda, Indore (Madhya Pradesh) 6000 13600",Madhya Pradesh,22.9881,78.9652,13600.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,122,111,0.09,0.911,0.5,+91-9750185443
+REC_EXC_325,CPCB/EXC/2023/325,M/s.  Moonstar  Enterprises  Pvt.  Ltd.,"Plot  No. 24/A, 24/D, 24/A-1, 21/D, 21/E, 21/E-1, Sector-B,
+Sanwer Road, Industrial Area Indore (MP) 3600",Madhya Pradesh,22.7623,78.5547,3600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,100,90,0.1,0.902,0.8,+91-9240093021
+REC_EXC_326,CPCB/EXC/2023/326,M/s. Prometheus Recycling Private Limited,"786/4, 799/1, 800,, Dilawar Ka pura, Susera, Tal: Gird Dist: Gwalior, SIDC 4000",Madhya Pradesh,23.3918,79.1078,4000.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,145,131,0.097,0.905,1.6,+91-9772725315
+REC_EXC_327,CPCB/EXC/2023/327,M/s.  Sani  Clean  (P)  Ltd.,"Plot  No.  802/947,  at-Tangiapada, Niala, Dist-Khurda 3000 9050",Odisha,21.299,85.5007,9050.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,88,78,0.114,0.889,1.2,+91-9986138048
+REC_EXC_328,CPCB/EXC/2023/328,M/s.   Varun   infra   Steel   Pvt.   Ltd.   Plot   No. 1991/3942,"At/P.O. Brahmani Tarang, Vedvyas, Rourkela-769004, Dist-Sundargarh 730",Odisha,20.6269,85.4653,730.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,85,79,0.071,0.931,1.5,+91-9485085298
+REC_EXC_329,CPCB/EXC/2023/329,M/s. Jagannath E-Waste Recyclers,"At-Pinchuli,
+P.O. Purushottampur, Dist-Ganjam 500",Odisha,20.7342,84.9516,500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,161,154,0.043,0.957,2.0,+91-9979094387
+REC_EXC_330,CPCB/EXC/2023/330,M/s.  P  K  Enterprises,"Plot  No.293/525,  Khata No.127/4 At /P.O. Kalunga,Dist-Sundargarh 730",Odisha,20.6562,84.8538,730.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,50.0,97,86,0.113,0.889,2.0,+91-9784669634
+REC_EXC_331,CPCB/EXC/2023/331,M/s Mirtunjai Udyog(Dismantler),"At-AA/2, Civil Township, Rourkela Distt- Sundargarh 730",Odisha,20.5468,85.4252,730.0,SUSPENDED,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,33,13,0.606,0.429,2.0,+91-9267909846
+REC_EXC_332,CPCB/EXC/2023/332,M/s.    Cosmic    Net,"B-25,    Saheed    Nagar, Bhubaneswar, 360",Odisha,20.4971,84.8885,360.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,198,170,0.141,0.86,0.7,+91-9581793349
+REC_EXC_333,CPCB/EXC/2023/333,M/s Ecokart Technology Pvt. Ltd.,"At/PO/Mouza-Kuradhamala, Daleiput, Dist-Khordha, M-
+7008551392 3000",Odisha,20.5063,85.5716,3000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,157,135,0.14,0.862,1.1,+91-9358061131
+REC_EXC_334,CPCB/EXC/2023/334,M/s Ramky Enviro Engineer Ltd.,"Vill. Nimbuan, Tehsil Dera Bassi, District SAS Nagar. 1200 10092",Punjab,30.8714,75.5042,10092.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,79,76,0.038,0.963,2.6,+91-9386815642
+REC_EXC_335,CPCB/EXC/2023/335,M/s  Spreco  Recycling,"D-45,  Industrial  Area, Focal Point, Raikot, District Ludhiana. 240",Punjab,30.9185,74.9666,240.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,83,77,0.072,0.929,1.6,+91-9806392054
+REC_EXC_336,CPCB/EXC/2023/336,M/s K.J. Recycler,"C-38, Sanjay Gandhi Nagar, Industrial Area, Jalandhar 600",Punjab,31.1916,75.5505,600.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,168,157,0.065,0.935,1.3,+91-9536170563
+REC_EXC_337,CPCB/EXC/2023/337,M/s   Black   Diamond   Cements   Pvt.   Ltd.,"(E-Waste    Dismantling    &    Recycling    Facility), Village  Humayunpur,  Nariangarh  Road,  Tehsil Dera Bassi, Dist",Punjab,31.5963,75.4734,2400.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,80,72,0.1,0.902,1.8,+91-9783007169
+REC_EXC_338,CPCB/EXC/2023/338,M/s.Cosmos  Recycling  Grewal  Nagar,"Street No. 2, VPO Hambran Jagroan, Ludhiana 450",Punjab,31.3443,75.5555,450.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,196,188,0.041,0.96,1.3,+91-9345117690
+REC_EXC_339,CPCB/EXC/2023/339,M/s.  Stellar  Recycling  LLP  Village  Lakhowal ( H.B.No.190 ),Tehsil & District Ludhiana 3600,Punjab,30.699,74.9834,3600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,110,103,0.064,0.938,2.5,+91-9895961452
+REC_EXC_340,CPCB/EXC/2023/340,M/s    Kumar    Enterprises,"Malerkotla    Road, village dulladi, teh nabha, Distt. Patial 1002",Punjab,31.5942,75.3375,1002.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,61,55,0.098,0.905,1.7,+91-9208204882
+REC_EXC_341,CPCB/EXC/2023/341,M/s. Green Bird Recycling,"223, Hadbast, Vill. Magarh, Kohara Macchiwara Road, Ludhiana 600",Punjab,31.4293,74.9656,600.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,161,149,0.075,0.926,3.0,+91-9299416696
+REC_EXC_342,CPCB/EXC/2023/342,M/s. H.M.E-waste Management G1-226,"RIICO Ind.Area, Kehrani Bhiwadi (Extn.) Tijara Distt-
+Alwar 895 82007.67",Rajasthan,27.0581,74.2586,82007.67,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,93,87,0.065,0.937,1.7,+91-9665711738
+REC_EXC_343,CPCB/EXC/2023/343,M/s. Dhruv Techengineers Pvt. Ltd.,"G-1209, Rampur mandana, Industrial Area, Bhiwadi,
+Alwar 2575",Rajasthan,27.4031,74.5267,2575.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,144,132,0.083,0.918,1.3,+91-9636330167
+REC_EXC_344,CPCB/EXC/2023/344,M/s  Greenscape  Eco Management Pvt.(Unt-II),F-588 & 591 MIA Alwar 49170,Rajasthan,27.4591,74.5686,49170.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,41,36,0.122,0.884,1.1,+91-9794304907
+REC_EXC_345,CPCB/EXC/2023/345,M/s Greenscape Eco Management Pvt Ltd F-584-585,"MIA, Alwar 1200",Rajasthan,27.1451,74.0519,1200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,62,55,0.113,0.891,1.5,+91-9862532565
+REC_EXC_346,CPCB/EXC/2023/346,M/s  ETCO  E-waste  Recycler  pvt.  ltd,"SB-23, Shilp Bari Road, 1415 VKI Area, Jaipur 1446",Rajasthan,26.8563,73.7745,1446.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,164,153,0.067,0.934,2.8,+91-9251478399
+REC_EXC_347,CPCB/EXC/2023/347,M/s. Universal E-Waste Recycling,"G1-117 (B), RIICO Industrial Area, Alwar 450",Rajasthan,27.2747,73.8193,450.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,86,74,0.14,0.864,2.1,+91-9870365456
+REC_EXC_348,CPCB/EXC/2023/348,M/s  Green  Leaf  Recycling  Industries,"G-166-167, West part, RIICO Ind Area Bagru Jaipur 1380",Rajasthan,26.6269,74.2657,1380.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,50.0,198,175,0.116,0.885,1.7,+91-9161316090
+REC_EXC_349,CPCB/EXC/2023/349,M/s   Shukla   E-Waste   Processors,"H-309   (B) RIICO Industrial Area, Bhiwadi, Tijara, Alwar. 795",Rajasthan,27.1293,74.2347,795.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,50.0,51,44,0.137,0.868,0.7,+91-9424629148
+REC_EXC_350,CPCB/EXC/2023/350,M/s  Vasoo  Metals,"(Division-III)  G-287,  MIA, Alwar 822.67",Rajasthan,27.4493,73.7862,822.67,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,75.0,140,129,0.079,0.923,0.5,+91-9629396869
+REC_EXC_351,CPCB/EXC/2023/351,M/s.   GS   International,"G1-101,   Shri   Khatu Shyam Ji Ind. Complex, Ringus, Sikar 600",Rajasthan,26.7747,74.3939,600.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,129,114,0.116,0.885,3.1,+91-9944964928
+REC_EXC_352,CPCB/EXC/2023/352,M/s.  Adatte  E-Waste  Management  Pvt.  Ltd.,"C6/23,  Opposite  to  Post  Office  ,  Safdarganj Development Area, New Delhi 1825",Rajasthan,26.6409,74.167,1825.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,208,200,0.038,0.962,2.8,+91-9637750371
+REC_EXC_353,CPCB/EXC/2023/353,M/s.  Green  Recycling  Waste  Management,"J-983, RIICO Ind. Area, Chopanki, Tijara, Alwar 303",Rajasthan,27.2249,74.398,303.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,97,94,0.031,0.97,1.9,+91-9991553664
+REC_EXC_354,CPCB/EXC/2023/354,M/s. PWL Ventures,"B137, Queen Road, Vidyut Nagar  B,  Jaipur  (Plot  no.-  F142,  Road  no.-6,
+RIICO Ind. Area, Bindayka, Jaipur) 5000",Rajasthan,26.7443,74.4436,5000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,50.0,174,160,0.08,0.92,1.8,+91-9497823394
+REC_EXC_355,CPCB/EXC/2023/355,M/s. Green India Waste Management,"G-1/565, RIICO Ind. Area, Khuskhera, Tapukaa, Bhiwadi,
+Alwar 1200",Rajasthan,27.4139,73.8022,1200.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,102,93,0.088,0.913,2.3,+91-9586584080
+REC_EXC_356,CPCB/EXC/2023/356,M/s EPRAGATHI Recycling Pvt. Ltd.,"P.No. 29, SKS Industrial Area Ringus, Tehsil- Srimadhopur,
+Distt- Sikar- 332404 2400",Rajasthan,27.0707,74.3886,2400.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,68,60,0.118,0.886,0.7,+91-9793728691
+REC_EXC_357,CPCB/EXC/2023/357,M/s Hydro Engineers,"H1-929, RIICO Industrial Area, Chopanki, Bhiwadi, District- Alwar 450",Rajasthan,26.5375,73.9663,450.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,90,81,0.1,0.902,2.3,+91-9842478154
+REC_EXC_358,CPCB/EXC/2023/358,M/s. Urban Metals,"E-2118, Ramchandrapura RIICO Industrial area,
+Sitapura, Tehsil: Sanganer, District-Jaipur 480",Rajasthan,27.1186,74.0901,480.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,75.0,193,187,0.031,0.969,2.9,+91-9733284994
+REC_EXC_359,CPCB/EXC/2023/359,M/s. Fateh Enviro Lab,"Khasra No. 1036/14, Industrial Area, Jasol,
+Balotra, Barmer 344022 350",Rajasthan,27.1406,74.4608,350.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,102,90,0.118,0.885,2.1,+91-9180975216
+REC_EXC_360,CPCB/EXC/2023/360,M/s Abaad Developers Private,"Limited at G1-747, RIICO INDUSTRIAL AREA, CHOPANKI,
+BHIWADI, Alwar Rajasthan, 301019. 700",Rajasthan,27.389,74.6332,700.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,216,197,0.088,0.913,3.1,+91-9692509050
+REC_EXC_361,CPCB/EXC/2023/361,M/s Green Web Recycling,"H1-865, Industrial Area, Manda-II, Chomu,
+Jaipur 303702 1050",Rajasthan,27.2293,74.1455,1050.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,121,110,0.091,0.911,1.4,+91-9932877706
+REC_EXC_362,CPCB/EXC/2023/362,M/s Eraw Waste Management LLP,"Plot no E-44, RIICO Industrial Area, Sarekhurd, Tijara, Alwar 1690",Rajasthan,27.1226,73.919,1690.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,117,113,0.034,0.966,1.3,+91-9785781965
+REC_EXC_363,CPCB/EXC/2023/363,M/s Golden Green Recyclers,"G1-11, S.K.S. Industrial Area, Ringus, Sri
+Madhopur Ringus, Sikar 332404 750",Rajasthan,26.5353,74.1267,750.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,186,161,0.134,0.867,3.3,+91-9665606854
+REC_EXC_364,CPCB/EXC/2023/364,M/s. Vinay Traders,"F-241-242, RIICO Ind. Area, Palra, Ajmer 2500",Rajasthan,27.2444,74.5444,2500.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,85,78,0.082,0.92,1.6,+91-9545771070
+REC_EXC_365,CPCB/EXC/2023/365,M/s  GPS  International,"G1-119  Industrial  Area Manda Phase-I, Chomu, Jaipur- 303712 900",Rajasthan,26.6004,74.5905,900.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,84,81,0.036,0.965,2.4,+91-9630515120
+REC_EXC_366,CPCB/EXC/2023/366,M/s Greenlet Recyclers Private Limited,"Plot No G-15-G,                                                    Sotanala
+Industrial Area, Behror, Tehsil- Behror, Dis",Rajasthan,27.0294,74.659,1500.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,166,144,0.133,0.869,2.0,+91-9932635541
+REC_EXC_367,CPCB/EXC/2023/367,M/s Marss Recycler Private Limited G-5 Industrial Area Manda,"Tehsil-
+Chomu (26 E-168 Near Meena Krishi Farm
+Murlipura Scheme Jaipur- 302039) 700",Rajasthan,27.0454,74.5124,700.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,86,74,0.14,0.864,1.0,+91-9845801380
+REC_EXC_368,CPCB/EXC/2023/368,M/s S.B.J. & Company F-137,"Growth Centre, RIICO Industrial Area, Dholpur 876",Rajasthan,26.9349,74.4398,876.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,133,128,0.038,0.963,2.7,+91-9164138257
+REC_EXC_369,CPCB/EXC/2023/369,M/s.     Tritech     Systems,"No.165/3,     Porur, Chennai- 116 420 130636",Tamil Nadu,12.8795,80.3121,130636.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,151,136,0.099,0.902,2.2,+91-9608588705
+REC_EXC_370,CPCB/EXC/2023/370,M/s. Genbruze Solutions Pvt. ltd.,"S. F. No. 9.28, 29pt,    Athipattu    Village,    Ambattur    Taluk,
+Chennai District 1100",Tamil Nadu,13.1019,80.3785,1100.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,156,138,0.115,0.886,2.7,+91-9408860567
+REC_EXC_371,CPCB/EXC/2023/371,M/s. Ecosible Recyclers Pvt Ltd,"No.154A/B,8th
+Mahatma Gandhi Road, Tass Industrial Estate, Ambattur, Chennai – 600098. 6000",Tamil Nadu,13.199,80.3276,6000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,103,93,0.097,0.905,1.0,+91-9100484273
+REC_EXC_372,CPCB/EXC/2023/372,M/s.   Green   Era   Recyclers   37,"Sivanandha Industries   Estate,   Dr.   M.S.   Udhayamurthy Nagar,     Thadagam     Road,     Edayarpalayam, Coimbatore ",Tamil Nadu,12.9103,80.3174,146.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,77,71,0.078,0.924,3.3,+91-9912159270
+REC_EXC_373,CPCB/EXC/2023/373,M/s.  Green  India  Recyclers,"SF.  No.  26/1B, Kovilpalayam       Road,       Soolakal       Village,
+Coimbatore District. 456",Tamil Nadu,12.7255,80.4628,456.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,36,34,0.056,0.947,1.8,+91-9177842160
+REC_EXC_374,CPCB/EXC/2023/374,M/s. A. K. Enterprises,"No:12, Chakarapani St, Velacherry, Chennai-32. 170",Tamil Nadu,13.194,80.628,170.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,189,178,0.058,0.942,0.5,+91-9947291464
+REC_EXC_375,CPCB/EXC/2023/375,M/s. Shri Raaam Recycling,"No. DP-29, SIDCO Industrial Estate,   SIPCOT Industrial Complex, Gummidipoondi- 601201 504",Tamil Nadu,13.1184,80.6068,504.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,147,140,0.048,0.953,2.0,+91-9403219346
+REC_EXC_376,CPCB/EXC/2023/376,M/s.  JADG  India  E-Waste  Recyclers  Pvt.  Ltd.,"SF  No.  256/1A1,  Kollur  Village,  Kilikodi  Post, Ponneri Taluk, Tiruvallur- 601206 600",Tamil Nadu,13.4377,80.6533,600.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,59,55,0.068,0.934,3.2,+91-9973908783
+REC_EXC_377,CPCB/EXC/2023/377,M/s. AER Worldwide india Pvt Ltd,"No.774,Elandandheri ,sadayankuppam village, near andar kuppam Check Post, Manali New Town, Chennai – 600103. 12000",Tamil Nadu,12.7907,79.8127,12000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,133,129,0.03,0.97,2.1,+91-9418280364
+REC_EXC_378,CPCB/EXC/2023/378,M/s.   Abishek   Enterprises,"SF   No.   2G,   2nd Ambattur, Chennai-600098 6000",Tamil Nadu,13.0332,80.2841,6000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,152,131,0.138,0.864,1.2,+91-9531732405
+REC_EXC_379,CPCB/EXC/2023/379,M/s. Virogreen India Pvt. Ltd.,"No. 297/1B2, No. 49, Pappankuppam Village, SR Kandigai Road, Gummidipoondi Taluk, Tiruvallur-601201 15000",Tamil Nadu,13.3119,80.3791,15000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,136,132,0.029,0.971,1.2,+91-9794428733
+REC_EXC_380,CPCB/EXC/2023/380,M/s.   Earth   Sense   Recycle   Private   Limited,"Survey  No.  247,  Kanttankulathur  Panchayat, Thenmelpakkam  Village,  Singaperumal  Kovil, Kanchipuram, Tamil Nadu- 60",Tamil Nadu,13.425,80.1439,4248.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,77,66,0.143,0.861,1.8,+91-9306297401
+REC_EXC_381,CPCB/EXC/2023/381,M/s. Envirogreen E waste recycling Solutions,"S.F.No.   2134,   Plot   No.   65,   Palur   Village, Chengalpattu Taluk & District 1900",Tamil Nadu,13.3647,80.5224,1900.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,73,69,0.055,0.947,2.5,+91-9516451454
+REC_EXC_382,CPCB/EXC/2023/382,M/s.  Leela  Traders.,"Plot  No.  C-15/1,  CMDA Industrial      Complex      Maraimalai      Nagar,
+Kancheepuram District 2640",Tamil Nadu,13.4731,80.5207,2640.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,93,88,0.054,0.947,2.2,+91-9668616405
+REC_EXC_383,CPCB/EXC/2023/383,M/s.    SEZ    Recycling,"TP-7,    IVth    Avenue, mahindra   World   City   Developers   Limited, Industrial  Estate,  SEZ  Area,  Thenmelpakkam ",Tamil Nadu,13.341,80.0776,1500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,69,64,0.072,0.93,1.8,+91-9777911243
+REC_EXC_384,CPCB/EXC/2023/384,M/s Trishyiraya Recycling India Pvt. Ltd.,"Plot No.A-7,     Phase-I,     MEPZ-SEZ,     Tambaram, Chennai-600 045 3100",Tamil Nadu,13.307,80.5165,3100.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,119,108,0.092,0.909,2.9,+91-9194257535
+REC_EXC_385,CPCB/EXC/2023/385,M/s.   S.   P.   P.   Enterprises,"S.   No.   184-4C, Mambakkam  Village  and  Post  Sriperumbudur Taluk Kanchipuram District 1080",Tamil Nadu,13.132,80.304,1080.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,202,193,0.045,0.956,2.6,+91-9764470426
+REC_EXC_386,CPCB/EXC/2023/386,M/s. RBIA Minerals and Metals Pvt. Ltd.,"S. F. No. 205-1B2A, Knadur Village, Sriperumbudur Taluk, Kancheepuram District 1400",Tamil Nadu,13.178,80.0353,1400.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,99,94,0.051,0.95,2.6,+91-9608297419
+REC_EXC_387,CPCB/EXC/2023/387,M/s.  Punithan  Enterprises Unit  –II,"No.  113/19 part,   Rajiv   Nagar,   Peinjambakkam,   Gundu Perumbedu Post SPR Talu, Kancheepuram Dt-601301 300",Tamil Nadu,12.7333,79.9879,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,125,111,0.112,0.89,2.4,+91-9564373549
+REC_EXC_388,CPCB/EXC/2023/388,M/s.    K.    P.    P    Enterprises,"No.    535-3C, Santhavellore  Village,  Sunguvarchatram  Post, Sriperumbudur Taluk, Kancheepuram District 1000",Tamil Nadu,13.2495,80.0937,1000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,133,125,0.06,0.941,3.0,+91-9369352928
+REC_EXC_389,CPCB/EXC/2023/389,M/s.   G   S   ENTERPRISES   S.F   NO:254/2A2A,"evalurkuppam         Village,         Sriperumbudur Taluk,Kancheepuram Dist 602105. 8400",Tamil Nadu,13.1594,79.838,8400.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,60,57,0.05,0.952,3.1,+91-9405639774
+REC_EXC_390,CPCB/EXC/2023/390,M/s.  Enviro  Metals  Recyclers  Private  Limited Pvt Limited Alu,"Ezichur           Village,Sriperumbudur Tk,Kancheepuram District. 12000",Tamil Nadu,12.6231,80.1819,12000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,216,207,0.042,0.959,2.2,+91-9369629438
+REC_EXC_391,CPCB/EXC/2023/391,M/s. World Scrap Recycling Solutions Pvt. Ltd.,"S.     No.     351/7,     Beemanthangal     Village, Sriperumbudur Taluk, Kancheepuram District 720",Tamil Nadu,12.6629,80.0829,720.0,SUSPENDED,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,181,72,0.602,0.404,2.6,+91-9353214051
+REC_EXC_392,CPCB/EXC/2023/392,M/s. Green E Waste Private Limited,"S. F. No. 294/pt,  Ayanambakkam  Village,  Poonamallee Taluk, Tiruvallur District. 422",Tamil Nadu,12.6216,80.6078,422.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,154,143,0.071,0.929,0.7,+91-9694089500
+REC_EXC_393,CPCB/EXC/2023/393,M/s.  Southern  Alloys,"DP  No.  S-105  and  106, SIDCO Industrial Estate, Kakallur Village Taluk and District 540",Tamil Nadu,13.3394,80.213,540.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,181,163,0.099,0.902,1.5,+91-9218873796
+REC_EXC_394,CPCB/EXC/2023/394,M/s.  Micro  E-Waste  Recyclers,"SF  No.  301/3, Varaganeri  Village,  Trichy  East  Taluk,  Trichy District. 900",Tamil Nadu,13.2158,80.24,900.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,199,188,0.055,0.945,2.0,+91-9955560479
+REC_EXC_395,CPCB/EXC/2023/395,M/s.   M.   G.   Traders,"No.   86,   Nehru   Street, Teachers Colony, Ambattur, Chennai - 600053 600",Tamil Nadu,13.0375,80.4455,600.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,75.0,50,46,0.08,0.923,2.6,+91-9946691838
+REC_EXC_396,CPCB/EXC/2023/396,M/s.  Udhaya  Traders,"No.  242,  Tiny  Sector Ambattur Industrial Estate, Chennai – 600058 84",Tamil Nadu,13.5569,79.8405,84.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,172,152,0.116,0.885,1.9,+91-9820526254
+REC_EXC_397,CPCB/EXC/2023/397,M/s Victory Recovery & Recycle Technologies India Pvt.Ltd.,"672/2, Doubal Dragon Industrial Park,    Kannur    Village    &    Post    Kottaiyur, Thiruvallur, District - Tamil Nadu",Tamil Nadu,13.0356,80.7194,100.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,88,83,0.057,0.944,1.9,+91-9897577747
+REC_EXC_398,CPCB/EXC/2023/398,M/s.  TES  AMM  Private  Limited,"Plot  No.A-18, SIPCOT  Industrial  Growth,  Centre  Oragadam, Panruti        ‘A’        Village,        Sriperumpudur, K",Tamil Nadu,13.5436,80.3066,30000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,66,63,0.045,0.956,3.3,+91-9457301785
+REC_EXC_399,CPCB/EXC/2023/399,M/s      Arockia      Enterprises,"S.F.No.4/1E, Seevaram      village,      Sholinganallur      taluk, Chennai – 600 097 216",Tamil Nadu,13.3233,79.8656,216.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,187,181,0.032,0.968,3.1,+91-9670864783
+REC_EXC_400,CPCB/EXC/2023/400,M/s  Ascent  Urban  Recyclers  Pvt  Limited,"SF No.62/1B,  2A2,  Padur  Road,  Mevalurkuppam village,  Sriperumbudur  taluk,  Kancheepuram district, Pin - 602 105 40",Tamil Nadu,13.2734,80.3675,400.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,117,113,0.034,0.966,3.5,+91-9228960723
+REC_EXC_401,CPCB/EXC/2023/401,M/s Blooming Recyclers,"Plot. No. D9/2, SIDCO Industrial       Estate,       Maraimalai       Nagar, Kizhikaranai village, Chengalpattu district",Tamil Nadu,12.7989,80.4619,730.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,146,126,0.137,0.865,1.5,+91-9896259636
+REC_EXC_402,CPCB/EXC/2023/402,M/s E PROCESS House c/o Bharat Electronics Limited,"SF   No   3   &   10/1   Nanthambakkam village, Alandur taluk, Chengalpattu district 435",Tamil Nadu,13.558,80.5877,435.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,40,38,0.05,0.952,1.1,+91-9337178929
+REC_EXC_403,CPCB/EXC/2023/403,M/s    INAA   Enterprises,"DP   No.    AC-31/24, Thirumudivakkam   village,   Kundrathur   taluk, Kancheepuram district 300",Tamil Nadu,12.8513,79.8717,300.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,160,156,0.025,0.975,3.4,+91-9914929191
+REC_EXC_404,CPCB/EXC/2023/404,M/s  John  Firm  SF  No.144/1C2,"Kerekodihalli village,     Karimangalam     taluk,     Dharmapuri
+district. 300",Tamil Nadu,12.5914,79.9263,300.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,85,74,0.129,0.874,1.6,+91-9545373859
+REC_EXC_405,CPCB/EXC/2023/405,M/s  KGN  Electronics,"No.48  A,  Dr  Ambedkar
+College Road, Erukkenchery village, Perambur taluk, Chennai district 250",Tamil Nadu,13.2567,79.8333,250.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,195,187,0.041,0.959,1.3,+91-9523410453
+REC_EXC_406,CPCB/EXC/2023/406,M/s  Ponniamman  Enterprises,"SF  No.  216/3,
+Tiruvallur  village,  Tiruvallur  taluk,  Tiruvallur district 12000",Tamil Nadu,13.0672,80.0731,12000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,39,35,0.103,0.902,1.4,+91-9113490091
+REC_EXC_407,CPCB/EXC/2023/407,M/s  R.M  Computers,"Plot  No.229,  9th  Street, Ambattur Chennai – 600098 228",Tamil Nadu,12.8563,80.2585,228.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,86,81,0.058,0.943,1.8,+91-9995206152
+REC_EXC_408,CPCB/EXC/2023/408,M/s Sai Sri Waste Management Pvt Ltd,"SF No 443/1B2,       443/2A,       Padaveedu       village, Kumarapalayam taluk, Kumarapalayam district 1680",Tamil Nadu,12.7734,80.1178,1680.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,135,121,0.104,0.898,0.9,+91-9368672524
+REC_EXC_409,CPCB/EXC/2023/409,M/s   SKV   E-Waste   Recycling   Pvt   Ltd,"Plot No.154  A&B,  Tass  Industrial  Area,  Ambattur SIDCO Industrial Estate, Chennai – 600 098 560",Tamil Nadu,13.5722,80.6602,560.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,111,101,0.09,0.912,2.0,+91-9903327013
+REC_EXC_410,CPCB/EXC/2023/410,M/s Tharani Electronics Waste,"SF No.381/3pt, 381/2pt,  384/2pt,  384/3  pt,  Sarkar  Samakulam village, Annur taluk, Coimbatore district 207",Tamil Nadu,13.4209,80.1321,207.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,216,205,0.051,0.95,3.2,+91-9700796012
+REC_EXC_411,CPCB/EXC/2023/411,M/s  Earth  Sense  Recycle  Pvt.Ltd.,"Plot No.37, APIIC Industrial park, Mankal (V), Maheswaram (M), Rangareddy District. Telangana- 501359 22775 148115",Telangana,17.8364,78.1622,148115.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,124,112,0.097,0.905,2.2,+91-9624730136
+REC_EXC_412,CPCB/EXC/2023/412,M/s  Z  Enviro  Industries  Pvt.  ltd.,"Pulimanmidi (V), Kandukur (M) Rangareddy District. 30000",Telangana,17.6266,78.2661,30000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,185,169,0.086,0.914,3.0,+91-9253362837
+REC_EXC_413,CPCB/EXC/2023/413,M/s   Silicon   Planet   Recycling   Pvt.   Ltd.,"Sy. No.811/A, Ankireddypally (V) &Grampanchayat Keesara (M) , Medchal Malkajgiri District 1000",Telangana,17.4889,78.5633,1000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,50.0,61,58,0.049,0.952,3.2,+91-9475725131
+REC_EXC_414,CPCB/EXC/2023/414,M/s. EnviroKare Recycling Solutions Pvt. Ltd.,"Sy.                 No.                 402,                 Raikal (V), Farooqnagar (M), Rangareddy District. 2549",Telangana,17.4418,78.8318,2549.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,118,101,0.144,0.858,1.2,+91-9632884217
+REC_EXC_415,CPCB/EXC/2023/415,M/s  Shreem  Mythri  Enterprises,"Plot  No.50, phase-III, IDA Cherlapally, kapra (M), Medchal-Malkajgiri District. 3700",Telangana,17.407,78.5756,3700.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,50.0,206,192,0.068,0.933,1.2,+91-9166014115
+REC_EXC_416,CPCB/EXC/2023/416,M/s. Elifecycle Management Private Limited,"Sy. No. 468, 470, 471 & 472, Theegapur, Kothur
+Rangareddy District 18900",Telangana,17.3433,78.3379,18900.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,138,134,0.029,0.971,1.1,+91-9253814126
+REC_EXC_417,CPCB/EXC/2023/417,M/s. Malpani Antenna Electronics Pvt. Ltd.,"Plot No.     D4,     Phase-I,     IDA,     Pashamailaram, Patancheru (M), Sangareddy District 687",Telangana,17.7934,78.4548,687.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,174,164,0.057,0.943,2.8,+91-9735078364
+REC_EXC_418,CPCB/EXC/2023/418,M/s.  Green  Wave  E-waste  Recycling,"Sy.  No. 1880E, 1880EE, Nandigama (V&M), Rangareddy
+District 4680",Telangana,17.5931,78.4624,4680.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,30.0,197,174,0.117,0.884,3.2,+91-9142322633
+REC_EXC_419,CPCB/EXC/2023/419,M/s. Pure Earth Recyclers Private Limited,"Sy. No.924, 994, Rudraram (V), Patancheruvu (M), Sangareddy District 5050",Telangana,17.6586,78.1101,5050.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,211,206,0.024,0.977,0.6,+91-9954864993
+REC_EXC_420,CPCB/EXC/2023/420,M/s   Enviro   Collection   Centre   (Dismantling Unit),"Plot   No.1-185/2/A,   Sy.   NO.298   part, Phase-I,   IDA   Jeedimetla,   Medchal-Malkajgiri District. 720",Telangana,17.1005,78.3227,720.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,165,147,0.109,0.892,2.6,+91-9575756650
+REC_EXC_421,CPCB/EXC/2023/421,M/s    Ramky    E-Waste    Recycling    Facility,"Hardware Park, kancha, Imarat of Raviryal (v), Maheswaram (M), Rangareddy District. 7840",Telangana,17.6864,78.3788,7840.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,46,40,0.13,0.875,2.5,+91-9382529620
+REC_EXC_422,CPCB/EXC/2023/422,M/s   Earthbox   Ventures   (p)   Ltd.,"(E-waste Dismantling   Unit),   Sy.   Nos.29,   30,   &   85, Uddemarri    (V),    Shamirpet    (M),    Medchal-Malkajgi",Telangana,17.7201,78.9141,3600.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,83,72,0.133,0.871,1.2,+91-9508381578
+REC_EXC_423,CPCB/EXC/2023/423,M/s Bellus E Waste,"Sy.No.4-120, Ramachandra Puram (GP), Kondurg (M), Rangareddy District. 3600",Telangana,17.1775,78.3189,3600.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,132,117,0.114,0.888,2.5,+91-9925964727
+REC_EXC_424,CPCB/EXC/2023/424,M/s Shreem Mythri Enterprises,"Plot No.50, phase-III, IDA Cherlapally, kapra (M), Medchal-
+Malkajgiri District. 600",Telangana,17.2025,78.8348,600.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,206,184,0.107,0.894,1.9,+91-9864993081
+REC_EXC_425,CPCB/EXC/2023/425,M/s. Earthbox Recycling Private Limited Sy No 114/1,"plot no s-2/12, Raviryala Grampanchayat, Maheshwaram (V & M), Rangareddy District 2340",Telangana,17.601,78.6929,2340.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,133,119,0.105,0.896,1.3,+91-9501092817
+REC_EXC_426,CPCB/EXC/2023/426,M/s TES-AMM India Pvt. Ltd Plot no 79,"Sy no 847,   IDA   Medchal,   Medchal   (M),   Medchal-Malkajgiri District 1800",Telangana,17.8767,78.5277,1800.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,184,160,0.13,0.871,2.6,+91-9198569502
+REC_EXC_427,CPCB/EXC/2023/427,M/s Kamal Electronics Refurbishing of E-waste Solutions,"Sy  No:  227/LU,  227/E1m   227/E2, 227/E/2/1     Atmakur     (V)     Sadasivpet     (M),
+Sangareddu District. 13680",Telangana,17.0355,78.9548,13680.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,147,138,0.061,0.94,2.4,+91-9198958695
+REC_EXC_428,CPCB/EXC/2023/428,M/s.  Chilkuri  Enterprises,"Sy  No.14,  Keesara (M), Medchal-Malkajgiri District 540",Telangana,17.4629,78.8911,540.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,192,170,0.115,0.887,1.2,+91-9754579873
+REC_EXC_429,CPCB/EXC/2023/429,M/s.  Reboot  Resources  Private  Limited,"Sy. No.113 Part, Patelguda (V), Ibrahimpatnam (M), Rangareddy District 9468",Telangana,17.7411,78.3435,9468.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,30.0,118,111,0.059,0.942,1.5,+91-9872912088
+REC_EXC_430,CPCB/EXC/2023/430,M/s. Green Enviro E Waste Recycling,"Sy. No. 729, Pochampally (V), B. Pochampally (M), Yadadri Bhuvanagiri District 8740",Telangana,17.7481,78.8092,8740.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,172,167,0.029,0.971,2.3,+91-9889603629
+REC_EXC_431,CPCB/EXC/2023/431,M/s. Recytronics Waste Solutions LLP,"Sy.No.96/Part/C, Patelguda, Mangalpalle (V), Ibrahimpatnam (M), Rangareddy District 4680",Telangana,17.5172,78.5703,4680.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,120,116,0.033,0.967,3.1,+91-9199398503
+REC_EXC_432,CPCB/EXC/2023/432,M/s. Exclusive PC World,"Plot No.30/9, Sy.No.460/2, TSIIC, IDA Mankhal,
+Maheshwaram (M), Rangareddy Distric 446",Telangana,17.542,78.8851,446.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,90,85,0.056,0.946,2.2,+91-9579066660
+REC_EXC_433,CPCB/EXC/2023/433,M/s. Ali Traders,"Sy.No.491/2, Alampally (V),Vikarabad(M), Vikarabad District 720",Telangana,17.0037,78.9673,720.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,31,29,0.065,0.939,2.4,+91-9587331594
+REC_EXC_434,CPCB/EXC/2023/434,M/s. Auctus – E Recycling Solutions Pvt. Ltd.,"F-637, M. G. Road, Industrial Area, Ghaziabad 1800 624219.47",Uttar Pradesh,26.879,80.5495,500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,154,147,0.045,0.955,2.9,+91-9236487526
+REC_EXC_435,CPCB/EXC/2023/435,M/s.  Mahaluxmi  metal  Alloys  (India)  Pvt.  Ltd.,"Modinagar, Ghaziabad 30000",Uttar Pradesh,27.3164,80.8774,30000.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,81,69,0.148,0.855,1.9,+91-9589498734
+REC_EXC_436,CPCB/EXC/2023/436,M/s.    N.K.    Products,"58-59,    M.    G.    Road, Ghaziabad 9000",Uttar Pradesh,26.9211,80.5841,9000.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,30.0,51,46,0.098,0.906,2.9,+91-9779910077
+REC_EXC_437,CPCB/EXC/2023/437,M/s  Bharat  Oil  Co.E-18,"Site  –  IV,  Sahibabad, Industrial Area, Ghaziabad 4000",Uttar Pradesh,27.1524,80.7744,4000.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,110,99,0.1,0.902,3.0,+91-9884571917
+REC_EXC_438,CPCB/EXC/2023/438,M/s Plant Green Recycling Pvt. Limited,"G-129, Phase – I , M.G. Road, Ghaziabad 1500",Uttar Pradesh,26.7277,81.2546,1500.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,192,165,0.141,0.861,3.3,+91-9889700400
+REC_EXC_439,CPCB/EXC/2023/439,M/s.  Rocket  Sales,"Plot  No.  1-12,  I/A,  M.  G. Road, Hapur 300",Uttar Pradesh,26.7675,81.0479,300.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,88,82,0.068,0.933,1.5,+91-9864941560
+REC_EXC_440,CPCB/EXC/2023/440,M/s.  Ariglonton  Information  System  Pvt.  Ltd.,"Plot No C-13, Site-4 Sahibabad Industrial Area Ghaziabad 40000",Uttar Pradesh,27.0615,80.5147,40000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,48,45,0.062,0.94,2.5,+91-9429866576
+REC_EXC_441,CPCB/EXC/2023/441,M/S  Fiz  Trading  Company,"C55,  Sector-B-3, Trans  Delhi Signature City Tronica City,  Loni, Ghaziabad 365",Uttar Pradesh,26.9949,80.6777,365.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,174,168,0.034,0.966,0.8,+91-9550532127
+REC_EXC_442,CPCB/EXC/2023/442,M/S. Tele Supar Electronics India Pvt Ltd,"B-15, Roop       Nagar       Industrial       Area,       Loni Ghaziabad,201102 730",Uttar Pradesh,27.0967,80.9779,730.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,97,89,0.082,0.919,3.0,+91-9280024509
+REC_EXC_443,CPCB/EXC/2023/443,M/s R.R. Recycler Pvt. Ltd.,"Khasra No.-115, M, Vill- Achraunda, Tehsil & District- Meerut 8000",Uttar Pradesh,26.503,80.6663,8000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,165,151,0.085,0.916,1.3,+91-9370798310
+REC_EXC_444,CPCB/EXC/2023/444,M/s.   6R   Recycling,"Plot   No-272,   MG   Road industrial area, Hapur 12000",Uttar Pradesh,26.5671,81.3324,12000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,86,76,0.116,0.886,2.8,+91-9234406801
+REC_EXC_445,CPCB/EXC/2023/445,M/s 3R Recycler Pvt Ltd. Unit 2,"Plot No. A-61/2, UPSIDC      Industrial      Area,      Sikandrabad,
+Bulandshahar,  Buland  Shahar-  203202  Uttar Prade",Uttar Pradesh,26.3898,81.2272,25000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,180,172,0.044,0.956,3.3,+91-9878684909
+REC_EXC_446,CPCB/EXC/2023/446,M/s. Karo Sambhav Pvt.Ltd.,")  Khasra 95-96, Village
+-  Sikhera,Hazazari Industrial Area,  Modinagar, Ghaziabad 30000",Uttar Pradesh,26.4543,81.2143,30000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,50.0,125,111,0.112,0.89,2.2,+91-9423029615
+REC_EXC_447,CPCB/EXC/2023/447,M/S Ozone Waste LLP Plot No.- C-25,"Upsidc,
+M.G. Road, Industrial Area, Hapur 6000",Uttar Pradesh,27.2311,81.0056,6000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,70,61,0.129,0.875,2.5,+91-9338070213
+REC_EXC_448,CPCB/EXC/2023/448,M/s.  Arsh  Recycling  Pvt.  Ltd.,"Plot  No.  203, UPSDIC, I/A, M/G. Road, Ghaziabad 15000",Uttar Pradesh,26.7873,80.5786,15000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,32,31,0.031,0.971,2.5,+91-9907649504
+REC_EXC_449,CPCB/EXC/2023/449,M/s.   Auctus   Recycling   Solutions   Pvt.   Ltd,"Habibpur, Greater Noida 20000",Uttar Pradesh,26.7777,80.7507,20000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,154,136,0.117,0.885,2.0,+91-9817010646
+REC_EXC_450,CPCB/EXC/2023/450,M/s. Khan Traders,"B-5, Site No. 4,    Panki Ind. Area, Kanpur 7190",Uttar Pradesh,26.7639,80.6064,7190.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,87,78,0.103,0.899,0.5,+91-9794576461
+REC_EXC_451,CPCB/EXC/2023/451,M/s.  Green  Tech  Recycling,"Khasra  No.  645,
+Acchraunds,     Bahdurpur     Road,     Partapur, Meerut 9000",Uttar Pradesh,26.5063,80.7818,9000.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,114,109,0.044,0.957,1.4,+91-9162344912
+REC_EXC_452,CPCB/EXC/2023/452,M/s.   Narora   Atomic   Power   Station,"Narora, Bulandshahar 10",Uttar Pradesh,26.5782,81.3146,10.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,75.0,104,94,0.096,0.906,1.7,+91-9223061236
+REC_EXC_453,CPCB/EXC/2023/453,M/s    Metal    Alloys,"E-46,    Industrial    Area, Ramnagar, Varanasi 1825",Uttar Pradesh,27.0779,81.393,1825.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,50.0,105,94,0.105,0.897,3.4,+91-9289831809
+REC_EXC_454,CPCB/EXC/2023/454,"M/s     Comwen     Information     Technologies
+Pvt.Ltd.","127/35B,     ChakRagunath,     Naini, Allahabad. 300",Uttar Pradesh,26.4086,80.9816,300.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,148,137,0.074,0.927,0.8,+91-9789324172
+REC_EXC_455,CPCB/EXC/2023/455,M/s.   Oasia   Eco   E-Waste   Recyclers   E-160,"Industrial Area, Khalilabad, Sant Kabairnagar. 3000",Uttar Pradesh,27.1791,81.2518,3000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,37,35,0.054,0.949,1.1,+91-9317150069
+REC_EXC_456,CPCB/EXC/2023/456,M/s.   Sims   Recycling   Solutions   Plot   No.   1,"Udyog Kendrall Ecotech-III, Greater Noida 1250",Uttar Pradesh,26.6842,81.3169,1250.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,100,86,0.14,0.863,2.8,+91-9462500290
+REC_EXC_457,CPCB/EXC/2023/457,M/s    J.A.O.    E-Waste    Recycling    Co,"Vill-Jaitpur,Distt-Moradabad. 720",Uttar Pradesh,26.8311,81.14,720.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,50,47,0.06,0.942,3.2,+91-9303645212
+REC_EXC_458,CPCB/EXC/2023/458,M/s.  HIN  Green  E-Waste  Recycling  Co.  Vill-Jaitpur,Distt-Moradabad 750,Uttar Pradesh,26.4959,80.7144,750.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,211,182,0.137,0.864,1.5,+91-9326994209
+REC_EXC_459,CPCB/EXC/2023/459,M/s  S.R.  Metcast  India  (P)  Ltd  11.8  Km.Agra Mathura Road,Agra. 600,Uttar Pradesh,26.5401,81.0877,600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,176,165,0.062,0.938,2.5,+91-9426695352
+REC_EXC_460,CPCB/EXC/2023/460,M/s  K.M.  Metals  Suppliers  9/270,"271,Mathura Agra. 5000",Uttar Pradesh,26.4878,80.9918,5000.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,116,110,0.052,0.949,0.7,+91-9250062915
+REC_EXC_461,CPCB/EXC/2023/461,M/s   Prakash   Metal   House   39/223,"Karwan Lohamandi, Agra. 1500",Uttar Pradesh,26.6173,80.5274,1500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,164,143,0.128,0.873,2.9,+91-9784716415
+REC_EXC_462,CPCB/EXC/2023/462,M/s    Shree   MahaveerJi    Trading    Company,"30/127, Chippitala, Agra 375",Uttar Pradesh,27.1084,80.9533,375.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,145,132,0.09,0.912,1.5,+91-9375873552
+REC_EXC_463,CPCB/EXC/2023/463,M/s.  E-Waste  Recyclers  India,"E-50,  UPSIDC Industrial   Area,   98Km   Stone,   NH-2,   Kosi Kotwan, Mathura 6000",Uttar Pradesh,26.8474,81.0911,6000.0,SUSPENDED,"PCB,BATTERY,CABLE",True,20.0,75.0,148,59,0.601,0.407,2.8,+91-9169580185
+REC_EXC_464,CPCB/EXC/2023/464,M/s E-Waste Recyclers Industries K40,"UPSIDC Industrial area, NH-2 Kosikalan, Mahura 150",Uttar Pradesh,26.8703,80.6998,150.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,210,199,0.052,0.948,2.3,+91-9149987331
+REC_EXC_465,CPCB/EXC/2023/465,M/s Supar Trading Company,"Plot No.-3 Govt. Industrial Estate, Talkatora Road, Lucknow 365",Uttar Pradesh,26.4495,80.5722,365.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,41,36,0.122,0.884,2.3,+91-9543026369
+REC_EXC_466,CPCB/EXC/2023/466,M/s.  V.  R.  Techno  Enviro  Services  Pvt.  Ltd.,"Khasra   No.   440,   Indira   Priyedarshni   Ward Jarhra Indira Nagar Lucknow 365",Uttar Pradesh,27.1125,80.4516,365.0,SUSPENDED,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,39,15,0.615,0.415,3.3,+91-9417052640
+REC_EXC_467,CPCB/EXC/2023/467,M/s   Greenzon   Recycling   Pvt.   Ltd.,"R   30, UPSIDC,      Industrial      Area,      Sikandrabad, Bulandshahar. 6022",Uttar Pradesh,26.972,81.1933,6022.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,51,44,0.137,0.868,0.6,+91-9492210593
+REC_EXC_468,CPCB/EXC/2023/468,M/s  Sachin  Enterprises,"123/751,  block-T  74
+Pratapganj     Gadariyan     Purwa,     Fazalgang, Kanpur 2500",Uttar Pradesh,26.5302,81.0403,2500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,119,102,0.143,0.86,2.9,+91-9495204271
+REC_EXC_469,CPCB/EXC/2023/469,M/s Greeniva Recycler Pvt. ltd.,"Plot No. G-284,
+M.G. Road, Industrial Area, Hapur 780",Uttar Pradesh,26.3746,81.0776,780.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,159,149,0.063,0.938,1.7,+91-9340427534
+REC_EXC_470,CPCB/EXC/2023/470,M/s S. Malik Traders,"plot No.93, 94 vill-Budhera jahidpur, Meerut 365",Uttar Pradesh,27.2371,81.0231,365.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,107,102,0.047,0.954,1.5,+91-9818410879
+REC_EXC_471,CPCB/EXC/2023/471,M/s Royal Faiz Recycling (P) Ltd,"I-22, I.A.M.G. Road, Hapur 12000",Uttar Pradesh,27.2097,80.5969,12000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,156,147,0.058,0.943,2.3,+91-9348620127
+REC_EXC_472,CPCB/EXC/2023/472,M/s 3 C Recycler,"F-326, I/A, M. G. Road, Hapur 3240",Uttar Pradesh,27.0231,81.1258,3240.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,173,153,0.116,0.886,1.5,+91-9648787954
+REC_EXC_473,CPCB/EXC/2023/473,M/s Life E-Recycling (p) Ltd.,"F-435, UPSIDC I/A,
+M. G. Road, Hapur 9000",Uttar Pradesh,26.9402,80.4624,9000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,171,149,0.129,0.873,0.9,+91-9505526059
+REC_EXC_474,CPCB/EXC/2023/474,M/s Hind Recycler (p) Ltd.,"Plot No.F-203, M.G. Road, Hapur 9000",Uttar Pradesh,27.271,80.9069,9000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,133,118,0.113,0.889,0.9,+91-9100131936
+REC_EXC_475,CPCB/EXC/2023/475,M/s  Hayat  Recycler,"F-53,54  I/A,  M.G.  Road, Hapur 1728",Uttar Pradesh,26.3603,80.7689,1728.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,219,202,0.078,0.923,3.2,+91-9416137171
+REC_EXC_476,CPCB/EXC/2023/476,M/s   B.R.P.   Infotech   Private   Limited,"F-394, Phase-1, M. G. Road, Industrial Area, Hapur 9000",Uttar Pradesh,26.9124,80.9607,9000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,50.0,202,197,0.025,0.975,1.2,+91-9507872758
+REC_EXC_477,CPCB/EXC/2023/477,M/s Sky Green Waste Recycling,"Management, Khasra No.174, Alipur Jijmana, Meerut, U.P 5475",Uttar Pradesh,26.8267,80.5842,5475.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,75.0,186,161,0.134,0.867,3.5,+91-9455255853
+REC_EXC_478,CPCB/EXC/2023/478,M/s  Swachh  Bharat  Recycling  Company,"Gali No.4,  2083,  Saipuram  Industrial  Area,  Delhi Road, Meerut, U.P. 4800",Uttar Pradesh,26.8105,80.7662,4800.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,113,106,0.062,0.939,2.6,+91-9592506784
+REC_EXC_479,CPCB/EXC/2023/479,M/s Rudra Interprises,"Plot No.A-96, Sector A-4, Tronica City, Loni, Ghaziabad 500",Uttar Pradesh,26.9791,80.5745,500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,196,189,0.036,0.965,3.5,+91-9497286362
+REC_EXC_480,CPCB/EXC/2023/480,M/s Avgree Recycling Pvt.Ltd. KH No.549,"Vill-Tiyala,    Meerut-Bulandshahar    Road,    Hapur Bypass, Hapur 11000",Uttar Pradesh,26.9659,80.6328,11000.0,SUSPENDED,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,138,55,0.601,0.407,1.2,+91-9639232243
+REC_EXC_481,CPCB/EXC/2023/481,M/s Faiz Recycling,"G-235, MG Road, Industrial Area, Hapur 36.67",Uttar Pradesh,26.8978,80.9698,36.67,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,49,45,0.082,0.922,0.8,+91-9467596299
+REC_EXC_482,CPCB/EXC/2023/482,M/s  Malik  Recycling,"25-A, Anand  Ind.  Estate, Mohan Nagar, Ghaziabad. 10000",Uttar Pradesh,26.8209,80.5129,10000.0,SUSPENDED,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,127,50,0.606,0.403,1.3,+91-9740666501
+REC_EXC_483,CPCB/EXC/2023/483,M/s  U.W.M. Recycling Pvt Ltd. Plot No.-F-331,"UPSIDC, M.G. road, Ind Area, Hapur. 12",Uttar Pradesh,26.599,80.754,12.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,204,184,0.098,0.903,3.2,+91-9915769496
+REC_EXC_484,CPCB/EXC/2023/484,M/s  Safdar E-Recycling Pvt  Ltd. Plot No.H-69,"M.G. road, Ind Area, Hapur 12000",Uttar Pradesh,27.0471,81.2166,12000.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,82,73,0.11,0.893,3.4,+91-9457359996
+REC_EXC_485,CPCB/EXC/2023/485,M/s Horizon Recycling Pvt.Ltd.,"Khasra No.35, Kumarhera,      7th      km      Dehradun      road, Saharanpur, U.P. 12000",Uttar Pradesh,27.0488,80.7776,12000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,139,124,0.108,0.894,3.3,+91-9103775702
+REC_EXC_486,CPCB/EXC/2023/486,M/s  Golden  E  Waste  Recyclers  Pvt.  ltd.,"Plot No.-12A,  Gagol  Road,  Behind  Sophia  School, Udyog Puram, Partapur, Meerut 9600",Uttar Pradesh,27.1367,80.7642,9600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,58,52,0.103,0.9,1.0,+91-9362442530
+REC_EXC_487,CPCB/EXC/2023/487,M/s    R.D   Recylers    khasara    no-46   village-shakharpur Ha,"Industrial Area, India",Uttar Pradesh,27.0048,81.4439,300.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,108,98,0.093,0.909,1.7,+91-9689589097
+REC_EXC_488,CPCB/EXC/2023/488,M/s Earth Zone Recycling Plot no-11 pargana-Hazipur Hapur road me,"Industrial Area, India",Uttar Pradesh,26.9607,81.0626,2400.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,36,33,0.083,0.921,1.1,+91-9875319881
+REC_EXC_489,CPCB/EXC/2023/489,M/s      Making      India      E-waste      recycling management,"Industrial Area, India",Uttar Pradesh,26.8241,81.048,1080.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,210,197,0.062,0.939,2.7,+91-9996922026
+REC_EXC_490,CPCB/EXC/2023/490,M/s    Indian    Recycler    Khasra    No338    Vill-Wazidpur Kav,"Industrial Area, India",Uttar Pradesh,27.0449,80.6611,3500.0,SUSPENDED,"PCB,BATTERY,CABLE",True,20.0,75.0,37,14,0.622,0.41,1.3,+91-9295283235
+REC_EXC_491,CPCB/EXC/2023/491,M/s   Greentek   Reman   Pvt   Ltd.   Plot     No-B-2/12,"Site-B Inds Area Surajpur, Greater Noida 9000",Uttar Pradesh,26.887,80.5255,9000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,45,41,0.089,0.915,1.8,+91-9510941699
+REC_EXC_492,CPCB/EXC/2023/492,M/s  Clean  Waste  Management.  Plot  No-131,"Udhyog   kendra   Second,  Ecotech-3,   Greater Noida 100",Uttar Pradesh,26.9611,80.9699,100.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,187,167,0.107,0.894,2.4,+91-9437811677
+REC_EXC_493,CPCB/EXC/2023/493,M/s  El  green  Recycling  Pvt  ltd.G-33,"Sec-63, Noida 100",Uttar Pradesh,26.7065,80.7532,100.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,119,116,0.025,0.975,1.7,+91-9543817003
+REC_EXC_494,CPCB/EXC/2023/494,M/s.  AIMS  Technologies  Pvt  Ltd.G-256,"MG Road Inds area, Hapur 1500",Uttar Pradesh,26.387,80.8516,1500.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,199,182,0.085,0.915,2.9,+91-9606512221
+REC_EXC_495,CPCB/EXC/2023/495,M/s  Future  Web,"48-A,  Harthala   Inds   Area, Kanth Road, Moradabad 750",Uttar Pradesh,26.3688,81.4287,750.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,219,197,0.1,0.9,2.4,+91-9662433908
+REC_EXC_496,CPCB/EXC/2023/496,M/s Buddha Industries,"Behind vision Exports Faridpur Sambhal Road, Moradabad 250",Uttar Pradesh,26.4632,80.5733,250.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,30.0,215,196,0.088,0.912,1.1,+91-9920985354
+REC_EXC_497,CPCB/EXC/2023/497,M/s    Latoori    Shah    Traders,"Gata    No1396, Bhojpur, Dharampur, Moradabad 1200",Uttar Pradesh,27.173,81.0342,1200.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,201,195,0.03,0.97,2.9,+91-9523324856
+REC_EXC_498,CPCB/EXC/2023/498,M/s  Shoeb  Waste  solution,"Gata  No250,  Vill-Fazalpur, Near Hindoli, Chadausi, Sambhal 600",Uttar Pradesh,26.3613,80.6936,600.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,208,194,0.067,0.933,0.6,+91-9398970773
+REC_EXC_499,CPCB/EXC/2023/499,M/s       NR       E-Waste       Company,"Gata No235,237,245,    250K    Vill-Sirsa,    Inayatpur, Moradabad 750",Uttar Pradesh,26.4063,81.0506,750.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,75.0,68,61,0.103,0.9,1.8,+91-9801654894
+REC_EXC_500,CPCB/EXC/2023/500,M/s Eco Trader,"Plot no.454, Rooma, Kanpur 100",Uttar Pradesh,26.4897,81.1885,100.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,106,103,0.028,0.972,1.6,+91-9482881782
+REC_EXC_501,CPCB/EXC/2023/501,M/s Aseries Envirotek India Pvt,"Ltd, Plot no. B-10 Industrial area, Salon, Raebareli. 3600",Uttar Pradesh,26.5409,80.9206,3600.0,SUSPENDED,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,165,66,0.6,0.407,2.1,+91-9649899759
+REC_EXC_502,CPCB/EXC/2023/502,M/s    ATR    Traders    Private    Limited,"G380, M.G.Road,  Industrial  Area,  Hapur  Ghaziabad 2400 MT/A 2400",Uttar Pradesh,26.5485,80.7043,2400.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,198,191,0.035,0.965,2.4,+91-9295786752
+REC_EXC_503,CPCB/EXC/2023/503,M/s    Electronic    Waste    India    VillKhujnawar Chutmalpur,"Kalasia    Road    Teh.-Behat    , Saharanpur 9000",Uttar Pradesh,26.6771,81.0354,9000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,217,189,0.129,0.872,2.5,+91-9813286051
+REC_EXC_504,CPCB/EXC/2023/504,M/s   Eco   Green   India,"Khasra   no.-447,   Vill-Ghosipur, Hapur Road, Meerut 365",Uttar Pradesh,26.7048,81.4357,365.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,50.0,170,148,0.129,0.872,0.7,+91-9117984955
+REC_EXC_505,CPCB/EXC/2023/505,M/s S.D. Recycling Process Industries,"Khasra no.-51,   52,   ,   Vill-   Shakarpur,,   Hapur   Road, Meerut 4800",Uttar Pradesh,26.5166,80.5016,4800.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,97,85,0.124,0.879,0.6,+91-9526746759
+REC_EXC_506,CPCB/EXC/2023/506,M/s   HIN   Green   E-waste   Recycling   (P)   Ltd,"Khasra    no.-733,737,    Vill.-   Baral,    Partapur, Meerut. 12000",Uttar Pradesh,26.8966,81.4094,12000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,177,156,0.119,0.883,1.1,+91-9476655817
+REC_EXC_507,CPCB/EXC/2023/507,M/s    J    I    ScrapTraders,"Plot    no.    418/12, Shastrinagar, Meerut 240",Uttar Pradesh,26.8936,80.9213,240.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,143,133,0.07,0.931,2.8,+91-9421790950
+REC_EXC_508,CPCB/EXC/2023/508,M/s E Tech Interprises,"Plot no.- E- 26,Phase-I/ G322   Phase-II,   M.G.Road,   Industrial   Area, Hapur 2520",Uttar Pradesh,26.5874,81.3205,2520.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",False,0.0,10.0,80,75,0.062,0.939,1.0,+91-9311131893
+REC_EXC_509,CPCB/EXC/2023/509,M/s  Habib  Trading  Company,"Khasra  no-  28, Village-   Alipur,   Jijmana,Pargana   &   Tehsil-Meerut 5400",Uttar Pradesh,26.5415,81.2567,5400.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,75.0,57,54,0.053,0.949,1.0,+91-9989904164
+REC_EXC_510,CPCB/EXC/2023/510,M/s   B.R.P.   Infotech   Private   Limited,"F-   381, Phase-I, M.G.Road, Industrial Area, Hapur 6000",Uttar Pradesh,27.0388,80.5862,6000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,116,107,0.078,0.924,0.9,+91-9853577967
+REC_EXC_511,CPCB/EXC/2023/511,M/s Recology Recycling India Pvt. Ltd.,"Khasra no.-69,   70,71   ,   Vill-Piple   Kheda,,   Sargana Sarawa Meerut, Meerut 13764",Uttar Pradesh,27.1156,81.4403,13764.0,SUSPENDED,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,55,22,0.6,0.421,0.9,+91-9783265512
+REC_EXC_512,CPCB/EXC/2023/512,M/s  Bright  E-Waste  Recycling  India,"Village-Ganeshpur, Mawana, Meerut 3240",Uttar Pradesh,26.555,80.8016,3240.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,106,98,0.075,0.926,1.2,+91-9769599636
+REC_EXC_513,CPCB/EXC/2023/513,M/s  Sheetala  Waste  Management  Project  Plot no.-D-26,"Sikandrabad    Indl.    Area,    Tehsil-Sikandrabad, Bulandshahar 3000",Uttar Pradesh,26.8184,80.9997,3000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,144,138,0.042,0.959,1.6,+91-9229762353
+REC_EXC_514,CPCB/EXC/2023/514,M/s Spreco Resource Recyclers,"Khasara no.-235,Vill-Abdulpur,   Block-   Khekra,   Baghpat, Meerut- 250101 3000",Uttar Pradesh,26.39,81.1455,3000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,50,47,0.06,0.942,0.9,+91-9918359472
+REC_EXC_515,CPCB/EXC/2023/515,M/s Hind Recycling Pvt. Ltd.,"G- 460, UPSIDC, Industrial Area M.G.Road, Hapur 960",Uttar Pradesh,26.4799,80.7075,960.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,50.0,54,48,0.111,0.893,2.0,+91-9253012472
+REC_EXC_516,CPCB/EXC/2023/516,M/s   Eco   Fly   E-Waste   Recycling   Pvt.   Ltd.,"Khasara  no-26,  Piplikhera,  Bhamanpur  Road, Indl. Area, Meerut 7800",Uttar Pradesh,26.5893,80.5375,7800.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,32,28,0.125,0.882,0.7,+91-9232847122
+REC_EXC_517,CPCB/EXC/2023/517,M/s Green Earth E- Recycling,"F-95, UPSIDC, Industrial     Area,      Gopalpur      Sikandrabad, Bulandshahar 6000",Uttar Pradesh,26.9724,80.9967,6000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,182,157,0.137,0.864,0.9,+91-9478359265
+REC_EXC_518,CPCB/EXC/2023/518,M/s  Waste  Tech  Recycling  Company,"Plot  no HD-7,  UPSIDC,  Industrial  Area,  Sikandrabad, Bulandshahar 1800",Uttar Pradesh,27.2374,81.0431,1800.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,75.0,102,94,0.078,0.923,1.0,+91-9878127183
+REC_EXC_519,CPCB/EXC/2023/519,M/s LIMR Recycling Pvt. Ltd.,"G- 256, Industrial Area, M.G.Road, Hapur 6000",Uttar Pradesh,26.5453,80.6931,6000.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,151,131,0.132,0.869,0.7,+91-9477047590
+REC_EXC_520,CPCB/EXC/2023/520,M/s Sky Green Waste Recycling Managememt,"Khasra No.- 51, 53,54,66,20,21, Vill.- Piplikhera, Hapur Road, Indl. Area, Meerut 9000",Uttar Pradesh,27.0698,81.2189,9000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,44,39,0.114,0.891,2.5,+91-9308974984
+REC_EXC_521,CPCB/EXC/2023/521,M/s  D  M  Recyclers  Vill.-  Phaphunda,"Hapur Road, Meerut 750",Uttar Pradesh,26.6402,80.7122,750.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,75.0,34,31,0.088,0.917,3.2,+91-9383807324
+REC_EXC_522,CPCB/EXC/2023/522,M/s Global Green E-Waste Recycling,"Khasra No.- 57, Indl. Area, Udhyogpuram, Partapur,
+Meerut 18000",Uttar Pradesh,27.2784,81.4431,18000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,139,120,0.137,0.865,1.3,+91-9758090468
+REC_EXC_523,CPCB/EXC/2023/523,M/s. Anshul Machinery Job Works Unit-II,"Khasra No. -260, Masuri, Dasna, Hapur 5000",Uttar Pradesh,26.4848,81.3053,5000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,81,74,0.086,0.916,1.7,+91-9616990566
+REC_EXC_524,CPCB/EXC/2023/524,M/s. Shiv Shakti metals Old Name Surya Metal,"Khasra No. -545, Vill-Phaphrana, S. P. Industrial
+Area, Modi Nagar, Ghaziabad 963",Uttar Pradesh,27.3233,81.0918,963.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,118,103,0.127,0.875,1.7,+91-9661426640
+REC_EXC_525,CPCB/EXC/2023/525,M/s. Waste PRO Recycling,"Khasra No 35 And 36, Udayrampur, Nangla, Dasna, Tehsil-
+Dhaulana, Hapur, 6000",Uttar Pradesh,26.5292,81.4114,6000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,215,188,0.126,0.876,2.4,+91-9684409412
+REC_EXC_526,CPCB/EXC/2023/526,M/s. S F Recycling Pvt Ltd,"Plot No. F-4, M.G. Road, Industrial Area, Hapur. 960",Uttar Pradesh,26.5789,80.8515,960.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,173,165,0.046,0.954,1.6,+91-9105492952
+REC_EXC_527,CPCB/EXC/2023/527,M/s. More Bright E Waste Erecycler P. Ltd.,"C-78, Phase-III, M. G. Road, Indtl Area, Hapur 4320",Uttar Pradesh,26.6704,81.2114,4320.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,78,67,0.141,0.863,1.3,+91-9367966130
+REC_EXC_528,CPCB/EXC/2023/528,M/s. Green Zone Recycling (P) Ltd.,"Plot No. -H.
+D. -6, UPSIDC Indl. Area, Sikandrabad,
+Bulandshahr 3000",Uttar Pradesh,26.5952,80.7631,3000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,36,34,0.056,0.947,1.3,+91-9795005701
+REC_EXC_529,CPCB/EXC/2023/529,M/s. Green Earth Recycler,"Plot No. F-557, Industrial Areal, M G Road, Hapur 720",Uttar Pradesh,27.037,81.3912,720.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,181,160,0.116,0.885,0.9,+91-9366563041
+REC_EXC_530,CPCB/EXC/2023/530,M/s. A One E Waste Recycling,"Vill. -Khardoni, Shekhupur, Meerut 301.8",Uttar Pradesh,26.4104,80.6233,301.8,SUSPENDED,"CRT,MIXED_PLASTIC,METALS",True,20.0,50.0,213,85,0.601,0.405,2.8,+91-9366057031
+REC_EXC_531,CPCB/EXC/2023/531,M/s. Sun E-Wsate Recycling Company F-163,"Industrial Area, Kosi Kotwan, Ext.-1, Kosi Kalan,
+Mathura. 1200",Uttar Pradesh,27.218,80.7356,1200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,186,176,0.054,0.947,2.4,+91-9636783906
+REC_EXC_532,CPCB/EXC/2023/532,M/s. Ezwaste Recycling,"Khasra No. -38, Vill. - Sardhan, Budhana Road, Khatauli,
+Muzaffarnagar 3000",Uttar Pradesh,27.2197,80.6151,3000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,201,177,0.119,0.882,3.0,+91-9310065268
+REC_EXC_533,CPCB/EXC/2023/533,M/s. Sri Balaji,"Arazi No. -316/7, Vill.-Kataria, Pargana-Ralhupur, Distt.-Chandauli 5000",Uttar Pradesh,26.9827,80.848,5000.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,75.0,205,196,0.044,0.957,3.3,+91-9889698222
+REC_EXC_534,CPCB/EXC/2023/534,M/s. A Q Recycling,"Plot No-F-639, UPSIDC, Industrial Area, M. G. Road, Hapur 864",Uttar Pradesh,26.4521,81.2851,864.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,75.0,46,41,0.109,0.896,0.8,+91-9777651505
+REC_EXC_535,CPCB/EXC/2023/535,M/s. Rajdhani Recycling P. Ltd.,"Plot No. F-416,
+M. G. Road, Indutrial Area, Hapur 3600",Uttar Pradesh,26.653,80.7723,3600.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,37,34,0.081,0.923,3.3,+91-9307328616
+REC_EXC_536,CPCB/EXC/2023/536,M/s. JSD Enterprises,"J-78, Site-C, Surajpur, Industrial Area, Greater Noida 3000",Uttar Pradesh,26.479,81.4238,3000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,30.0,30,26,0.133,0.875,1.6,+91-9504120440
+REC_EXC_537,CPCB/EXC/2023/537,M/s. E-Waste Recyclers India,"Unit-3, Khasra No. -266, 110 KM Mile Stone, Tehsil-Chhata,
+Mathura 4800",Uttar Pradesh,26.5183,80.6137,4800.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,182,159,0.126,0.875,1.7,+91-9415096272
+REC_EXC_538,CPCB/EXC/2023/538,M/s. E-Waste Recyclers India,"E-49, UPSIDC Industrial Area, Kosi Kotwan, Mathura 1500",Uttar Pradesh,26.798,81.3154,1500.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,51,45,0.118,0.887,3.1,+91-9845376895
+REC_EXC_539,CPCB/EXC/2023/539,M/s 2NDS Computer,"Plot no J-71, J-72, UPSIDC Industrial area, Kosi
+Kotwan, Mathura. 600",Uttar Pradesh,26.7657,80.9042,600.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,123,114,0.073,0.928,3.0,+91-9141245764
+REC_EXC_540,CPCB/EXC/2023/540,M/s Sanif Insulation,"Vill- Kakrala, Pargana-Bhokerheri, opp. Sugar Mill
+Morna, Muzarffarnagar-251316 300",Uttar Pradesh,27.2674,80.7912,300.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,199,176,0.116,0.886,2.2,+91-9155745877
+REC_EXC_541,CPCB/EXC/2023/541,M/s Green India E-Waste Recycling Khasra no-3,"Hapur Road, Vill.-
+Ruknuddin Urf, Phaphunda, Meerut 1440",Uttar Pradesh,27.1906,81.1885,1440.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,139,134,0.036,0.965,3.3,+91-9875395424
+REC_EXC_542,CPCB/EXC/2023/542,M/s Ever Green E-Waste Recycling Management,"Vill.-Rampur, Tehsil.-
+Mahmudabad, Distt.- Sitapur 936",Uttar Pradesh,27.0523,80.7539,936.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,88,82,0.068,0.933,1.2,+91-9252858851
+REC_EXC_543,CPCB/EXC/2023/543,M/s Era Green E-Waste Recycling Pvt. Ltd.,"Khasra no-189/2, Plot No.-
+B-35/1, Vill.-Kunda, Distt.- Meerut 9000",Uttar Pradesh,27.2645,80.5542,9000.0,ACTIVE,"PCB,BATTERY,CABLE",True,20.0,30.0,213,203,0.047,0.953,2.7,+91-9901071274
+REC_EXC_544,CPCB/EXC/2023/544,M/s A R Computer Scrap,"Plot No.-7, Pillokhari Road near Falak Palace,
+Meerut 6600",Uttar Pradesh,27.0223,80.9551,6600.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,127,116,0.087,0.915,2.9,+91-9403759505
+REC_EXC_545,CPCB/EXC/2023/545,M/s Aksha Recycling & Waste Management Pvt. Ltd.,", Khasra no.-
+876,1193-1195, 7.5 K.M. Jansath Road,Vill.- Sher Nagar,
+Muzaffarnagar 15000",Uttar Pradesh,27.3336,81.2008,15000.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,81,78,0.037,0.964,2.6,+91-9510511181
+REC_EXC_546,CPCB/EXC/2023/546,M/s Khekra Fabrication & Recycle Industries Pvt. Ltd.,"Khasra no.-31,
+Vill- Udairampur Nagla, UPSIDC Asrea, Mussoorie Gulawati Road,
+Pargan-Dasna, Tehsil-Dhaulana, Hapur-24530",Uttar Pradesh,27.2055,80.7721,1800.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",False,0.0,10.0,157,152,0.032,0.969,0.5,+91-9348331328
+REC_EXC_547,CPCB/EXC/2023/547,M/s Greenwish E-Waste Recyclers,"F- 162, Industrial Area, Kosi Kotwan,
+Extn.-1, Kosi Kalan, Mathura 1200",Uttar Pradesh,27.2981,80.5832,1200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",False,0.0,10.0,92,79,0.141,0.862,1.8,+91-9644889117
+REC_EXC_548,CPCB/EXC/2023/548,M/s GreenLink Recyclers Pvt. Ltd.,"Khasra no.-1641, Dasna, Kushilya
+Road, Tehsil- Ghaziabad, distt.- Ghaziabad-
+201009 6000",Uttar Pradesh,26.7853,81.4237,6000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,50.0,60,54,0.1,0.903,1.4,+91-9306442768
+REC_EXC_549,CPCB/EXC/2023/549,M/s Cynosure Recycling Private Ltd. Khasara No.-64,"Vill.-Peeplikhera,
+Pargana-Sarawa, Meerut-250002 U.P. 9000",Uttar Pradesh,26.6613,81.1202,9000.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,75.0,176,158,0.102,0.899,3.2,+91-9916596860
+REC_EXC_550,CPCB/EXC/2023/550,M/s Reclaim Enviro Pvt. Ltd.,"E.-506, Industrial Area, M.G. Road, Hapur 1236",Uttar Pradesh,26.3894,81.3109,1236.0,ACTIVE,"PCB,BATTERY,CABLE",False,0.0,10.0,158,140,0.114,0.887,0.9,+91-9916349050
+REC_EXC_551,CPCB/EXC/2023/551,M/s Ecotech Recyclers,"Khasara No.-1049,1050.1051, Vill.-Peeplikhera, Pargana-Sarawa, Meerut- 4440",Uttar Pradesh,27.2006,80.4594,4440.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,30.0,75.0,46,44,0.043,0.958,3.4,+91-9554949556
+REC_EXC_552,CPCB/EXC/2023/552,M/S Recyclico Waste Management,"Khasra No169 Green Land Industrial Complex, Gram-Dhakpura Tappa Haweli,Badaun, Up - 243638 10500",Uttar Pradesh,26.6309,80.7352,10500.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,125,117,0.064,0.937,1.1,+91-9946971984
+REC_EXC_553,CPCB/EXC/2023/553,M/s WEEE PRO RESource Recovery Solutions Private Limited  F-39 UP,"Gopalpur , Sikandaradbad,Buland shahar-
+203001 1476",Uttar Pradesh,26.85,81.2426,1476.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,75.0,87,75,0.138,0.865,1.2,+91-9898698592
+REC_EXC_554,CPCB/EXC/2023/554,M/s. 3R Recycler   Plot No. A-61/1,"UPSIDC Industrial Area, Sikandrabad, Bulandshahar,
+Buland Shahar- 203202 Uttar Pradesh 6600",Uttar Pradesh,26.3865,80.7202,6600.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,30.0,30.0,65,57,0.123,0.881,0.8,+91-9984575300
+REC_EXC_555,CPCB/EXC/2023/555,M/s Attero Recycling Pvt. ltd. Kh. No.117,"Raipur Industrial Area, Bhagwanpur 144000 153068.06",Uttarakhand,29.708,79.2828,153068.06,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,50.0,50.0,186,167,0.102,0.899,2.4,+91-9672361116
+REC_EXC_556,CPCB/EXC/2023/556,M/s Bharat Oil & Waste Management ltd. Mauja Mukimpur,"Laksar, Haridwar 325",Uttarakhand,29.7128,79.4574,325.0,ACTIVE,"PCB,BATTERY,CABLE",True,50.0,50.0,72,62,0.139,0.865,2.2,+91-9836183475
+REC_EXC_557,CPCB/EXC/2023/557,M/s Resource E-Waste Solution Pvt.Ltd. F-97,"Industrial area, Bhadrabad, Haridwar 2343.06",Uttarakhand,30.2024,78.8753,2343.06,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,20.0,50.0,217,190,0.124,0.877,3.4,+91-9777597166
+REC_EXC_558,CPCB/EXC/2023/558,M/s Anmol Paryavaran Sanrakshan Samiti,"Daulatpur Hazaratpur urf, Budhwasahid,
+Daulatpur 1200",Uttarakhand,29.8667,79.1621,1200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,50.0,184,173,0.06,0.941,1.9,+91-9318780145
+REC_EXC_559,CPCB/EXC/2023/559,M/s. Starto Metal Recycle plant,"Kh. No-314 Kh, village –Mehvar Khurd, Roorkee 1000",Uttarakhand,30.0393,78.8975,1000.0,ACTIVE,"CRT,MIXED_PLASTIC,METALS",True,20.0,75.0,217,187,0.138,0.863,2.2,+91-9545192906
+REC_EXC_560,CPCB/EXC/2023/560,M/s. Nayak Enterprises,"Village Dhakia, No. 1, Post Kundeshwari, Tehsil Kashipur, District Udham Singh Nagar, Kashipur, Uttrakhand,
+244713, Indi",Uttarakhand,29.6225,79.1291,1200.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,50.0,149,137,0.081,0.921,3.2,+91-9125971841
+REC_EXC_561,CPCB/EXC/2023/561,M/s. Root Recycling,"Khasra NO. 911, Village Padli Gurjar, Roorkee, Haridwar 2880",Uttarakhand,29.9641,78.7649,2880.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,20.0,30.0,79,77,0.025,0.975,2.6,+91-9300477332
+REC_EXC_562,CPCB/EXC/2023/562,M/s. Asha Enterprises,"Khasra No. 438/1, Rawli Mehdood , Hpase-2, Gangotri Enclave, Haridwar 120",Uttarakhand,30.0106,78.8017,120.0,ACTIVE,"PCB,BATTERY,CABLE",True,30.0,30.0,74,66,0.108,0.895,3.2,+91-9593519004
+REC_EXC_563,CPCB/EXC/2023/563,M/s J.S. Pigments Pvt. ltd,"Vill.+ P.O.-Jarua, P.S.-Polba, Hoogly-712138 600 2640",West Bengal,22.8256,88.3071,2640.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,30.0,108,99,0.083,0.918,1.2,+91-9474131545
+REC_EXC_564,CPCB/EXC/2023/564,M/s Lubrina Recycling Pvt. ltd.,"P.O. Bakrahat,
+P.S. Bishnupur, Distt.-24 Pgs(S), Pin-743377. 1080",West Bengal,23.406,87.7788,1080.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,30.0,30.0,160,144,0.1,0.901,2.2,+91-9311449835
+REC_EXC_565,CPCB/EXC/2023/565,M/s. P. U. Steel and Electro Process pvt. Ltd.,"Ruiya Industrial complex P.O. Patuliar PS-
+Khadar Distt. 24,  PGS (N), West Bengal - 750119 180",West Bengal,23.249,88.1668,180.0,ACTIVE,"PCB,BATTERY,CABLE,LCD,CRT,MIXED_PLASTIC",True,50.0,50.0,128,125,0.023,0.977,3.3,+91-9629184518
+REC_EXC_566,CPCB/EXC/2023/566,M/s Old N Furniture 323,"K.P. Mondal Road, PO & PS Budge Budge, Dist-24 PGS(S), Pin-700137 180",West Bengal,22.826,87.8996,180.0,SUSPENDED,"PCB,CABLE,LCD,MOTORS",True,20.0,30.0,54,21,0.611,0.411,0.7,+91-9690413967
+REC_EXC_567,CPCB/EXC/2023/567,M/s. Bhanu Metal Industries,"Vill. Khamar, P.O.
+-Rajarhat, P.S.-Rajarhat, Dist. 24, PGS (N)-
+700135 600",West Bengal,22.9372,88.104,600.0,ACTIVE,"PCB,CABLE,LCD,MOTORS",True,50.0,30.0,107,99,0.075,0.927,2.3,+91-9215395704
