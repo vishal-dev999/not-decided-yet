@@ -4230,16 +4230,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: selected ? AppColors.primaryGold : Colors.transparent,
+          color: selected ? const Color.fromARGB(255, 90, 119, 198) : Colors.transparent,
         ),
       ),
       child: RadioListTile<ReNovaThemeMode>(
         value: mode,
         groupValue: selectedTheme,
-        activeColor: AppColors.primaryGold,
+        activeColor: const Color.fromARGB(255, 50, 161, 226),
         secondary: Icon(
           icon,
-          color: AppColors.primaryGold,
+          color: const Color.fromARGB(255, 74, 124, 215),
         ),
         title: Text(title),
         onChanged: (value) {
