@@ -4230,7 +4230,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: selected ? const Color.fromARGB(255, 90, 119, 198) : Colors.transparent,
+          color: selected ? const Color.fromARGB(255, 1, 15, 53) : Colors.transparent,
         ),
       ),
       child: RadioListTile<ReNovaThemeMode>(
