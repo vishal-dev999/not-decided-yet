@@ -1,0 +1,97 @@
+{
+  "version": "2026.07.W4",
+  "last_updated": "2026-07-29",
+  "source_records": 45,
+  "benchmarks": {
+    "ALUMINIUM_WIRE": {
+      "material_category": "CABLE",
+      "unit": "KG",
+      "mandi_buying_price": 119.83,
+      "recycler_offered_price": 145.81,
+      "market_range_min": 107.85,
+      "market_range_max": 160.39,
+      "trend_30d_pct": 15.9,
+      "trend_direction": "UP"
+    },
+    "BATTERY_LITHIUM_PORTABLE": {
+      "material_category": "BATTERY",
+      "unit": "KG",
+      "mandi_buying_price": 129.83,
+      "recycler_offered_price": 160.81,
+      "market_range_min": 116.85,
+      "market_range_max": 176.89,
+      "trend_30d_pct": 14.2,
+      "trend_direction": "UP"
+    },
+    "COPPER_HEAVY_INSULATED": {
+      "material_category": "CABLE",
+      "unit": "KG",
+      "mandi_buying_price": 429.83,
+      "recycler_offered_price": 480.81,
+      "market_range_min": 386.85,
+      "market_range_max": 528.89,
+      "trend_30d_pct": 4.3,
+      "trend_direction": "UP"
+    },
+    "CRT_MONITOR": {
+      "material_category": "DISPLAY",
+      "unit": "PIECE",
+      "mandi_buying_price": 69.83,
+      "recycler_offered_price": 100.81,
+      "market_range_min": 62.85,
+      "market_range_max": 110.89,
+      "trend_30d_pct": 24.7,
+      "trend_direction": "UP"
+    },
+    "LCD_PANEL_INTACT": {
+      "material_category": "DISPLAY",
+      "unit": "PIECE",
+      "mandi_buying_price": 159.83,
+      "recycler_offered_price": 220.81,
+      "market_range_min": 143.85,
+      "market_range_max": 242.89,
+      "trend_30d_pct": 9.9,
+      "trend_direction": "UP"
+    },
+    "LEAD_ACID": {
+      "material_category": "BATTERY",
+      "unit": "KG",
+      "mandi_buying_price": 94.83,
+      "recycler_offered_price": 112.81,
+      "market_range_min": 85.35,
+      "market_range_max": 124.09,
+      "trend_30d_pct": 21.5,
+      "trend_direction": "UP"
+    },
+    "MIXED_EWASTE_CASING": {
+      "material_category": "PLASTIC",
+      "unit": "KG",
+      "mandi_buying_price": 27.83,
+      "recycler_offered_price": 36.81,
+      "market_range_min": 25.05,
+      "market_range_max": 40.49,
+      "trend_30d_pct": 86.9,
+      "trend_direction": "UP"
+    },
+    "MOTHERBOARD_HIGH_GRADE": {
+      "material_category": "PCB",
+      "unit": "KG",
+      "mandi_buying_price": 289.83,
+      "recycler_offered_price": 330.81,
+      "market_range_min": 260.85,
+      "market_range_max": 363.89,
+      "trend_30d_pct": 6.4,
+      "trend_direction": "UP"
+    },
+    "POWER_SUPPLY_LOW_GRADE": {
+      "material_category": "PCB",
+      "unit": "KG",
+      "mandi_buying_price": 54.83,
+      "recycler_offered_price": 70.81,
+      "market_range_min": 49.35,
+      "market_range_max": 77.89,
+      "trend_30d_pct": 39.3,
+      "trend_direction": "UP"
+    }
+  }
+}
