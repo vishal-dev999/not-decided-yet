@@ -123,6 +123,15 @@ class DatabaseHelper {
     });
   }
 
+  Future<List<Map<String, dynamic>>> getQueuedLots({int limit = 20}) async {
+    final db = await database;
+    return await db.query(
+      'sync_queue',
+      orderBy: 'created_at DESC',
+      limit: limit,
+    );
+  }
+
   Future<List<Map<String, dynamic>>> getPendingQueue() async {
     final db = await database;
     return await db.query(
