@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/services/pricing_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -32,6 +33,7 @@ class _UploadPageState extends State<UploadPage> {
   @override
   void initState() {
     super.initState();
+    PricingService.init();
     _refreshQueue();
   }
 
@@ -613,12 +615,33 @@ class _UploadPageState extends State<UploadPage> {
       final lotUid = 'LOT-${DateTime.now().millisecondsSinceEpoch}';
 
       // JSON metadata to accompany the image
+      final weight = double.tryParse(_weightController.text.trim()) ?? 1.0;
+      final estimatedTotal = PricingService.estimateValue(
+        _detectedMaterial ?? '',
+        weight,
+      );
+
       final payload = jsonEncode({
-        'lot_uid': lotUid,
-        'classified_material': _detectedMaterial,
-        'confidence': _confidence,
-        'created_at': DateTime.now().toIso8601String(),
-        'status': 'PENDING',
+        'lot_uuid': lotUid,
+        'tflite_class': _detectedMaterial,
+        'material_category': _detectedMaterial,
+        'sub_category': _detectedMaterial,
+        'weight_kg': weight,
+        'location_cluster': 'BHUBANESWAR',
+        'device_id': 'flutter-device-001',
+        'captured_at': DateTime.now().toUtc().toIso8601String(),
+        'latitude': 20.2961,
+        'longitude': 85.8245,
+        'offline_estimated_value_inr':
+            estimatedTotal, // <--- SAVES REAL ESTIMATE
+        'image_ref': p.basename(_capturedImage!.path),
+        'extra': {
+          'bulk_image_path': _bulkImage?.path,
+          'bulk_image_ref': _bulkImage != null
+              ? p.basename(_bulkImage!.path)
+              : null,
+          'model_confidence': _confidence,
+        },
       });
 
       // Save to SQLite
