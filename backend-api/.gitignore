@@ -31,6 +31,10 @@ secrets/
 *.sqlite3
 data/*.db
 data/*.sqlite*
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite*
 
 # Uploads / generated artifacts
 storage/uploads/
