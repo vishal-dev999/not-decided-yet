@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Waste AI</title>
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 16px; background: #f1f5f9; color: #0f172a; }
+    .card { background: white; padding: 18px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 16px; }
+    
+    /* Big tap-friendly upload/camera box */
+    .file-dropzone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      border: 2px dashed #94a3b8;
+      border-radius: 12px;
+      background: #f8fafc;
+      cursor: pointer;
+      text-align: center;
+    }
+    input[type="file"] { display: none; }
+    
+    button { background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; font-weight: 600; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    button.alt { background: #dc2626; }
+    button:disabled { background: #94a3b8; }
+    
+    select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; background: white; }
+    img#preview { width: 100%; max-height: 300px; object-fit: contain; border-radius: 10px; display: none; margin-top: 14px; background: #000; }
+    
+    .status-badge { margin-top: 14px; padding: 12px; border-radius: 8px; font-size: 15px; text-align: center; background: #e2e8f0; font-weight: 500; }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-err { background: #fee2e2; color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <h2>♻️ E-Waste Material Tester</h2>
+
+  <div class="card">
+    <!-- Tapping this opens camera OR photo gallery -->
+    <label class="file-dropzone" for="cameraInput">
+      <span style="font-size: 32px;">📷 / 🖼️</span>
+      <span style="margin-top: 8px; font-weight: 600;">Take Photo or Upload from Gallery</span>
+      <span style="font-size: 13px; color: #64748b; margin-top: 4px;">Tap here to select</span>
+    </label>
+    <!-- Removed capture="environment" so phone gives choice of camera or gallery -->
+    <input type="file" id="cameraInput" accept="image/*">
+    
+    <img id="preview" alt="Scrap Preview">
+    <div id="result" class="status-badge">Select an image to start inference</div>
+  </div>
+
+  <div class="card" id="feedbackCard" style="display:none;">
+    <h3>Incorrect prediction?</h3>
+    <label style="font-size: 14px; color: #475569;">Select what it actually is:</label>
+    <select id="classSelect"></select>
+    <button class="alt" id="sendFeedbackBtn">Send Photo to Dataset Inbox</button>
+    <div id="syncStatus" style="font-size: 13px; text-align: center; margin-top: 8px; color: #64748b;"></div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(console.error);
+    }
+
+    let currentBlob = null;
+    const dbPromise = indexedDB.open("EWasteCache", 1);
+    dbPromise.onupgradeneeded = e => e.target.result.createObjectStore("sync_queue", { autoIncrement: true });
+
+    // 1. Populate Classes Dropdown
+    fetch('/api/classes')
+      .then(r => r.json())
+      .then(d => {
+        const select = document.getElementById('classSelect');
+        select.innerHTML = '';
+        d.classes.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c; 
+          opt.innerText = c;
+          select.appendChild(opt);
+        });
+      })
+      .catch(() => {
+        document.getElementById('result').innerText = "⚠️ Server unreachable. Check tunnel connection.";
+      });
+
+    // 2. Automatically Run Inference Immediately When Image is Picked
+    document.getElementById('cameraInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      currentBlob = file;
+
+      // Show Preview
+      const preview = document.getElementById('preview');
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+
+      // Auto-trigger prediction
+      await runInference(file);
+    });
+
+    async function runInference(file) {
+      const result = document.getElementById('result');
+      result.className = "status-badge";
+      result.innerText = "⏳ Running MobileNetV3 inference...";
+
+      const fd = new FormData();
+      fd.append('file', file);
+
+      try {
+        const res = await fetch('/api/predict', { method: 'POST', body: fd });
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Server returned ${res.status}: ${errText}`);
+        }
+        const data = await res.json();
+        result.className = "status-badge badge-success";
+        result.innerHTML = `Predicted: <strong>${data.prediction}</strong><br><span style="font-size: 13px;">Confidence: ${data.confidence.toFixed(1)}%</span>`;
+        document.getElementById('feedbackCard').style.display = 'block';
+      } catch (err) {
+        result.className = "status-badge badge-err";
+        result.innerText = "❌ " + err.message;
+        document.getElementById('feedbackCard').style.display = 'block';
+      }
+    }
+
+    // 3. Save / Sync Misclassifications
+    document.getElementById('sendFeedbackBtn').addEventListener('click', async () => {
+      const label = document.getElementById('classSelect').value;
+      const syncStatus = document.getElementById('syncStatus');
+      syncStatus.innerText = "Uploading...";
+
+      const fd = new FormData();
+      fd.append('file', currentBlob);
+      fd.append('actual_label', label);
+
+      try {
+        const res = await fetch('/api/feedback', { method: 'POST', body: fd });
+        if (!res.ok) throw new Error();
+        syncStatus.innerText = "✅ Saved directly to dataset inbox!";
+      } catch {
+        // Fallback to IndexedDB queue
+        const db = await new Promise(r => {
+          const req = indexedDB.open("EWasteCache", 1);
+          req.onsuccess = () => r(req.result);
+        });
+        const tx = db.transaction("sync_queue", "readwrite");
+        tx.objectStore("sync_queue").add({ blob: currentBlob, label: label });
+        syncStatus.innerText = "💾 Saved locally (offline). Will auto-upload when reconnected.";
+      }
+    });
+
+    // 4. Background Sync when Phone reconnects
+    window.addEventListener('online', async () => {
+      const db = await new Promise(r => {
+        const req = indexedDB.open("EWasteCache", 1);
+        req.onsuccess = () => r(req.result);
+      });
+      const tx = db.transaction("sync_queue", "readwrite");
+      const store = tx.objectStore("sync_queue");
+      const getAll = store.openCursor();
+
+      getAll.onsuccess = async e => {
+        const cursor = e.target.result;
+        if (cursor) {
+          const { blob, label } = cursor.value;
+          const fd = new FormData();
+          fd.append('file', blob);
+          fd.append('actual_label', label);
+          try {
+            await fetch('/api/feedback', { method: 'POST', body: fd });
+            const delTx = db.transaction("sync_queue", "readwrite");
+            delTx.objectStore("sync_queue").delete(cursor.key);
+          } catch {}
+          cursor.continue();
+        }
+      };
+    });
+  </script>
+</body>
+</html>
