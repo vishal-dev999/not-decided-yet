@@ -4,21 +4,28 @@ import torch
 import torch.nn as nn
 from torchvision import datasets, models, transforms
 from torch.utils.data import DataLoader
+from PIL import Image
+
+def rgb_loader(path):
+    with open(path, "rb") as f:
+        img = Image.open(f)
+        return img.convert("RGB")
 
 def main():
     # 1. Directory resolution
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-    REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
+    REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 
-    DATA_DIR = os.path.join(REPO_ROOT, "datasets", "images")
+    DATA_DIR = os.path.abspath(os.path.join(REPO_ROOT, "..", "datasets", "images"))
     TRAIN_DIR = os.path.join(DATA_DIR, "train")
     VAL_DIR = os.path.join(DATA_DIR, "val")
-    OUTPUT_DIR = SCRIPT_DIR
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    ARTIFACTS_DIR = os.path.join(REPO_ROOT, "artifacts")
+    os.makedirs(ARTIFACTS_DIR, exist_ok=True)
+    OUTPUT_DIR = ARTIFACTS_DIR
 
     BATCH_SIZE = 32
     EPOCHS = 12
-    LEARNING_RATE = 1e-3
     DEVICE = torch.device("cpu")
 
     # Preprocessing transforms (MobileNet standard input)
@@ -37,9 +44,9 @@ def main():
         ])
     }
 
-    # 2. Load datasets with num_workers=0 for safe CPU execution
-    train_dataset = datasets.ImageFolder(TRAIN_DIR, transform=data_transforms["train"])
-    val_dataset = datasets.ImageFolder(VAL_DIR, transform=data_transforms["val"])
+    # 2. Load datasets with custom loader (handles RGBA / transparency)
+    train_dataset = datasets.ImageFolder(TRAIN_DIR, transform=data_transforms["train"], loader=rgb_loader)
+    val_dataset = datasets.ImageFolder(VAL_DIR, transform=data_transforms["val"], loader=rgb_loader)
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
@@ -50,6 +57,9 @@ def main():
     print(f"Detected {num_classes} classes: {class_names}")
     print(f"Training samples: {len(train_dataset)} | Validation samples: {len(val_dataset)}")
 
+    if len(train_dataset) == 0 or len(val_dataset) == 0:
+        raise ValueError("Dataset empty! Make sure split_dataset.py populated both train and val folders.")
+
     # Save class labels
     labels_path = os.path.join(OUTPUT_DIR, "labels.txt")
     with open(labels_path, "w") as f:
@@ -57,40 +67,36 @@ def main():
             f.write(f"{name}\n")
     print(f"Saved {labels_path}")
 
-# 1. Load backbone
+    # 3. Model Setup
     model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
 
-# 2. Freeze all early layers (edges, textures, color gradients)
+    # Freeze early layers
     for param in model.parameters():
         param.requires_grad = False
 
-# 3. Unfreeze the last 3 depthwise-separable blocks of the backbone
+    # Unfreeze the last 3 depthwise-separable blocks
     for block in model.features[-3:]:
         for param in block.parameters():
             param.requires_grad = True
 
-# 4. Replace final classification head
+    # Replace final classification head
     in_features = model.classifier[3].in_features
     model.classifier[3] = nn.Linear(in_features, num_classes)
     model.to(DEVICE)
 
-# 5. Differential Learning Rates:
-# Train the newly initialized head faster, and gently fine-tune the backbone
+    # Differential Learning Rates
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam([
         {"params": model.features[-3:].parameters(), "lr": 1e-4},
         {"params": model.classifier.parameters(), "lr": 1e-3}
     ])
 
-# Train for 10-12 epochs
-    EPOCHS = 12
-
     # 4. Train and validate
     print("\nStarting training loop...")
     start_time = time.time()
 
     for epoch in range(EPOCHS):
-        # --- Training Phase ---
+        # Training Phase
         model.train()
         train_loss, train_correct, train_total = 0.0, 0, 0
 
@@ -111,7 +117,7 @@ def main():
         epoch_train_loss = train_loss / train_total
         epoch_train_acc = (train_correct / train_total) * 100
 
-        # --- Validation Phase ---
+        # Validation Phase
         model.eval()
         val_loss, val_correct, val_total = 0.0, 0, 0
 
@@ -129,7 +135,7 @@ def main():
         epoch_val_loss = val_loss / val_total
         epoch_val_acc = (val_correct / val_total) * 100
 
-        print(f"Epoch {epoch+1}/{EPOCHS} | "
+        print(f"Epoch {epoch+1:02d}/{EPOCHS} | "
               f"Train Loss: {epoch_train_loss:.4f} Acc: {epoch_train_acc:.1f}% | "
               f"Val Loss: {epoch_val_loss:.4f} Acc: {epoch_val_acc:.1f}%")
 
