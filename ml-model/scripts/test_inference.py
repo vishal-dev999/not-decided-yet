@@ -4,7 +4,14 @@ import numpy as np
 import onnxruntime as ort
 from PIL import Image
 
-def test_model(image_path, model_path="model.onnx", labels_path="labels.txt"):
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_MODEL = os.path.join(SCRIPT_DIR, "model.onnx")
+if not os.path.exists(DEFAULT_MODEL):
+    DEFAULT_MODEL = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "model.onnx"))
+
+DEFAULT_LABELS = os.path.join(SCRIPT_DIR, "labels.txt")
+
+def test_model(image_path, model_path=DEFAULT_MODEL, labels_path=DEFAULT_LABELS):
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model not found: {model_path}")
     if not os.path.exists(image_path):
@@ -18,9 +25,9 @@ def test_model(image_path, model_path="model.onnx", labels_path="labels.txt"):
 
     # 2. Open image and resize to 224x224 RGB
     img = Image.open(image_path).convert("RGB")
-    img = img.resize((224, 224))
+    img = img.resize((224, 224), Image.BILINEAR)
 
-    # 3. Convert to float numpy array and normalize: ToTensor() -> (val / 255.0)
+    # 3. Convert to float numpy array and scale [0, 1]
     arr = np.array(img, dtype=np.float32) / 255.0
 
     # 4. Standard ImageNet normalization: (arr - mean) / std
@@ -55,23 +62,10 @@ def test_model(image_path, model_path="model.onnx", labels_path="labels.txt"):
     print("Class Probabilities:")
     for i, p in enumerate(probs):
         name = labels[i] if i < len(labels) else f"Class {i}"
-        print(f"  [{i}] {name:<20}: {p * 100:.2f}%")
+        print(f"  [{i}] {name:<25}: {p * 100:.2f}%")
 
 if __name__ == "__main__":
-    # Pass an image from your val/train dataset or command line arg
-    default_img = "../../datasets/images/val"
     if len(sys.argv) > 1:
-        img_file = sys.argv[1]
+        test_model(sys.argv[1])
     else:
-        # Pick the first available image from the dataset if no path is given
-        found = None
-        for root, _, files in os.walk(default_img):
-            for f in files:
-                if f.lower().endswith((".jpg", ".png", ".jpeg")):
-                    found = os.path.join(root, f)
-                    break
-            if found:
-                break
-        img_file = found or "sample.jpg"
-
-    test_model(img_file)
+        print("Usage: python test_onnx.py <path_to_test_image.jpg>")
