@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,22 +24,26 @@ void main() async {
 // ============================================================
 
 class AppColors {
-  static const Color darkBackground = Color(0xFF00002A);
-  static const Color cardBg = Color(0xFF1A3F75);
+  // Dark Mode Palette
+  static const Color darkBackground = Color(0xFF0D1B1E); // Deep dark forest green
+  static const Color cardBg = Color(0xFF1B3B36); // Rich dark emerald green
 
-  static const Color primaryGold = Color(0xFFE99856);
-  static const Color accentCoral = Color(0xFFA54055);
-  static const Color mintGreen = Color(0xFF86C5DA);
+  static const Color primaryGold = Color(0xFF70A9A1); // Mint green accent
+  static const Color accentCoral = Color(0xFF5A9E87); // Deep sage green
+  static const Color mintGreen = Color(0xFF90E0EF);
 
-  static const Color lightGreen = Color(0xFF72D6A4);
+  static const Color lightGreen = Color(0xFF4CAF50);
+  static const Color ColorGold = Color(0xFFF2B84B);
   static const Color warning = Color(0xFFF2B84B);
   static const Color danger = Color(0xFFE66A6A);
 
-  static const Color lightBackground = Color(0xFFF5F7FB);
+  // Light Mode Palette (Feather Green & Off-White)
+  static const Color lightBackground = Color(0xFFFAFAF7); // Soft off-white background
   static const Color lightCard = Color(0xFFFFFFFF);
-  static const Color lightText = Color(0xFF172033);
-  static const Color lightMuted = Color(0xFF667085);
-  static const Color lightFaint = Color(0xFF8A93A3);
+  static const Color featherGreen = Color(0xFF7FA998); // Soft feather green accent
+  static const Color lightText = Color(0xFF1E2D2B);
+  static const Color lightMuted = Color(0xFF5B7065);
+  static const Color lightFaint = Color(0xFF8FA89B);
 }
 
 // ============================================================
@@ -91,13 +98,18 @@ class AppThemeColors {
 }
 
 // ============================================================
-// LANGUAGE
+// LANGUAGE & USER TYPE
 // ============================================================
 
 enum AppLanguage {
   english,
   hindi,
   marathi,
+}
+
+enum UserType {
+  scrapCollector,
+  recycler,
 }
 
 // ============================================================
@@ -115,8 +127,7 @@ class ReNovaStorage {
 
   static Future<ReNovaStorage> create() async {
     final prefs = await SharedPreferences.getInstance();
-    final directory =
-        await getApplicationDocumentsDirectory();
+    final directory = await getApplicationDocumentsDirectory();
 
     return ReNovaStorage._(
       prefs,
@@ -124,134 +135,119 @@ class ReNovaStorage {
     );
   }
 
-  String? get collectorName =>
-      prefs.getString('collector_name');
-
-  String? get location =>
-      prefs.getString('collector_location');
-
-  String? get language =>
-      prefs.getString('language');
-
-  String? get theme =>
-      prefs.getString('theme');
-
-  String? get profileImagePath =>
-      prefs.getString('profile_image_path');
-
-  String? get pickupImagePath =>
-      prefs.getString('pickup_image_path');
-
-  String? get paymentPreference =>
-      prefs.getString('payment_preference');
+  String? get collectorName => prefs.getString('collector_name');
+  String? get location => prefs.getString('collector_location');
+  String? get age => prefs.getString('collector_age');
+  String? get otherDetails => prefs.getString('collector_other_details');
+  String? get language => prefs.getString('language');
+  String? get theme => prefs.getString('theme');
+  String? get profileImagePath => prefs.getString('profile_image_path');
+  String? get pickupImagePath => prefs.getString('pickup_image_path');
+  String? get paymentPreference => prefs.getString('payment_preference');
+  String? get userType => prefs.getString('user_type');
+  String? get savedUpiId => prefs.getString('saved_upi_id');
 
   String get collectorId =>
-      prefs.getString('collector_id') ??
-      'RN-COL-2026-01428';
+      prefs.getString('collector_id') ?? 'RN-COL-2026-01428';
 
   Future<void> saveProfile({
     required String name,
     required String location,
+    String? age,
+    String? otherDetails,
     required String language,
     required String paymentPreference,
     String? profileImagePath,
+    String? userType,
   }) async {
-    await prefs.setString(
-      'collector_name',
-      name,
-    );
-
-    await prefs.setString(
-      'collector_location',
-      location,
-    );
-
-    await prefs.setString(
-      'language',
-      language,
-    );
-
-    await prefs.setString(
-      'payment_preference',
-      paymentPreference,
-    );
+    await prefs.setString('collector_name', name);
+    await prefs.setString('collector_location', location);
+    if (age != null) await prefs.setString('collector_age', age);
+    if (otherDetails != null) await prefs.setString('collector_other_details', otherDetails);
+    await prefs.setString('language', language);
+    await prefs.setString('payment_preference', paymentPreference);
+    if (userType != null) {
+      await prefs.setString('user_type', userType);
+    }
 
     if (profileImagePath != null) {
-      await prefs.setString(
-        'profile_image_path',
-        profileImagePath,
-      );
+      await prefs.setString('profile_image_path', profileImagePath);
     }
   }
 
-  Future<void> saveTheme(
-    ReNovaThemeMode mode,
-  ) async {
-    await prefs.setString(
-      'theme',
-      mode == ReNovaThemeMode.dark
-          ? 'dark'
-          : 'light',
-    );
+  Future<void> saveUpiId(String upiId) async {
+    await prefs.setString('saved_upi_id', upiId);
   }
 
-  Future<String> saveImagePermanently(
-    XFile image,
-    String filename,
-  ) async {
-    final target = File(
-      '${documentsDirectory.path}/$filename',
-    );
+  Future<void> saveTheme(ReNovaThemeMode mode) async {
+    await prefs.setString('theme', mode == ReNovaThemeMode.dark ? 'dark' : 'light');
+  }
 
-    await File(image.path).copy(
-      target.path,
-    );
-
+  Future<String> saveImagePermanently(XFile image, String filename) async {
+    final target = File('${documentsDirectory.path}/$filename');
+    await File(image.path).copy(target.path);
     return target.path;
   }
 
-  Future<void> savePickupImage(
-    XFile image,
-  ) async {
-    final path = await saveImagePermanently(
-      image,
-      'renova_pickup.jpg',
-    );
-
-    await prefs.setString(
-      'pickup_image_path',
-      path,
-    );
+  Future<void> savePickupImage(XFile image) async {
+    final path = await saveImagePermanently(image, 'renova_pickup.jpg');
+    await prefs.setString('pickup_image_path', path);
   }
 
-  Future<void> saveProfileImage(
-    XFile image,
-  ) async {
-    final path = await saveImagePermanently(
-      image,
-      'renova_profile.jpg',
-    );
-
-    await prefs.setString(
-      'profile_image_path',
-      path,
-    );
+  Future<void> saveProfileImage(XFile image) async {
+    final path = await saveImagePermanently(image, 'renova_profile.jpg');
+    await prefs.setString('profile_image_path', path);
   }
 
   Future<void> removePickupImage() async {
     final path = pickupImagePath;
-
     if (path != null) {
       final file = File(path);
-
       if (await file.exists()) {
         await file.delete();
       }
     }
+    await prefs.remove('pickup_image_path');
+  }
 
-    await prefs.remove(
-      'pickup_image_path',
-    );
+  List<Map<String, dynamic>> get classificationHistory {
+    final raw = prefs.getStringList('classification_history') ?? [];
+    return raw.map((item) {
+      try {
+        return Map<String, dynamic>.from(jsonDecode(item) as Map);
+      } catch (_) {
+        return <String, dynamic>{};
+      }
+    }).where((item) => item.isNotEmpty).toList();
+  }
+
+  Future<void> saveClassification(Map<String, dynamic> item) async {
+    final items = prefs.getStringList('classification_history') ?? [];
+    items.insert(0, jsonEncode(item));
+    if (items.length > 100) {
+      items.removeRange(100, items.length);
+    }
+    await prefs.setStringList('classification_history', items);
+  }
+
+  List<Map<String, dynamic>> get paymentHistory {
+    final raw = prefs.getStringList('payment_history') ?? [];
+    return raw.map((item) {
+      try {
+        return Map<String, dynamic>.from(jsonDecode(item) as Map);
+      } catch (_) {
+        return <String, dynamic>{};
+      }
+    }).where((item) => item.isNotEmpty).toList();
+  }
+
+  Future<void> savePayment(Map<String, dynamic> item) async {
+    final items = prefs.getStringList('payment_history') ?? [];
+    items.insert(0, jsonEncode(item));
+    if (items.length > 100) {
+      items.removeRange(100, items.length);
+    }
+    await prefs.setStringList('payment_history', items);
   }
 }
 
@@ -268,80 +264,51 @@ class ReNovaApp extends StatefulWidget {
   });
 
   @override
-  State<ReNovaApp> createState() =>
-      _ReNovaAppState();
+  State<ReNovaApp> createState() => _ReNovaAppState();
 }
 
-class _ReNovaAppState
-    extends State<ReNovaApp> {
+class _ReNovaAppState extends State<ReNovaApp> {
   late ReNovaThemeMode themeMode;
-
   AppLanguage language = AppLanguage.english;
-
   String collectorName = '';
   String location = '';
-
   String paymentPreference = 'Cash';
-
   String? profileImagePath;
 
   @override
   void initState() {
     super.initState();
 
-    final savedTheme =
-        widget.storage.theme;
+    final savedTheme = widget.storage.theme;
+    themeMode = savedTheme == 'light'
+        ? ReNovaThemeMode.light
+        : ReNovaThemeMode.dark;
 
-    themeMode =
-        savedTheme == 'light'
-            ? ReNovaThemeMode.light
-            : ReNovaThemeMode.dark;
+    final savedLanguage = widget.storage.language;
+    language = savedLanguage == 'hindi'
+        ? AppLanguage.hindi
+        : savedLanguage == 'marathi'
+            ? AppLanguage.marathi
+            : AppLanguage.english;
 
-    final savedLanguage =
-        widget.storage.language;
-
-    language =
-        savedLanguage == 'hindi'
-            ? AppLanguage.hindi
-            : savedLanguage == 'marathi'
-                ? AppLanguage.marathi
-                : AppLanguage.english;
-
-    collectorName =
-        widget.storage.collectorName ?? '';
-
-    location =
-        widget.storage.location ?? '';
-
-    paymentPreference =
-        widget.storage.paymentPreference ??
-            'Cash';
-
-    profileImagePath =
-        widget.storage.profileImagePath;
+    collectorName = widget.storage.collectorName ?? '';
+    location = widget.storage.location ?? '';
+    paymentPreference = widget.storage.paymentPreference ?? 'Cash';
+    profileImagePath = widget.storage.profileImagePath;
   }
 
-  Future<void> changeTheme(
-    ReNovaThemeMode mode,
-  ) async {
+  Future<void> changeTheme(ReNovaThemeMode mode) async {
     setState(() {
       themeMode = mode;
     });
-
     await widget.storage.saveTheme(mode);
   }
 
-  Future<void> changeLanguage(
-    AppLanguage newLanguage,
-  ) async {
+  Future<void> changeLanguage(AppLanguage newLanguage) async {
     setState(() {
       language = newLanguage;
     });
-
-    await widget.storage.prefs.setString(
-      'language',
-      newLanguage.name,
-    );
+    await widget.storage.prefs.setString('language', newLanguage.name);
   }
 
   @override
@@ -349,84 +316,56 @@ class _ReNovaAppState
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ReNova',
-
       theme: ThemeData(
         brightness: Brightness.light,
         useMaterial3: true,
-        scaffoldBackgroundColor:
-            AppColors.lightBackground,
-        colorScheme:
-            ColorScheme.fromSeed(
-          seedColor:
-              AppColors.primaryGold,
+        scaffoldBackgroundColor: AppColors.lightBackground,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.featherGreen,
           brightness: Brightness.light,
         ),
-        appBarTheme:
-            const AppBarTheme(
-          backgroundColor:
-              AppColors.lightBackground,
-          foregroundColor:
-              AppColors.lightText,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.lightBackground,
+          foregroundColor: AppColors.lightText,
           elevation: 0,
         ),
-        navigationBarTheme:
-            NavigationBarThemeData(
-          backgroundColor:
-              AppColors.lightCard,
-          indicatorColor:
-              AppColors.primaryGold
-                  .withValues(alpha: 0.22),
-          labelTextStyle:
-              const WidgetStatePropertyAll(
-            TextStyle(
-              fontWeight:
-                  FontWeight.w600,
-            ),
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: AppColors.lightCard,
+          indicatorColor: AppColors.featherGreen.withValues(alpha: 0.22),
+          labelTextStyle: const WidgetStatePropertyAll(
+            TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
           ),
         ),
       ),
-
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         useMaterial3: true,
-        scaffoldBackgroundColor:
-            AppColors.darkBackground,
-        colorScheme:
-            ColorScheme.fromSeed(
-          seedColor:
-              AppColors.primaryGold,
+        scaffoldBackgroundColor: AppColors.darkBackground,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primaryGold,
           brightness: Brightness.dark,
         ),
-        appBarTheme:
-            const AppBarTheme(
-          backgroundColor:
-              AppColors.darkBackground,
-          foregroundColor:
-              Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.darkBackground,
+          foregroundColor: Colors.white,
           elevation: 0,
         ),
-        navigationBarTheme:
-            NavigationBarThemeData(
-          backgroundColor:
-              AppColors.cardBg,
-          indicatorColor:
-              AppColors.primaryGold
-                  .withValues(alpha: 0.25),
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: AppColors.cardBg,
+          indicatorColor: AppColors.primaryGold.withValues(alpha: 0.25),
+          labelTextStyle: const WidgetStatePropertyAll(
+            TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+          ),
         ),
       ),
-
-      themeMode:
-          themeMode == ReNovaThemeMode.light
-              ? ThemeMode.light
-              : ThemeMode.dark,
-
-      home:
-          LanguageSelectionScreen(
+      themeMode: themeMode == ReNovaThemeMode.light
+          ? ThemeMode.light
+          : ThemeMode.dark,
+      home: LanguageSelectionScreen(
         themeMode: themeMode,
         onThemeChanged: changeTheme,
         language: language,
-        onLanguageChanged:
-            changeLanguage,
+        onLanguageChanged: changeLanguage,
       ),
     );
   }
@@ -441,42 +380,93 @@ Widget themeSwitchButton(
   ReNovaThemeMode mode,
   ValueChanged<ReNovaThemeMode> onChanged,
 ) {
-  final isDark =
-      mode == ReNovaThemeMode.dark;
+  final state = context.findAncestorStateOfType<_ReNovaAppState>();
+  final currentMode = state?.themeMode ?? mode;
+  final isDark = currentMode == ReNovaThemeMode.dark;
 
   return IconButton(
-    tooltip: isDark
-        ? 'Switch to light mode'
-        : 'Switch to dark mode',
+    tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
     icon: Icon(
-      isDark
-          ? Icons.light_mode
-          : Icons.dark_mode,
-      color: AppColors.primaryGold,
+      isDark ? Icons.light_mode : Icons.dark_mode,
+      color: isDark ? AppColors.primaryGold : AppColors.featherGreen,
     ),
     onPressed: () {
-      onChanged(
-        isDark
-            ? ReNovaThemeMode.light
-            : ReNovaThemeMode.dark,
-      );
+      final newMode = isDark ? ReNovaThemeMode.light : ReNovaThemeMode.dark;
+      if (state != null) {
+        state.changeTheme(newMode);
+      } else {
+        onChanged(newMode);
+      }
     },
   );
+}
+
+// ============================================================
+// ANIMATED BELL ICON BUTTON
+// ============================================================
+
+class AnimatedBellIconButton extends StatefulWidget {
+  final VoidCallback onPressed;
+
+  const AnimatedBellIconButton({super.key, required this.onPressed});
+
+  @override
+  State<AnimatedBellIconButton> createState() => _AnimatedBellIconButtonState();
+}
+
+class _AnimatedBellIconButtonState extends State<AnimatedBellIconButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _triggerShake() {
+    _controller.forward(from: 0.0);
+    widget.onPressed();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final double rotate =
+            math.sin(_controller.value * math.pi * 4) * 0.25;
+        return Transform.rotate(
+          angle: rotate,
+          child: child,
+        );
+      },
+      child: IconButton(
+        icon: const Icon(Icons.notifications_none),
+        onPressed: _triggerShake,
+      ),
+    );
+  }
 }
 
 // ============================================================
 // SCREEN 1 - LANGUAGE
 // ============================================================
 
-class LanguageSelectionScreen
-    extends StatefulWidget {
+class LanguageSelectionScreen extends StatefulWidget {
   final ReNovaThemeMode themeMode;
-  final ValueChanged<ReNovaThemeMode>
-      onThemeChanged;
-
+  final ValueChanged<ReNovaThemeMode> onThemeChanged;
   final AppLanguage language;
-  final ValueChanged<AppLanguage>
-      onLanguageChanged;
+  final ValueChanged<AppLanguage> onLanguageChanged;
 
   const LanguageSelectionScreen({
     super.key,
@@ -487,13 +477,11 @@ class LanguageSelectionScreen
   });
 
   @override
-  State<LanguageSelectionScreen>
-      createState() =>
-          _LanguageSelectionScreenState();
+  State<LanguageSelectionScreen> createState() =>
+      _LanguageSelectionScreenState();
 }
 
-class _LanguageSelectionScreenState
-    extends State<LanguageSelectionScreen> {
+class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   late AppLanguage selectedLanguage;
 
   @override
@@ -513,6 +501,17 @@ class _LanguageSelectionScreenState
     }
   }
 
+  String get subtitle {
+    switch (selectedLanguage) {
+      case AppLanguage.english:
+        return 'Formal Recycling & Fair Price Bridge';
+      case AppLanguage.hindi:
+        return 'औपचारिक रीसाइक्लिंग और उचित मूल्य पुल';
+      case AppLanguage.marathi:
+        return 'अधिकृत पुनर्वापर आणि योग्य मूल्य मंच';
+    }
+  }
+
   String get continueText {
     switch (selectedLanguage) {
       case AppLanguage.english:
@@ -526,6 +525,8 @@ class _LanguageSelectionScreenState
 
   @override
   Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -533,140 +534,84 @@ class _LanguageSelectionScreenState
           child: Column(
             children: [
               Align(
-                alignment:
-                    Alignment.topRight,
-                child:
-                    themeSwitchButton(
+                alignment: Alignment.topRight,
+                child: themeSwitchButton(
                   context,
                   widget.themeMode,
                   widget.onThemeChanged,
                 ),
               ),
-
               const SizedBox(height: 35),
-
+              // Front Logo Updated
               Container(
                 height: 95,
                 width: 95,
-                decoration:
-                    BoxDecoration(
-                  color:
-                      AppColors.primaryGold,
-                  borderRadius:
-                      BorderRadius.circular(
-                    28,
+                decoration: BoxDecoration(
+                  color: activeAccent,
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.eco,
+                    size: 58,
+                    color: AppColors.darkBackground,
                   ),
                 ),
-                child: const Icon(
-                  Icons.recycling,
-                  size: 58,
-                  color:
-                      AppColors.darkBackground,
-                ),
               ),
-
               const SizedBox(height: 24),
-
-              const Text(
+              Text(
                 'ReNova',
                 style: TextStyle(
                   fontSize: 38,
-                  fontWeight:
-                      FontWeight.bold,
-                  color:
-                      AppColors.primaryGold,
+                  fontWeight: FontWeight.bold,
+                  color: activeAccent,
                 ),
               ),
-
               const SizedBox(height: 8),
-
               Text(
-                'Formal Recycling & Fair Price Bridge',
-                textAlign:
-                    TextAlign.center,
+                subtitle,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15,
-                  color:
-                      AppThemeColors.muted(
-                    context,
-                  ),
+                  color: AppThemeColors.muted(context),
                 ),
               ),
-
               const SizedBox(height: 40),
-
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 21,
-                  fontWeight:
-                      FontWeight.bold,
-                  color:
-                      AppThemeColors.text(
-                    context,
-                  ),
+                  fontWeight: FontWeight.bold,
+                  color: AppThemeColors.text(context),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              _languageButton(
-                'English',
-                AppLanguage.english,
-              ),
-
-              _languageButton(
-                'हिंदी',
-                AppLanguage.hindi,
-              ),
-
-              _languageButton(
-                'मराठी',
-                AppLanguage.marathi,
-              ),
-
+              _languageButton('English', AppLanguage.english),
+              _languageButton('हिंदी', AppLanguage.hindi),
+              _languageButton('मराठी', AppLanguage.marathi),
               const SizedBox(height: 20),
-
               SizedBox(
-                width:
-                    double.infinity,
+                width: double.infinity,
                 height: 54,
-                child:
-                    ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor:
-                        AppColors.primaryGold,
-                    foregroundColor:
-                        AppColors.darkBackground,
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
-                      ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: activeAccent,
+                    foregroundColor: AppColors.darkBackground,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   onPressed: () {
-                    widget
-                        .onLanguageChanged(
-                      selectedLanguage,
-                    );
-
+                    widget.onLanguageChanged(selectedLanguage);
                     final storage = _getStorage(context);
 
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            CollectorProfileScreen(
-                          language:
-                              selectedLanguage,
-                          themeMode:
-                              widget.themeMode,
-                          onThemeChanged:
-                              widget
-                                  .onThemeChanged,
+                        builder: (_) => CollectorProfileScreen(
+                          language: selectedLanguage,
+                          themeMode: widget.themeMode,
+                          onThemeChanged: widget.onThemeChanged,
                           storage: storage,
                           initialName: storage.collectorName ?? '',
                           initialLocation: storage.location ?? '',
@@ -676,11 +621,9 @@ class _LanguageSelectionScreenState
                   },
                   child: Text(
                     continueText,
-                    style:
-                        const TextStyle(
+                    style: const TextStyle(
                       fontSize: 17,
-                      fontWeight:
-                          FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -692,61 +635,39 @@ class _LanguageSelectionScreenState
     );
   }
 
-  Widget _languageButton(
-    String text,
-    AppLanguage language,
-  ) {
-    final selected =
-        selectedLanguage == language;
+  Widget _languageButton(String text, AppLanguage language) {
+    final selected = selectedLanguage == language;
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
 
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
       onTap: () {
         setState(() {
-          selectedLanguage =
-              language;
+          selectedLanguage = language;
         });
       },
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
         width: double.infinity,
-        margin:
-            const EdgeInsets.only(
-          bottom: 12,
-        ),
-        padding:
-            const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 18,
-        ),
-        decoration:
-            BoxDecoration(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+        decoration: BoxDecoration(
           color: selected
-              ? AppColors.primaryGold
-                  .withValues(
-                  alpha: 0.18,
-                )
-              : AppThemeColors.card(
-                  context,
-                ),
-          borderRadius:
-              BorderRadius.circular(16),
+              ? activeAccent.withValues(alpha: 0.18)
+              : AppThemeColors.card(context),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected
-                ? AppColors.primaryGold
-                : Colors.transparent,
+            color: selected ? activeAccent : Colors.transparent,
             width: 1.5,
           ),
         ),
         child: Row(
           children: [
             Icon(
-              selected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_off,
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
               color: selected
-                  ? AppColors.primaryGold
-                  : AppThemeColors.faint(
-                      context,
-                    ),
+                  ? activeAccent
+                  : AppThemeColors.faint(context),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -754,12 +675,8 @@ class _LanguageSelectionScreenState
                 text,
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight:
-                      FontWeight.w600,
-                  color:
-                      AppThemeColors.text(
-                    context,
-                  ),
+                  fontWeight: FontWeight.w600,
+                  color: AppThemeColors.text(context),
                 ),
               ),
             ),
@@ -774,19 +691,11 @@ class _LanguageSelectionScreenState
 // STORAGE ACCESS
 // ============================================================
 
-ReNovaStorage _getStorage(
-  BuildContext context,
-) {
-  final state =
-      context.findAncestorStateOfType<
-          _ReNovaAppState>();
-
+ReNovaStorage _getStorage(BuildContext context) {
+  final state = context.findAncestorStateOfType<_ReNovaAppState>();
   if (state == null) {
-    throw Exception(
-      'ReNova storage is unavailable.',
-    );
+    throw Exception('ReNova storage is unavailable.');
   }
-
   return state.widget.storage;
 }
 
@@ -794,16 +703,11 @@ ReNovaStorage _getStorage(
 // SCREEN 2 - COLLECTOR PROFILE (LOGIN / SIGNUP)
 // ============================================================
 
-class CollectorProfileScreen
-    extends StatefulWidget {
+class CollectorProfileScreen extends StatefulWidget {
   final AppLanguage language;
-
   final ReNovaThemeMode themeMode;
-  final ValueChanged<ReNovaThemeMode>
-      onThemeChanged;
-
+  final ValueChanged<ReNovaThemeMode> onThemeChanged;
   final ReNovaStorage storage;
-
   final String initialName;
   final String initialLocation;
 
@@ -818,32 +722,28 @@ class CollectorProfileScreen
   });
 
   @override
-  State<CollectorProfileScreen>
-      createState() =>
-          _CollectorProfileScreenState();
+  State<CollectorProfileScreen> createState() => _CollectorProfileScreenState();
 }
 
-class _CollectorProfileScreenState
-    extends State<CollectorProfileScreen> {
+class _CollectorProfileScreenState extends State<CollectorProfileScreen> {
   late TextEditingController nameController;
   late TextEditingController locationController;
 
   final ImagePicker picker = ImagePicker();
   String? profileImagePath;
+  UserType selectedUserType = UserType.scrapCollector;
 
   @override
   void initState() {
     super.initState();
-
-    nameController = TextEditingController(
-      text: widget.initialName,
-    );
-
-    locationController = TextEditingController(
-      text: widget.initialLocation,
-    );
-
+    nameController = TextEditingController(text: widget.initialName);
+    locationController = TextEditingController(text: widget.initialLocation);
     profileImagePath = widget.storage.profileImagePath;
+
+    final savedUserType = widget.storage.userType;
+    if (savedUserType == 'recycler') {
+      selectedUserType = UserType.recycler;
+    }
   }
 
   @override
@@ -882,6 +782,17 @@ class _CollectorProfileScreenState
     }
   }
 
+  String get subtitle {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Create or log into your digital collector profile';
+      case AppLanguage.hindi:
+        return 'अपना डिजिटल स्क्रैप प्रोफ़ाइल बनाएं या लॉग इन करें';
+      case AppLanguage.marathi:
+        return 'तुमचे डिजिटल प्रोफाइल तयार करा किंवा लॉगिन करा';
+    }
+  }
+
   String get nameLabel {
     switch (widget.language) {
       case AppLanguage.english:
@@ -904,6 +815,39 @@ class _CollectorProfileScreenState
     }
   }
 
+  String get userTypeLabel {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Select Role';
+      case AppLanguage.hindi:
+        return 'अपनी भूमिका चुनें';
+      case AppLanguage.marathi:
+        return 'तुमची भूमिका निवडा';
+    }
+  }
+
+  String get collectorRoleText {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Scrap Collector';
+      case AppLanguage.hindi:
+        return 'कबाड़ संग्रहकर्ता (Scrap Collector)';
+      case AppLanguage.marathi:
+        return 'भंगार विक्रेता (Scrap Collector)';
+    }
+  }
+
+  String get recyclerRoleText {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Recycler';
+      case AppLanguage.hindi:
+        return 'पुनर्चक्रणकर्ता (Recycler)';
+      case AppLanguage.marathi:
+        return 'पुनर्वापरकर्ता (Recycler)';
+    }
+  }
+
   String get continueText {
     switch (widget.language) {
       case AppLanguage.english:
@@ -915,9 +859,160 @@ class _CollectorProfileScreenState
     }
   }
 
+  String get privacyText {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Only essential collector information is used. ReNova does not require unnecessary personal details.';
+      case AppLanguage.hindi:
+        return 'केवल आवश्यक संग्रहकर्ता जानकारी का उपयोग किया जाता है। ReNova को अनावश्यक व्यक्तिगत विवरणों की आवश्यकता नहीं है।';
+      case AppLanguage.marathi:
+        return 'फक्त आवश्यक माहिती वापरली जाते. ReNova ला अनावश्यक वैयक्तिक माहितीची गरज नाही.';
+    }
+  }
+
+  void _showRoleSelectorBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppThemeColors.card(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppThemeColors.faint(context),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        userTypeLabel,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppThemeColors.text(context),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        child: Column(
+                          children: [
+                            _roleOptionTile(
+                              title: collectorRoleText,
+                              icon: Icons.unarchive_outlined,
+                              type: UserType.scrapCollector,
+                              onTap: () {
+                                setModalState(() {
+                                  selectedUserType = UserType.scrapCollector;
+                                });
+                                setState(() {});
+                                Navigator.pop(context);
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            _roleOptionTile(
+                              title: recyclerRoleText,
+                              icon: Icons.autorenew,
+                              type: UserType.recycler,
+                              onTap: () {
+                                setModalState(() {
+                                  selectedUserType = UserType.recycler;
+                                });
+                                setState(() {});
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _roleOptionTile({
+    required String title,
+    required IconData icon,
+    required UserType type,
+    required VoidCallback onTap,
+  }) {
+    final selected = selectedUserType == type;
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: selected
+              ? activeAccent.withValues(alpha: 0.18)
+              : AppThemeColors.background(context),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? activeAccent : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: activeAccent,
+              size: 28,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppThemeColors.text(context),
+                ),
+              ),
+            ),
+            Icon(
+              selected ? Icons.check_circle : Icons.circle_outlined,
+              color: selected
+                  ? activeAccent
+                  : AppThemeColors.faint(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasValidImage = profileImagePath != null && File(profileImagePath!).existsSync();
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
 
     return Scaffold(
       appBar: AppBar(
@@ -939,7 +1034,7 @@ class _CollectorProfileScreenState
                 children: [
                   CircleAvatar(
                     radius: 48,
-                    backgroundColor: AppColors.primaryGold,
+                    backgroundColor: activeAccent,
                     backgroundImage: hasValidImage ? FileImage(File(profileImagePath!)) : null,
                     child: !hasValidImage
                         ? const Icon(
@@ -960,55 +1055,98 @@ class _CollectorProfileScreenState
                   ),
                 ],
               ),
-
               const SizedBox(height: 24),
-
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 27,
-                  fontWeight: FontWeight.bold,
-                  color: AppThemeColors.text(context),
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 800),
+                builder: (context, val, child) {
+                  return Opacity(
+                    opacity: val,
+                    child: Transform.translate(
+                      offset: Offset(0, -15 * (1 - val)),
+                      child: child,
+                    ),
+                  );
+                },
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 27,
+                    fontWeight: FontWeight.bold,
+                    color: AppThemeColors.text(context),
+                  ),
                 ),
               ),
-
               const SizedBox(height: 10),
-
               Text(
-                'Create or log into your digital collector profile',
+                subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppThemeColors.muted(context),
                 ),
               ),
-
-              const SizedBox(height: 35),
-
-              _label(nameLabel),
-
+              const SizedBox(height: 30),
+              _label(userTypeLabel),
               const SizedBox(height: 8),
-
+              InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: _showRoleSelectorBottomSheet,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: AppThemeColors.card(context),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: activeAccent.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        selectedUserType == UserType.scrapCollector
+                            ? Icons.unarchive_outlined
+                            : Icons.autorenew,
+                        color: activeAccent,
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Text(
+                          selectedUserType == UserType.scrapCollector
+                              ? collectorRoleText
+                              : recyclerRoleText,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppThemeColors.text(context),
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_up,
+                        color: activeAccent,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              _label(nameLabel),
+              const SizedBox(height: 8),
               _field(
                 controller: nameController,
                 hint: 'e.g. Rahul Sharma',
                 icon: Icons.person,
               ),
-
               const SizedBox(height: 18),
-
               _label(locationLabel),
-
               const SizedBox(height: 8),
-
               _field(
                 controller: locationController,
                 hint: 'e.g. Bhubaneswar',
                 icon: Icons.location_on,
               ),
-
               const SizedBox(height: 25),
-
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
@@ -1026,7 +1164,7 @@ class _CollectorProfileScreenState
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Only essential collector information is used. ReNova does not require unnecessary personal details.',
+                        privacyText,
                         style: TextStyle(
                           color: AppThemeColors.text(context),
                           fontSize: 13,
@@ -1036,15 +1174,13 @@ class _CollectorProfileScreenState
                   ],
                 ),
               ),
-
               const SizedBox(height: 25),
-
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
+                    backgroundColor: activeAccent,
                     foregroundColor: AppColors.darkBackground,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -1118,6 +1254,7 @@ class _CollectorProfileScreenState
       language: widget.language.name,
       paymentPreference: widget.storage.paymentPreference ?? 'Cash',
       profileImagePath: profileImagePath,
+      userType: selectedUserType.name,
     );
 
     if (!mounted) return;
@@ -1146,10 +1283,8 @@ class MainDashboardContainer extends StatefulWidget {
   final String collectorName;
   final String location;
   final AppLanguage language;
-
   final ReNovaThemeMode themeMode;
   final ValueChanged<ReNovaThemeMode> onThemeChanged;
-
   final ReNovaStorage storage;
 
   const MainDashboardContainer({
@@ -1171,7 +1306,7 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
   late String collectorName;
   late String location;
 
-  int currentIndex = 4;
+  int currentIndex = 0;
 
   String paymentPreference = 'Cash';
   String? profileImagePath;
@@ -1190,14 +1325,36 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
     uploadedPickupPath = widget.storage.pickupImagePath;
   }
 
+  String get dashboardText {
+    switch (currentLanguage) {
+      case AppLanguage.english:
+        return 'Dashboard';
+      case AppLanguage.hindi:
+        return 'डैशबोर्ड';
+      case AppLanguage.marathi:
+        return 'डॅशबोर्ड';
+    }
+  }
+
   String get historyText {
     switch (currentLanguage) {
       case AppLanguage.english:
-        return 'History';
+        return 'Deals';
       case AppLanguage.hindi:
-        return 'इतिहास';
+        return 'सौदे';
       case AppLanguage.marathi:
-        return 'इतिहास';
+        return 'सोदे';
+    }
+  }
+
+  String get pickupText {
+    switch (currentLanguage) {
+      case AppLanguage.english:
+        return 'Pick-Up';
+      case AppLanguage.hindi:
+        return 'पिक-अप';
+      case AppLanguage.marathi:
+        return 'पिक-अप';
     }
   }
 
@@ -1223,183 +1380,319 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
     }
   }
 
-  String get pickupText {
+  String get classifyText {
     switch (currentLanguage) {
       case AppLanguage.english:
-        return 'Pickup';
+        return 'Classify';
       case AppLanguage.hindi:
-        return 'पिकअप';
+        return 'वर्गीकरण';
       case AppLanguage.marathi:
-        return 'पिकअप';
+        return 'वर्गीकरण';
     }
   }
 
-  String get settingsText {
+  String get classifyScrapText {
     switch (currentLanguage) {
       case AppLanguage.english:
-        return 'Settings';
+        return 'Classify Scrap';
       case AppLanguage.hindi:
-        return 'सेटिंग्स';
+        return 'कबाड़ का वर्गीकरण';
       case AppLanguage.marathi:
-        return 'सेटिंग्ज';
+        return 'भंगाराचे वर्गीकरण';
     }
+  }
+
+  String get classifyBulkText {
+    switch (currentLanguage) {
+      case AppLanguage.english:
+        return 'Classify Bulk';
+      case AppLanguage.hindi:
+        return 'बल्क वर्गीकरण';
+      case AppLanguage.marathi:
+        return 'बल्क वर्गीकरण';
+    }
+  }
+
+  String get recentText {
+    switch (currentLanguage) {
+      case AppLanguage.english:
+        return 'Recent';
+      case AppLanguage.hindi:
+        return 'हालिया';
+      case AppLanguage.marathi:
+        return 'अलीकडील';
+    }
+  }
+
+  String get notificationsTitle {
+    switch (currentLanguage) {
+      case AppLanguage.english:
+        return 'Notifications';
+      case AppLanguage.hindi:
+        return 'सूचनाएं';
+      case AppLanguage.marathi:
+        return 'सूचना';
+    }
+  }
+
+  void _showClassifyOptionsModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppThemeColors.card(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.center_focus_strong, color: AppColors.primaryGold),
+                title: Text(classifyScrapText),
+                subtitle: const Text('Single item analysis via Camera or Gallery'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    currentIndex = 5;
+                  });
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.apps, color: AppColors.primaryGold),
+                title: Text(classifyBulkText),
+                subtitle: const Text('Analyze bulk scrap for weight & price'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ClassifyBulkScreen(storage: widget.storage, language: currentLanguage),
+                    ),
+                  ).then((_) {
+                    if (mounted) {
+                      setState(() {
+                        currentIndex = 0;
+                      });
+                    }
+                  });
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.history, color: AppColors.primaryGold),
+                title: Text(recentText),
+                subtitle: const Text('View history categorized by Week, Month, Year'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecentUploadsScreen(language: currentLanguage, storage: widget.storage),
+                    ),
+                  ).then((_) {
+                    if (mounted) {
+                      setState(() {
+                        currentIndex = 0;
+                      });
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     final tabs = [
+      OverviewDashboardTab(
+        collectorName: collectorName,
+        location: location,
+        language: currentLanguage,
+        profileImagePath: profileImagePath,
+        onNavigateTab: (index) {
+          if (index == 5) {
+            _showClassifyOptionsModal(context);
+          } else {
+            setState(() {
+              currentIndex = index;
+            });
+          }
+        },
+      ),
+      PickupTab(language: currentLanguage),
       HistoryTab(
         language: currentLanguage,
       ),
-
-      const EarningsTab(),
-
+      EarningsTab(
+        language: currentLanguage,
+      ),
       PaymentTab(
         language: currentLanguage,
         paymentPreference: paymentPreference,
         onPaymentPreferenceChanged: _changePayment,
       ),
-
       PickupUploadTab(
         savedPhotoPath: uploadedPickupPath,
         storage: widget.storage,
+        language: currentLanguage,
         onPhotoUploaded: (path) {
           setState(() {
             uploadedPickupPath = path;
           });
         },
       ),
-
-      SettingsTab(
-        collectorName: collectorName,
-        location: location,
-        language: currentLanguage,
-        profileImagePath: profileImagePath,
-        paymentPreference: paymentPreference,
-        themeMode: widget.themeMode,
-        onThemeChanged: widget.onThemeChanged,
-        onLanguageChanged: (language) async {
-          setState(() {
-            currentLanguage = language;
-          });
-
-          await widget.storage.prefs.setString(
-            'language',
-            language.name,
-          );
-        },
-        onProfileUpdated: (
-          newName,
-          newLocation,
-          newPayment,
-          newImage,
-        ) async {
-          await _saveProfile(
-            newName,
-            newLocation,
-            newPayment,
-            newImage,
-          );
-        },
-      ),
     ];
 
-    return Scaffold(
+    return PopScope(
+      canPop: currentIndex == 0,
+      onPopInvoked: (didPop) {
+        if (!didPop && currentIndex != 0) {
+          setState(() {
+            currentIndex = 0;
+          });
+        }
+      },
+      child: Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Icon(
-              Icons.recycling,
-              color: AppColors.primaryGold,
-            ),
-            SizedBox(width: 8),
-            Flexible(
-              child: Text(
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.recycling,
+                color: activeAccent,
+              ),
+              const SizedBox(width: 8),
+              Text(
                 'ReNova',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryGold,
+                  color: activeAccent,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.notifications_none,
+            tooltip: 'Safety Guidance',
+            icon: Icon(
+              Icons.health_and_safety_outlined,
+              color: activeAccent,
             ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SafetyTab(language: currentLanguage),
+                ),
+              ).then((_) {
+                if (mounted) {
+                  setState(() {
+                    currentIndex = 0;
+                  });
+                }
+              });
+            },
+          ),
+          IconButton(
+            tooltip: 'Settings',
+            icon: Icon(
+              Icons.settings,
+              color: activeAccent,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SettingsTab(
+                    collectorName: collectorName,
+                    location: location,
+                    language: currentLanguage,
+                    profileImagePath: profileImagePath,
+                    paymentPreference: paymentPreference,
+                    themeMode: widget.themeMode,
+                    onThemeChanged: widget.onThemeChanged,
+                    storage: widget.storage,
+                    onLanguageChanged: (lang) async {
+                      setState(() {
+                        currentLanguage = lang;
+                      });
+                      await widget.storage.prefs.setString('language', lang.name);
+                      final appState = context.findAncestorStateOfType<_ReNovaAppState>();
+                      if (appState != null) {
+                        await appState.changeLanguage(lang);
+                      }
+                    },
+                    onProfileUpdated: (newName, newLoc, newPay, newImg, newAge, newOther) async {
+                      await _saveProfile(newName, newLoc, newPay, newImg, newAge, newOther);
+                    },
+                  ),
+                ),
+              ).then((_) {
+                if (mounted) {
+                  setState(() {
+                    currentIndex = 0;
+                  });
+                }
+              });
+            },
+          ),
+          AnimatedBellIconButton(
             onPressed: _showNotifications,
           ),
-
           themeSwitchButton(
             context,
             widget.themeMode,
             widget.onThemeChanged,
           ),
-
-          Container(
-            margin: const EdgeInsets.only(
-              right: 8,
-              top: 11,
-              bottom: 11,
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.mintGreen.withValues(
-                alpha: 0.15,
-              ),
-              borderRadius: BorderRadius.circular(
-                20,
-              ),
-              border: Border.all(
-                color: AppColors.mintGreen,
-              ),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.wifi_off,
-                  size: 13,
-                  color: AppColors.mintGreen,
-                ),
-                SizedBox(width: 3),
-                Text(
-                  'Offline',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: AppColors.mintGreen,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
-
-      body: IndexedStack(
-        index: currentIndex,
-        children: tabs,
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: tabs[currentIndex],
       ),
-
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
         onDestinationSelected: (index) {
-          setState(() {
-            currentIndex = index;
-          });
+          if (index == 5) {
+            _showClassifyOptionsModal(context);
+          } else {
+            setState(() {
+              currentIndex = index;
+            });
+          }
         },
         destinations: [
+          NavigationDestination(
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(
+              Icons.dashboard,
+              color: activeAccent,
+            ),
+            label: dashboardText,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.local_shipping_outlined),
+            selectedIcon: Icon(
+              Icons.local_shipping,
+              color: activeAccent,
+            ),
+            label: pickupText,
+          ),
           NavigationDestination(
             icon: const Icon(
               Icons.history,
             ),
-            selectedIcon: const Icon(
+            selectedIcon: Icon(
               Icons.history,
-              color: AppColors.primaryGold,
+              color: activeAccent,
             ),
             label: historyText,
           ),
@@ -1407,9 +1700,9 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
             icon: const Icon(
               Icons.currency_rupee,
             ),
-            selectedIcon: const Icon(
+            selectedIcon: Icon(
               Icons.currency_rupee,
-              color: AppColors.primaryGold,
+              color: activeAccent,
             ),
             label: earningsText,
           ),
@@ -1417,33 +1710,24 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
             icon: const Icon(
               Icons.account_balance_wallet,
             ),
-            selectedIcon: const Icon(
+            selectedIcon: Icon(
               Icons.account_balance_wallet,
-              color: AppColors.primaryGold,
+              color: activeAccent,
             ),
             label: paymentText,
           ),
           NavigationDestination(
             icon: const Icon(
-              Icons.local_shipping,
+              Icons.auto_awesome,
             ),
-            selectedIcon: const Icon(
-              Icons.local_shipping,
-              color: AppColors.primaryGold,
+            selectedIcon: Icon(
+              Icons.auto_awesome,
+              color: activeAccent,
             ),
-            label: pickupText,
-          ),
-          NavigationDestination(
-            icon: const Icon(
-              Icons.settings,
-            ),
-            selectedIcon: const Icon(
-              Icons.settings,
-              color: AppColors.primaryGold,
-            ),
-            label: settingsText,
+            label: classifyText,
           ),
         ],
+      ),
       ),
     );
   }
@@ -1465,8 +1749,10 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
     String name,
     String newLocation,
     String newPayment,
-    XFile? image,
-  ) async {
+    XFile? image, [
+    String? age,
+    String? otherDetails,
+  ]) async {
     String? imagePath = profileImagePath;
 
     if (image != null) {
@@ -1486,6 +1772,8 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
     await widget.storage.saveProfile(
       name: name,
       location: newLocation,
+      age: age,
+      otherDetails: otherDetails,
       language: currentLanguage.name,
       paymentPreference: newPayment,
       profileImagePath: imagePath,
@@ -1493,6 +1781,8 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
   }
 
   void _showNotifications() {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: AppThemeColors.card(
@@ -1506,12 +1796,12 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Notifications',
+                Text(
+                  notificationsTitle,
                   style: TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primaryGold,
+                    color: activeAccent,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -1543,14 +1833,16 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
     String title,
     String subtitle,
   ) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: AppColors.primaryGold.withValues(
+        backgroundColor: activeAccent.withValues(
           alpha: 0.15,
         ),
         child: Icon(
           icon,
-          color: AppColors.primaryGold,
+          color: activeAccent,
         ),
       ),
       title: Text(
@@ -1566,6 +1858,1969 @@ class _MainDashboardContainerState extends State<MainDashboardContainer> {
             context,
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// SETTINGS TAB WITH PROFILE, LANGUAGE OPTIONS, AND ABOUT
+// ============================================================
+
+class SettingsTab extends StatefulWidget {
+  final String collectorName;
+  final String location;
+  final AppLanguage language;
+  final String? profileImagePath;
+  final String paymentPreference;
+  final ReNovaThemeMode themeMode;
+  final ValueChanged<ReNovaThemeMode> onThemeChanged;
+  final ValueChanged<AppLanguage> onLanguageChanged;
+  final Function(String name, String location, String payment, XFile? image, String age, String otherDetails) onProfileUpdated;
+  final ReNovaStorage? storage;
+
+  const SettingsTab({
+    super.key,
+    required this.collectorName,
+    required this.location,
+    required this.language,
+    required this.profileImagePath,
+    required this.paymentPreference,
+    required this.themeMode,
+    required this.onThemeChanged,
+    required this.onLanguageChanged,
+    required this.onProfileUpdated,
+    this.storage,
+  });
+
+  @override
+  State<SettingsTab> createState() => _SettingsTabState();
+}
+
+class _SettingsTabState extends State<SettingsTab> {
+  late AppLanguage selectedLanguage;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedLanguage = widget.language;
+  }
+
+  String _t(String en, String hi, String mr) {
+    switch (selectedLanguage) {
+      case AppLanguage.hindi:
+        return hi;
+      case AppLanguage.marathi:
+        return mr;
+      case AppLanguage.english:
+      default:
+        return en;
+    }
+  }
+
+  void _showEditProfileDialog() {
+    final nameController = TextEditingController(text: widget.collectorName);
+    final locationController = TextEditingController(text: widget.location);
+    final ageController = TextEditingController(text: widget.storage?.age ?? '');
+    final otherController = TextEditingController(text: widget.storage?.otherDetails ?? '');
+    String currentPayment = widget.paymentPreference;
+    XFile? pickedFile;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final activeAccent = AppThemeColors.isDark(context)
+                ? AppColors.primaryGold
+                : AppColors.featherGreen;
+
+            return AlertDialog(
+              backgroundColor: AppThemeColors.card(context),
+              title: Text(
+                _t('Edit Profile', 'प्रोफ़ाइल संपादित करें', 'प्रोफाइल संपादित करा'),
+                style: TextStyle(color: AppThemeColors.text(context)),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: _t('Name', 'नाम', 'नाव'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: ageController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: _t('Age', 'आयु', 'वय'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: locationController,
+                      decoration: InputDecoration(
+                        labelText: _t('Location', 'स्थान', 'स्थान'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: currentPayment,
+                      items: ['Cash', 'UPI / Digital Wallet']
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => currentPayment = val);
+                        }
+                      },
+                      decoration: InputDecoration(
+                        labelText: _t('Payment Preference', 'भुगतान पसंद', 'पेमेंट पसंती'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: otherController,
+                      decoration: InputDecoration(
+                        labelText: _t('Other Details', 'अन्य विवरण', 'इतर तपशील'),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(backgroundColor: activeAccent),
+                      onPressed: () async {
+                        final picker = ImagePicker();
+                        final img = await picker.pickImage(source: ImageSource.gallery);
+                        if (img != null) {
+                          setDialogState(() => pickedFile = img);
+                        }
+                      },
+                      icon: const Icon(Icons.photo_library, color: AppColors.darkBackground),
+                      label: Text(
+                        pickedFile == null
+                            ? _t('Change Profile Picture', 'प्रोफ़ाइल चित्र बदलें', 'प्रोफाइल फोटो बदला')
+                            : _t('Image Selected', 'चित्र चुना गया', 'फोटो निवडला'),
+                        style: const TextStyle(color: AppColors.darkBackground),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(_t('Cancel', 'रद्द करें', 'रद्द करा')),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    widget.onProfileUpdated(
+                      nameController.text.trim(),
+                      locationController.text.trim(),
+                      currentPayment,
+                      pickedFile,
+                      ageController.text.trim(),
+                      otherController.text.trim(),
+                    );
+                    Navigator.pop(ctx);
+                    setState(() {});
+                  },
+                  child: Text(_t('Save', 'सहेजें', 'जतन करा')),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showProfileDetails() {
+    final hasValidImage = widget.profileImagePath != null &&
+        File(widget.profileImagePath!).existsSync();
+    final activeAccent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppThemeColors.card(context),
+      showDragHandle: true,
+      builder: (ctx) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 45,
+                  backgroundColor: activeAccent,
+                  backgroundImage: hasValidImage
+                      ? FileImage(File(widget.profileImagePath!))
+                      : null,
+                  child: !hasValidImage
+                      ? const Icon(Icons.person, size: 50, color: AppColors.darkBackground)
+                      : null,
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  widget.collectorName.isEmpty ? _t('User', 'उपयोगकर्ता', 'वापरकर्ता') : widget.collectorName,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppThemeColors.text(context),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _detailRow(Icons.badge, _t('Collector ID', 'कलेक्टर आईडी', 'कलेक्टर आयडी'),
+                    widget.storage?.collectorId ?? 'RN-COL-2026-01428'),
+                _detailRow(Icons.location_on, _t('Location', 'स्थान', 'स्थान'),
+                    widget.location.isEmpty ? _t('Not specified', 'निर्दिष्ट नहीं', 'नमूद नाही') : widget.location),
+                _detailRow(Icons.cake, _t('Age', 'आयु', 'वय'),
+                    widget.storage?.age?.isNotEmpty == true ? widget.storage!.age! : _t('Not specified', 'निर्दिष्ट नहीं', 'नमूद नाही')),
+                _detailRow(Icons.payments, _t('Payment', 'भुगतान', 'पेमेंट'),
+                    widget.paymentPreference),
+                if (widget.storage?.otherDetails?.isNotEmpty == true)
+                  _detailRow(Icons.notes, _t('Other Details', 'अन्य विवरण', 'इतर तपशील'),
+                      widget.storage!.otherDetails!),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _showEditProfileDialog();
+                    },
+                    icon: Icon(Icons.edit, color: activeAccent),
+                    label: Text(
+                      _t('Edit Profile', 'प्रोफ़ाइल संपादित करें', 'प्रोफाइल संपादित करा'),
+                      style: TextStyle(color: activeAccent),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _detailRow(IconData icon, String label, String value) {
+    final activeAccent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    return ListTile(
+      leading: Icon(icon, color: activeAccent),
+      title: Text(label, style: TextStyle(color: AppThemeColors.muted(context), fontSize: 12)),
+      subtitle: Text(value, style: TextStyle(color: AppThemeColors.text(context), fontSize: 15)),
+    );
+  }
+
+  void _showLanguagePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppThemeColors.card(context),
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Text('🇬🇧', style: TextStyle(fontSize: 24)),
+              title: const Text('English'),
+              trailing: selectedLanguage == AppLanguage.english
+                  ? const Icon(Icons.check_circle)
+                  : null,
+              onTap: () => _selectLanguage(AppLanguage.english, ctx),
+            ),
+            ListTile(
+              leading: const Text('🇮🇳', style: TextStyle(fontSize: 24)),
+              title: const Text('हिंदी'),
+              trailing: selectedLanguage == AppLanguage.hindi
+                  ? const Icon(Icons.check_circle)
+                  : null,
+              onTap: () => _selectLanguage(AppLanguage.hindi, ctx),
+            ),
+            ListTile(
+              leading: const Text('🇮🇳', style: TextStyle(fontSize: 24)),
+              title: const Text('मराठी'),
+              trailing: selectedLanguage == AppLanguage.marathi
+                  ? const Icon(Icons.check_circle)
+                  : null,
+              onTap: () => _selectLanguage(AppLanguage.marathi, ctx),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _selectLanguage(AppLanguage lang, BuildContext sheetContext) {
+    setState(() => selectedLanguage = lang);
+    widget.onLanguageChanged(lang);
+    Navigator.pop(sheetContext);
+  }
+
+  void _showCollectorTools() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CollectorToolsScreen(
+          language: selectedLanguage,
+        ),
+      ),
+    );
+  }
+
+  void _showSimpleInfo(String title, String body, {IconData icon = Icons.info_outline}) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppThemeColors.card(context),
+        title: Row(
+          children: [
+            Icon(icon, color: AppColors.featherGreen),
+            const SizedBox(width: 8),
+            Expanded(child: Text(title)),
+          ],
+        ),
+        content: Text(body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(_t('Close', 'बंद करें', 'बंद करा')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    final items = <Widget>[
+      _settingsButton(
+        Icons.person_outline,
+        _t('Profile', 'प्रोफ़ाइल', 'प्रोफाइल'),
+        _t('View account details and edit your profile', 'खाते का विवरण देखें और प्रोफ़ाइल संपादित करें', 'खाते तपशील पहा आणि प्रोफाइल संपादित करा'),
+        _showProfileDetails,
+      ),
+      _settingsButton(
+        Icons.language,
+        _t('App Language', 'ऐप की भाषा', 'अ‍ॅपची भाषा'),
+        _t('Change app text and safety audio language', 'ऐप का टेक्स्ट और सुरक्षा ऑडियो भाषा बदलें', 'अ‍ॅपचा मजकूर आणि सुरक्षा ऑडिओ भाषा बदला'),
+        _showLanguagePicker,
+      ),
+      _settingsButton(
+        Icons.build_circle_outlined,
+        _t('Collector Tools', 'कलेक्टर टूल्स', 'कलेक्टर टूल्स'),
+        _t('Weekly price board and recyclers nearby', 'साप्ताहिक मूल्य बोर्ड और पास के रीसायकलर', 'साप्ताहिक किंमत बोर्ड आणि जवळचे रीसायकलर'),
+        _showCollectorTools,
+      ),
+      _settingsButton(
+        Icons.security,
+        _t('Security', 'सुरक्षा', 'सुरक्षा'),
+        _t('Review account and app security information', 'खाते और ऐप सुरक्षा जानकारी देखें', 'खाते आणि अ‍ॅप सुरक्षा माहिती पहा'),
+        () => _showSimpleInfo(
+          _t('Security', 'सुरक्षा', 'सुरक्षा'),
+          _t(
+            'Your ReNova profile is stored locally on this device. Avoid sharing OTPs, passcodes or payment credentials.',
+            'आपकी ReNova प्रोफ़ाइल इस डिवाइस पर स्थानीय रूप से संग्रहीत है। OTP, पासकोड या भुगतान जानकारी साझा न करें।',
+            'तुमची ReNova प्रोफाइल या डिव्हाइसवर स्थानिकरित्या साठवली जाते. OTP, पासकोड किंवा पेमेंट माहिती शेअर करू नका.',
+          ),
+          icon: Icons.security,
+        ),
+      ),
+      _settingsButton(
+        Icons.lock_outline,
+        _t('Passcode', 'पासकोड', 'पासकोड'),
+        _t('Set or manage your app passcode', 'ऐप पासकोड सेट या प्रबंधित करें', 'अ‍ॅप पासकोड सेट किंवा व्यवस्थापित करा'),
+        () => _showSimpleInfo(
+          _t('Passcode', 'पासकोड', 'पासकोड'),
+          _t(
+            'Passcode management can be connected to device authentication in the production version.',
+            'उत्पादन संस्करण में पासकोड प्रबंधन को डिवाइस प्रमाणीकरण से जोड़ा जा सकता है।',
+            'उत्पादन आवृत्तीत पासकोड व्यवस्थापन डिव्हाइस प्रमाणीकरणाशी जोडता येईल.',
+          ),
+          icon: Icons.lock_outline,
+        ),
+      ),
+      _settingsButton(
+        Icons.notifications_outlined,
+        _t('Notifications', 'सूचनाएं', 'सूचना'),
+        _t('Manage notification preferences', 'सूचना प्राथमिकताएं प्रबंधित करें', 'सूचना प्राधान्ये व्यवस्थापित करा'),
+        () => _showSimpleInfo(
+          _t('Notifications', 'सूचनाएं', 'सूचना'),
+          _t(
+            'Notifications can include pickup matches, payment updates and classification reminders.',
+            'सूचनाओं में पिकअप मैच, भुगतान अपडेट और वर्गीकरण रिमाइंडर शामिल हो सकते हैं।',
+            'सूचनांमध्ये पिकअप मॅच, पेमेंट अपडेट आणि वर्गीकरण स्मरणपत्रे असू शकतात.',
+          ),
+          icon: Icons.notifications_outlined,
+        ),
+      ),
+      _settingsButton(
+        Icons.info_outline,
+        _t('About ReNova', 'ReNova के बारे में', 'ReNova बद्दल'),
+        _t('Prototype and team information', 'प्रोटोटाइप और टीम की जानकारी', 'प्रोटोटाइप आणि टीमची माहिती'),
+        () => _showSimpleInfo(
+          _t('About ReNova', 'ReNova के बारे में', 'ReNova बद्दल'),
+          _t(
+            'This app is an experimental prototype version 1.0.0 made by Team ReNova, a team of 6 members for SIH 2026.',
+            'यह ऐप SIH 2026 के लिए 6 सदस्यों की Team ReNova द्वारा बनाया गया प्रायोगिक प्रोटोटाइप संस्करण 1.0.0 है।',
+            'हे अ‍ॅप SIH 2026 साठी Team ReNova च्या 6 सदस्यांनी तयार केलेले प्रायोगिक प्रोटोटाइप आवृत्ती 1.0.0 आहे.',
+          ),
+          icon: Icons.info_outline,
+        ),
+      ),
+      _settingsButton(
+        Icons.help_outline,
+        _t('Help and Security', 'मदद और सुरक्षा', 'मदत आणि सुरक्षा'),
+        _t('Safety, privacy and app help', 'सुरक्षा, गोपनीयता और ऐप सहायता', 'सुरक्षा, गोपनीयता आणि अ‍ॅप मदत'),
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SafetyTab(language: selectedLanguage),
+          ),
+        ),
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          _t('Settings', 'सेटिंग्स', 'सेटिंग्ज'),
+          style: TextStyle(color: AppThemeColors.text(context)),
+        ),
+        actions: [
+          themeSwitchButton(context, widget.themeMode, widget.onThemeChanged),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _profileQuickBar(),
+          const SizedBox(height: 16),
+          Text(
+            _t('Account & Preferences', 'खाता और प्राथमिकताएं', 'खाते आणि प्राधान्ये'),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.text(context),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...items,
+          const SizedBox(height: 8),
+          Text(
+            _t(
+              'Current language: ${selectedLanguage == AppLanguage.english ? 'English' : selectedLanguage == AppLanguage.hindi ? 'Hindi' : 'Marathi'}',
+              'वर्तमान भाषा: ${selectedLanguage == AppLanguage.english ? 'अंग्रेज़ी' : selectedLanguage == AppLanguage.hindi ? 'हिंदी' : 'मराठी'}',
+              'सध्याची भाषा: ${selectedLanguage == AppLanguage.english ? 'इंग्रजी' : selectedLanguage == AppLanguage.hindi ? 'हिंदी' : 'मराठी'}',
+            ),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppThemeColors.faint(context), fontSize: 12),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _profileQuickBar() {
+    final activeAccent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    final hasValidImage = widget.profileImagePath != null &&
+        File(widget.profileImagePath!).existsSync();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppThemeColors.card(context),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: activeAccent.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: activeAccent,
+            backgroundImage: hasValidImage
+                ? FileImage(File(widget.profileImagePath!))
+                : null,
+            child: !hasValidImage
+                ? const Icon(Icons.person, color: AppColors.darkBackground)
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.collectorName.isEmpty
+                      ? _t('User', 'उपयोगकर्ता', 'वापरकर्ता')
+                      : widget.collectorName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: AppThemeColors.text(context),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  widget.location.isEmpty
+                      ? _t('Not specified', 'निर्दिष्ट नहीं', 'नमूद नाही')
+                      : widget.location,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppThemeColors.muted(context),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: _t('Edit Profile', 'प्रोफ़ाइल संपादित करें', 'प्रोफाइल संपादित करा'),
+            icon: Icon(Icons.edit, color: activeAccent),
+            onPressed: _showEditProfileDialog,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _settingsButton(
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
+    final activeAccent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: AppThemeColors.card(context),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: activeAccent.withValues(alpha: 0.18)),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        leading: CircleAvatar(
+          backgroundColor: activeAccent.withValues(alpha: 0.14),
+          child: Icon(icon, color: activeAccent),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppThemeColors.text(context),
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(color: AppThemeColors.muted(context), fontSize: 12),
+        ),
+        trailing: Icon(Icons.chevron_right, color: AppThemeColors.faint(context)),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+// ============================================================
+// COLLECTOR TOOLS
+// ============================================================
+
+class CollectorToolsScreen extends StatelessWidget {
+  final AppLanguage language;
+
+  const CollectorToolsScreen({
+    super.key,
+    required this.language,
+  });
+
+  String _t(String en, String hi, String mr) {
+    switch (language) {
+      case AppLanguage.hindi:
+        return hi;
+      case AppLanguage.marathi:
+        return mr;
+      case AppLanguage.english:
+      default:
+        return en;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_t('Collector Tools', 'कलेक्टर टूल्स', 'कलेक्टर टूल्स')),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _toolCard(
+            context,
+            Icons.location_on,
+            _t('Recyclers Nearby', 'पास के रीसायकलर', 'जवळचे रीसायकलर'),
+            _t('View nearby recycler options for the prototype.',
+                'प्रोटोटाइप में पास के रीसायकलर विकल्प देखें।',
+                'प्रोटोटाइपमधील जवळचे रीसायकलर पर्याय पहा.'),
+            () => _showNearbyRecyclers(context, activeAccent),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _toolCard(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
+    final activeAccent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: AppThemeColors.card(context),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: CircleAvatar(
+          radius: 27,
+          backgroundColor: activeAccent.withValues(alpha: 0.15),
+          child: Icon(icon, color: activeAccent),
+        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(subtitle),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  void _showNearbyRecyclers(BuildContext context, Color accent) {
+    final recyclers = [
+      ['EcoRecycle Ltd', '1.2 km', 'E-Waste • PCB • Batteries'],
+      ['GreenLoop Recycling', '2.4 km', 'E-Waste • Metals • Plastics'],
+      ['ReCircle Hub', '3.1 km', 'Electronics • Mixed Scrap'],
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppThemeColors.card(context),
+      showDragHandle: true,
+      builder: (_) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(16),
+          children: [
+            Text(
+              _t('Recyclers Nearby', 'पास के रीसायकलर', 'जवळचे रीसायकलर'),
+              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold, color: accent),
+            ),
+            const SizedBox(height: 12),
+            ...recyclers.map(
+              (r) => Card(
+                child: ListTile(
+                  leading: Icon(Icons.recycling, color: accent),
+                  title: Text(r[0]),
+                  subtitle: Text('${r[1]} • ${r[2]}'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// RECY AI CHATBOT DIALOG / BOT
+// ============================================================
+
+class ChatMessage {
+  final String text;
+  final bool isUser;
+  final String? audioText;
+
+  ChatMessage({
+    required this.text,
+    required this.isUser,
+    this.audioText,
+  });
+}
+
+class RecyChatbotSheet extends StatefulWidget {
+  final AppLanguage language;
+
+  const RecyChatbotSheet({super.key, required this.language});
+
+  @override
+  State<RecyChatbotSheet> createState() => _RecyChatbotSheetState();
+}
+
+class _RecyChatbotSheetState extends State<RecyChatbotSheet> {
+  final FlutterTts tts = FlutterTts();
+  final List<ChatMessage> _messages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _messages.add(ChatMessage(
+      text: welcomeMsg,
+      isUser: false,
+      audioText: welcomeMsg,
+    ));
+  }
+
+  @override
+  void dispose() {
+    tts.stop();
+    super.dispose();
+  }
+
+  String get welcomeMsg {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return 'नमस्ते! मैं Recy हूँ, आपका रीसाइक्लिंग AI सहायक! 🤖✨ आज मैं आपकी क्या मदद कर सकता हूँ? नीचे दिए गए प्रश्नों में से चुनें!';
+      case AppLanguage.marathi:
+        return 'नमस्कार! मी Recy आहे, तुमचा रीसायकलिंग AI मित्र! 🤖✨ आज मी तुम्हाला कशी मदत करू शकतो? खालील प्रश्नांमधून निवडा!';
+      case AppLanguage.english:
+      default:
+        return 'Hello! I am Recy, your friendly recycling AI buddy! 🤖✨ How can I help you today? Pick a question below!';
+    }
+  }
+
+  List<Map<String, String>> get questionsAndAnswers {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return [
+          {
+            'q': 'कबाड़ का सही मूल्य कैसे प्राप्त करें?',
+            'a': 'अपने कबाड़ को धातु, प्लास्टिक और ई-कचरे में अलग करें। वर्गीकृत सामग्री पर अधिक मूल्य मिलता है!'
+          },
+          {
+            'q': 'ई-कचरा (E-Waste) कैसे बेचें?',
+            'a': 'ऐप में \'Classify\' विकल्प पर जाएं, ई-कचरे की फोटो लें और आपको तुरंत अनुमानित मूल्य और रीसाइक्लिंग सुझाव मिल जाएंगे।'
+          },
+          {
+            'q': 'पिकअप कैसे शेड्यूल करें?',
+            'a': 'Pick-Up टैब पर जाएं और अपने नजदीकी संग्रहण स्थल की जांच करके पिकअप स्वीकार करें।'
+          },
+          {
+            'q': 'प्लास्टिक कचरे का क्या करें?',
+            'a': 'प्लास्टिक को बोतल, हार्ड प्लास्टिक और थैलियों में छांट लें। साफ और सूखी प्लास्टिक का बेहतर दाम मिलता है।'
+          },
+          {
+            'q': 'पुराने इलेक्ट्रॉनिक्स की जांच कैसे करें?',
+            'a': 'मशीनों से बैटरी निकालें और सर्किट्स को अलग रखें। बैटरी का सुरक्षित निपटान जरूरी है।'
+          },
+          {
+            'q': 'तांबा और पीतल की कीमत ज्यादा क्यों है?',
+            'a': 'ये कीमती धातुएं हैं जिनका पुनर्चक्रण आसान है और उद्योग में इनकी बहुत मांग है।'
+          },
+          {
+            'q': 'डिजिटल भुगतान कैसे प्राप्त करें?',
+            'a': 'Payment टैब में जाकर अपना UPI या बैंक विवरण अपडेट करें। भुगतान सीधा आपके खाते में आएगा।'
+          },
+          {
+            'q': 'कबाड़ का वजन कैसे मापा जाता है?',
+            'a': 'हमारे सत्यापित रीसायकलर डिजिटल कांटे का उपयोग करते हैं जिससे सटीक वजन मिलता है।'
+          },
+          {
+            'q': 'सुरक्षा के लिए क्या उपाय करें?',
+            'a': 'कबाड़ उठाते समय दस्ताने और मजबूत जूते पहनें। खतरनाक रसायनों और कांच से बचें।'
+          },
+          {
+            'q': 'क्या घर बैठे पिकअप हो सकता है?',
+            'a': 'हाँ, ऐप में Pick-Up विकल्प का उपयोग करके आप निकटतम पिकअप अनुरोध चुन सकते हैं।'
+          },
+          {
+            'q': 'रीसाइक्लिंग से पर्यावरण को क्या फायदा है?',
+            'a': 'इससे प्राकृतिक संसाधनों की बचत होती है और प्रदूषण कम होता है।'
+          },
+          {
+            'q': 'नया रीसायकलर कैसे खोजें?',
+            'a': 'डैशबोर्ड और Pick-Up टैब में आपके पास के सभी प्रमाणित रीसायकलर्स की सूची दिखती है।'
+          },
+          {
+            'q': 'लोहे का कबाड़ कैसे बेचें?',
+            'a': 'लोहे को जंग और गंदगी से साफ रखें। भारी लोहे की कीमत सामान्य कबाड़ से बेहतर मिलती है।'
+          },
+          {
+            'q': 'ऐप में भाषा कैसे बदलें?',
+            'a': 'सेटिंग्स विकल्प में जाकर आप हिंदी, अंग्रेजी या मराठी चुन सकते हैं।'
+          },
+        ];
+      case AppLanguage.marathi:
+        return [
+          {
+            'q': 'भंगाराचा योग्य दर कसा मिळवावा?',
+            'a': 'तुमचे भंगार प्लास्टिक, धातू आणि ई-कचऱ्यामध्ये वेगळे करा. वर्गीकरण केलेल्या भंगाराला जास्त दर मिळतो!'
+          },
+          {
+            'q': 'ई-कचरा कसा विकावा?',
+            'a': '\'Classify\' पर्यायावर जा, फोटो काढा आणि तुम्हाला लगेचच अंदाजित किंमत आणि रीसायकलिंग पर्याय मिळतील.'
+          },
+          {
+            'q': 'पिकअप कसा बुक करावा?',
+            'a': 'Pick-Up टॅबवर जा आणि तुमच्या जवळच्या ठिकाणी पिकअप शेड्युल करा.'
+          },
+          {
+            'q': 'प्लास्टिक कचऱ्याचे काय करावे?',
+            'a': 'प्लास्टिकच्या बाटल्या आणि इतर प्लास्टिक वेगळे करा. स्वच्छ प्लास्टिकला चांगला भाव मिळतो.'
+          },
+          {
+            'q': 'जुने इलेक्ट्रॉनिक्स कसे तपासावे?',
+            'a': 'इलेक्ट्रॉनिक वस्तूंमधून बॅटरी वेगळी करा. सर्किट बोर्ड कोरडे ठेवा.'
+          },
+          {
+            'q': 'तांबे आणि पितळाला जास्त दर का मिळतो?',
+            'a': 'ह्या मौल्यवान धातू आहेत आणि उद्योगांमध्ये यांची मागणी जास्त असते.'
+          },
+          {
+            'q': 'डिजिटल पेमेंट कसे मिळवावे?',
+            'a': 'Payment टॅबवर जाऊन तुमची UPI माहिती सेट करा. पैसे थेट खात्यात जमा होतील.'
+          },
+          {
+            'q': 'भंगाराचे वजन कसे केले जाते?',
+            'a': 'डिजिटल काट्याचा वापर करून अचूक वजन केले जाते.'
+          },
+          {
+            'q': 'सुरक्षतेसाठी काय काळजी घ्यावी?',
+            'a': 'काम करताना हातमोजे आणि योग्य शूज वापरा. काच व रसायनांपासून सावध राहा.'
+          },
+          {
+            'q': 'घरपोच पिकअप सुविधा उपलब्ध आहे का?',
+            'a': 'होय, Pick-Up पर्यायातून तुम्ही जवळची पिकअप मागणी स्वीकारू शकता.'
+          },
+          {
+            'q': 'पुनर्वापराचा पर्यावरणाला काय फायदा होतो?',
+            'a': 'यामुळे प्रदूषण कमी होते आणि नैसर्गिक संसाधनांची बचत होते.'
+          },
+          {
+            'q': 'नवीन रीसायकलर कसा शोधावा?',
+            'a': 'डॅशबोर्डवर तुम्हाला परिसरातील नोंदणीकृत रीसायकलर दिसतील.'
+          },
+          {
+            'q': 'खंडी लोखंड कसे विकावे?',
+            'a': 'लोखंड स्वच्छ आणि कोरडे ठेवा. जाड लोखंडाला चांगला दर मिळतो.'
+          },
+          {
+            'q': 'अ‍ॅपची भाषा कशी बदलावी?',
+            'a': 'सेटिंग्ज मध्ये जाऊन तुम्ही तुमची आवडती भाषा निवडू शकता.'
+          },
+        ];
+      case AppLanguage.english:
+      default:
+        return [
+          {
+            'q': 'How do I get the best scrap prices?',
+            'a': 'Separate your scrap into copper, PCB, and plastics beforehand. Clean and sorted scrap earns a higher value!'
+          },
+          {
+            'q': 'How to classify and sell E-Waste?',
+            'a': 'Go to the Classify tab, take a photo of your electronic item, and Recy AI will estimate its weight and fair price.'
+          },
+          {
+            'q': 'How do I check pickup schedules?',
+            'a': 'Check the Pick-Up tab from the bottom navigation bar to view all designated pickup locations and details.'
+          },
+          {
+            'q': 'What is the best way to handle plastic scrap?',
+            'a': 'Segregate PET bottles, hard plastics, and flexible films. Clean and dry plastics get better market rates.'
+          },
+          {
+            'q': 'How to process old circuit boards (PCBs)?',
+            'a': 'Remove batteries and bulky casings. Keep PCBs dry to maintain highest recovery grade value.'
+          },
+          {
+            'q': 'Why do copper and brass have higher rates?',
+            'a': 'They are high-demand non-ferrous metals that can be recycled infinitely without quality loss.'
+          },
+          {
+            'q': 'How do I receive digital payments?',
+            'a': 'Go to the Payment tab and choose UPI/Digital Wallet as your preference for instant settlements.'
+          },
+          {
+            'q': 'How is scrap weight verified?',
+            'a': 'Partnered recyclers use certified digital weighing scales to ensure accurate and transparent measurement.'
+          },
+          {
+            'q': 'What safety gear should scrap collectors use?',
+            'a': 'Always wear heavy-duty gloves, safety shoes, and protective goggles when handling broken glass or sharp metals.'
+          },
+          {
+            'q': 'Can I schedule doorstep scrap collection?',
+            'a': 'Yes, use the Pick-Up tab to view nearby collection requests and schedule a convenient pickup time.'
+          },
+          {
+            'q': 'What are the environmental benefits of recycling?',
+            'a': 'Recycling reduces landfill waste, conserves raw natural resources, and lowers industrial carbon emissions.'
+          },
+          {
+            'q': 'How to find verified recyclers nearby?',
+            'a': 'The Dashboard map and Pick-Up list highlight verified regional recycling units close to your location.'
+          },
+          {
+            'q': 'How to maximize earnings from iron scrap?',
+            'a': 'Remove heavy rust, soil, and non-metal attachments. Heavy structural iron commands higher pricing.'
+          },
+          {
+            'q': 'How do I change the app language?',
+            'a': 'Open Settings from the top bar to switch seamlessly between English, Hindi, and Marathi.'
+          },
+        ];
+    }
+  }
+
+  Future<void> _speak(String text) async {
+    await tts.stop();
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        await tts.setLanguage('hi-IN');
+        break;
+      case AppLanguage.marathi:
+        await tts.setLanguage('mr-IN');
+        break;
+      case AppLanguage.english:
+      default:
+        await tts.setLanguage('en-IN');
+        break;
+    }
+    await tts.setSpeechRate(0.42);
+    await tts.speak(text);
+  }
+
+  void _onQuestionSelected(String question, String answer) {
+    setState(() {
+      _messages.add(ChatMessage(
+        text: question,
+        isUser: true,
+      ));
+      _messages.add(ChatMessage(
+        text: answer,
+        isUser: false,
+        audioText: answer,
+      ));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+      decoration: BoxDecoration(
+        color: AppThemeColors.card(context),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: AppThemeColors.faint(context),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: activeAccent.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.smart_toy, size: 36, color: AppColors.mintGreen),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Recy AI Assistant',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppThemeColors.text(context),
+                        ),
+                      ),
+                      Text(
+                        'Your Recycling Guide',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppThemeColors.muted(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            // Chat message area
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: _messages.length,
+                itemBuilder: (context, index) {
+                  final msg = _messages[index];
+                  return Align(
+                    alignment: msg.isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(12),
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75,
+                      ),
+                      decoration: BoxDecoration(
+                        color: msg.isUser
+                            ? activeAccent
+                            : activeAccent.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(14),
+                          topRight: const Radius.circular(14),
+                          bottomLeft: Radius.circular(msg.isUser ? 14 : 2),
+                          bottomRight: Radius.circular(msg.isUser ? 2 : 14),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              msg.text,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: msg.isUser
+                                    ? AppColors.darkBackground
+                                    : AppThemeColors.text(context),
+                                fontWeight: msg.isUser ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                          if (!msg.isUser && msg.audioText != null) ...[
+                            const SizedBox(width: 6),
+                            InkWell(
+                              onTap: () => _speak(msg.audioText!),
+                              child: const Icon(
+                                Icons.volume_up,
+                                size: 18,
+                                color: AppColors.mintGreen,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const Divider(height: 16),
+            Text(
+              'Select a question:',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: AppThemeColors.text(context),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Options list
+            SizedBox(
+              height: 140,
+              child: ListView.builder(
+                itemCount: questionsAndAnswers.length,
+                itemBuilder: (context, index) {
+                  final item = questionsAndAnswers[index];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 6),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => _onQuestionSelected(item['q']!, item['a']!),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppThemeColors.background(context),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: activeAccent.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.help_outline, size: 16, color: activeAccent),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                item['q']!,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppThemeColors.text(context),
+                                ),
+                              ),
+                            ),
+                            Icon(Icons.arrow_forward_ios, size: 12, color: AppThemeColors.faint(context)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// PICK-UP TAB (NEWLY ADDED)
+// ============================================================
+
+class PickupTab extends StatelessWidget {
+  final AppLanguage language;
+
+  const PickupTab({super.key, this.language = AppLanguage.english});
+
+  String get pickupTitle {
+    switch (language) {
+      case AppLanguage.hindi:
+        return 'पिक-अप लॉट विवरण';
+      case AppLanguage.marathi:
+        return 'पिक-अप लॉट तपशील';
+      case AppLanguage.english:
+      default:
+        return 'Pick-Up Lot Details';
+    }
+  }
+
+  String get pickupSubtitle {
+    switch (language) {
+      case AppLanguage.hindi:
+        return 'वर्तमान निर्धारित पिकअप स्थान और सामग्री विवरण';
+      case AppLanguage.marathi:
+        return 'सध्याचे नियोजित पिकअप ठिकाणे आणि साहित्याचा तपशील';
+      case AppLanguage.english:
+      default:
+        return 'Current scheduled pickup locations and item breakdown';
+    }
+  }
+
+  List<Map<String, String>> get lotDetails {
+    switch (language) {
+      case AppLanguage.hindi:
+        return [
+          {
+            'location': '1. क्षेत्र A - उत्तर यार्ड',
+            'details': '150 किग्रा मिश्रित पीसीबी और तांबे के तार • प्राथमिकता: उच्च',
+          },
+          {
+            'location': '2. क्षेत्र B - केंद्रीय हब',
+            'details': '85 किग्रा लेड-एसिड बैटरियां • प्राथमिकता: मध्यम',
+          },
+          {
+            'location': '3. क्षेत्र C - दक्षिण भंडारण',
+            'details': '210 किग्रा सीआरटी कांच और प्लास्टिक कवर • प्राथमिकता: कम',
+          },
+        ];
+      case AppLanguage.marathi:
+        return [
+          {
+            'location': '1. विभाग A - उत्तर यार्ड',
+            'details': '150 किलोग्रॅम मिश्रित पीसीबी आणि तांब्याच्या तारा • प्राधान्य: उच्च',
+          },
+          {
+            'location': '2. विभाग B - मध्यवर्ती हब',
+            'details': '85 किलोग्रॅम लेड-ॲसिड बॅटऱ्या • प्राधान्य: मध्यम',
+          },
+          {
+            'location': '3. विभाग C - दक्षिण साठा',
+            'details': '210 किलोग्रॅम सीआरटी काच आणि प्लास्टिक कव्हर • प्राधान्य: कमी',
+          },
+        ];
+      case AppLanguage.english:
+      default:
+        return [
+          {
+            'location': '1. Zone A - North Yard',
+            'details': '150 kg Mixed PCB & Copper Wires • Priority: High',
+          },
+          {
+            'location': '2. Zone B - Central Hub',
+            'details': '85 kg Lead-Acid Batteries • Priority: Medium',
+          },
+          {
+            'location': '3. Zone C - South Storage',
+            'details': '210 kg CRT Glasses & Plastic Shells • Priority: Low',
+          },
+        ];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            pickupTitle,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.text(context),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            pickupSubtitle,
+            style: TextStyle(
+              color: AppThemeColors.muted(context),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RecyclerNearbyMapScreen(language: language),
+                  ),
+                );
+              },
+              icon: Icon(Icons.map_outlined, color: activeAccent),
+              label: Text(
+                _LanguageText.t(language, 'Recycler Nearby', 'पास के रीसायकलर', 'जवळचे रीसायकलर'),
+                style: TextStyle(color: activeAccent, fontWeight: FontWeight.bold),
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: BorderSide(color: activeAccent),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          ...lotDetails.map(
+            (lot) => AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppThemeColors.card(context),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: activeAccent.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: activeAccent.withValues(alpha: 0.15),
+                    child: Icon(
+                      Icons.location_on,
+                      color: activeAccent,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          lot['location']!,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppThemeColors.text(context),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          lot['details']!,
+                          style: TextStyle(
+                            color: AppThemeColors.muted(context),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// RECYCLER NEARBY MAP (PROTOTYPE, FRONT-END DATA ONLY)
+// ============================================================
+
+class RecyclerNearbyMapScreen extends StatelessWidget {
+  final AppLanguage language;
+
+  const RecyclerNearbyMapScreen({super.key, required this.language});
+
+  static const double _maxRadiusKm = 8;
+
+  List<Map<String, dynamic>> get _recyclers => [
+        {
+          'name': 'EcoRecycle Ltd',
+          'distance': 1.2,
+          'angle': 40.0,
+          'tag': _LanguageText.t(language, 'E-Waste • PCB • Batteries', 'ई-कचरा • पीसीबी • बैटरी', 'ई-कचरा • पीसीबी • बॅटरी'),
+        },
+        {
+          'name': 'GreenLoop Recycling',
+          'distance': 2.4,
+          'angle': 120.0,
+          'tag': _LanguageText.t(language, 'E-Waste • Metals • Plastics', 'ई-कचरा • धातु • प्लास्टिक', 'ई-कचरा • धातू • प्लास्टिक'),
+        },
+        {
+          'name': 'ReCircle Hub',
+          'distance': 3.1,
+          'angle': 200.0,
+          'tag': _LanguageText.t(language, 'Electronics • Mixed Scrap', 'इलेक्ट्रॉनिक्स • मिश्रित कबाड़', 'इलेक्ट्रॉनिक्स • मिश्रित भंगार'),
+        },
+        {
+          'name': 'Metro Metal Works',
+          'distance': 5.6,
+          'angle': 280.0,
+          'tag': _LanguageText.t(language, 'Copper • Aluminium', 'तांबा • एल्युमीनियम', 'तांबे • ॲल्युमिनियम'),
+        },
+        {
+          'name': 'UrbanScrap Recyclers',
+          'distance': 7.4,
+          'angle': 330.0,
+          'tag': _LanguageText.t(language, 'Mixed Scrap', 'मिश्रित कबाड़', 'मिश्रित भंगार'),
+        },
+      ];
+
+  @override
+  Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+    final double mapSize = math.min(300.0, MediaQuery.of(context).size.width - 32);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_LanguageText.t(language, 'Recycler Nearby', 'पास के रीसायकलर', 'जवळचे रीसायकलर')),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _LanguageText.t(language, 'Recyclers within 8 km', '8 किमी के दायरे में रीसायकलर', '8 किमी परिसरातील रीसायकलर'),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppThemeColors.text(context),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _LanguageText.t(
+                language,
+                'Prototype map using sample locations. This will use live location and Google Maps in a future version.',
+                'यह प्रोटोटाइप नमूना स्थानों का उपयोग करता है। भविष्य के संस्करण में इसमें लाइव लोकेशन और गूगल मैप्स होंगे।',
+                'हे प्रोटोटाइप नमुना ठिकाणे वापरते. भविष्यातील आवृत्तीत यात थेट लोकेशन आणि गूगल नकाशे असतील.',
+              ),
+              style: TextStyle(color: AppThemeColors.muted(context), fontSize: 12),
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: SizedBox(
+                width: mapSize,
+                height: mapSize,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    for (final ring in [1.0, 0.75, 0.5, 0.25])
+                      Container(
+                        width: mapSize * ring,
+                        height: mapSize * ring,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: activeAccent.withValues(alpha: 0.25),
+                          ),
+                        ),
+                      ),
+                    for (final r in _recyclers)
+                      Positioned(
+                        left: mapSize / 2 +
+                            ((mapSize / 2) * ((r['distance'] as double) / _maxRadiusKm)) *
+                                math.cos((r['angle'] as double) * math.pi / 180) -
+                            16,
+                        top: mapSize / 2 +
+                            ((mapSize / 2) * ((r['distance'] as double) / _maxRadiusKm)) *
+                                math.sin((r['angle'] as double) * math.pi / 180) -
+                            16,
+                        child: GestureDetector(
+                          onTap: () => _showRecyclerInfo(context, r, activeAccent),
+                          child: CircleAvatar(
+                            radius: 14,
+                            backgroundColor: activeAccent,
+                            child: const Icon(Icons.recycling, size: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: AppColors.danger,
+                      child: const Icon(Icons.person_pin_circle, color: Colors.white, size: 18),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Center(
+              child: Text(
+                _LanguageText.t(language, 'You are at the center', 'आप केंद्र में हैं', 'तुम्ही मध्यभागी आहात'),
+                style: TextStyle(color: AppThemeColors.faint(context), fontSize: 11),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _LanguageText.t(language, 'Nearby Recyclers', 'पास के रीसायकलर', 'जवळचे रीसायकलर'),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppThemeColors.text(context),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ..._recyclers.map(
+              (r) => Card(
+                child: ListTile(
+                  leading: Icon(Icons.recycling, color: activeAccent),
+                  title: Text(r['name'] as String),
+                  subtitle: Text('${r['distance']} km • ${r['tag']}'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRecyclerInfo(BuildContext context, Map<String, dynamic> r, Color accent) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppThemeColors.card(context),
+        title: Text(r['name'] as String),
+        content: Text('${r['distance']} km • ${r['tag']}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(_LanguageText.t(language, 'Close', 'बंद करें', 'बंद करा')),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// OVERVIEW DASHBOARD TAB
+// ============================================================
+
+class OverviewDashboardTab extends StatelessWidget {
+  final String collectorName;
+  final String location;
+  final AppLanguage language;
+  final String? profileImagePath;
+  final ValueChanged<int> onNavigateTab;
+
+  const OverviewDashboardTab({
+    super.key,
+    required this.collectorName,
+    required this.location,
+    required this.language,
+    this.profileImagePath,
+    required this.onNavigateTab,
+  });
+
+  String get welcomeText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Welcome back,';
+      case AppLanguage.hindi:
+        return 'वापसी पर स्वागत है,';
+      case AppLanguage.marathi:
+        return 'पुन्हा स्वागत आहे,';
+    }
+  }
+
+  String get quickStatsText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Dashboard Overview';
+      case AppLanguage.hindi:
+        return 'डैशबोर्ड अवलोकन';
+      case AppLanguage.marathi:
+        return 'डॅशबोर्ड विहंगावलोकन';
+    }
+  }
+
+  String get totalEarningsLabel {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Total Earnings';
+      case AppLanguage.hindi:
+        return 'कुल कमाई';
+      case AppLanguage.marathi:
+        return 'एकूण कमाई';
+    }
+  }
+
+  String get scrapProcessedLabel {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Scrap Processed';
+      case AppLanguage.hindi:
+        return 'संसाधित कबाड़';
+      case AppLanguage.marathi:
+        return 'प्रक्रियेत आणलेले भंगार';
+    }
+  }
+
+  String get pendingPayoutLabel {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Pending Payout';
+      case AppLanguage.hindi:
+        return 'बकाया भुगतान';
+      case AppLanguage.marathi:
+        return 'लंबित पेमेंट';
+    }
+  }
+
+  String get classificationsLabel {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Classifications';
+      case AppLanguage.hindi:
+        return 'वर्गीकरण';
+      case AppLanguage.marathi:
+        return 'वर्गीकरण';
+    }
+  }
+
+  String get quickActionsText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Quick Actions';
+      case AppLanguage.hindi:
+        return 'त्वरित क्रियाएं';
+      case AppLanguage.marathi:
+        return 'जलद कृती';
+    }
+  }
+
+  String get actionClassifyText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Classify Scrap';
+      case AppLanguage.hindi:
+        return 'कबाड़ वर्गीकृत करें';
+      case AppLanguage.marathi:
+        return 'भंगार वर्गीकरण करा';
+    }
+  }
+
+  String get actionPaymentText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Payment Status';
+      case AppLanguage.hindi:
+        return 'भुगतान स्थिति';
+      case AppLanguage.marathi:
+        return 'पेमेंट स्थिती';
+    }
+  }
+
+  String get actionHistoryText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'View Deals';
+      case AppLanguage.hindi:
+        return 'सौदे देखें';
+      case AppLanguage.marathi:
+        return 'सोदे पहा';
+    }
+  }
+
+  String get recyAiText {
+    switch (language) {
+      case AppLanguage.hindi:
+        return 'Recy AI';
+      case AppLanguage.marathi:
+        return 'Recy AI';
+      case AppLanguage.english:
+      default:
+        return 'Recy AI';
+    }
+  }
+
+  String get pickupText {
+    switch (language) {
+      case AppLanguage.hindi:
+        return 'पिक-अप';
+      case AppLanguage.marathi:
+        return 'पिक-अप';
+      case AppLanguage.english:
+      default:
+        return 'Pick-Up';
+    }
+  }
+
+  String get earningsText {
+    switch (language) {
+      case AppLanguage.hindi:
+        return 'कमाई';
+      case AppLanguage.marathi:
+        return 'कमाई';
+      case AppLanguage.english:
+      default:
+        return 'Earnings';
+    }
+  }
+
+  void _openRecyChatbot(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => RecyChatbotSheet(language: language),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasValidImage = profileImagePath != null && File(profileImagePath!).existsSync();
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppThemeColors.card(context),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        welcomeText,
+                        style: TextStyle(
+                          color: AppThemeColors.muted(context),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        collectorName.isEmpty ? 'Collector' : collectorName,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: activeAccent,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            size: 14,
+                            color: AppColors.mintGreen,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            location.isEmpty ? 'Bhubaneswar' : location,
+                            style: const TextStyle(
+                              color: AppColors.mintGreen,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: activeAccent,
+                  backgroundImage: hasValidImage ? FileImage(File(profileImagePath!)) : null,
+                  child: !hasValidImage
+                      ? const Icon(
+                          Icons.person,
+                          size: 32,
+                          color: AppColors.darkBackground,
+                        )
+                      : null,
+                )
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            quickStatsText,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.text(context),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _statCard(
+                  context,
+                  totalEarningsLabel,
+                  '₹18,450',
+                  Icons.currency_rupee,
+                  activeAccent,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _statCard(
+                  context,
+                  scrapProcessedLabel,
+                  '125.5 kg',
+                  Icons.scale,
+                  AppColors.mintGreen,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _statCard(
+                  context,
+                  pendingPayoutLabel,
+                  '₹1,200',
+                  Icons.hourglass_top,
+                  AppColors.warning,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _statCard(
+                  context,
+                  classificationsLabel,
+                  '28 Done',
+                  Icons.auto_awesome,
+                  AppColors.lightGreen,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Text(
+            quickActionsText,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.text(context),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _actionButton(
+                context,
+                Icons.auto_awesome,
+                actionClassifyText,
+                () => onNavigateTab(5),
+              ),
+              _actionButton(
+                context,
+                Icons.account_balance_wallet,
+                actionPaymentText,
+                () => onNavigateTab(4),
+              ),
+              _actionButton(
+                context,
+                Icons.history,
+                actionHistoryText,
+                () => onNavigateTab(2),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _actionButton(
+                context,
+                Icons.smart_toy,
+                recyAiText,
+                () => _openRecyChatbot(context),
+              ),
+              _actionButton(
+                context,
+                Icons.local_shipping,
+                pickupText,
+                () => onNavigateTab(1),
+              ),
+              _actionButton(
+                context,
+                Icons.currency_rupee,
+                earningsText,
+                () => onNavigateTab(3),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          PriceBoardTab(language: language),
+        ],
+      ),
+    );
+  }
+
+  Widget _statCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppThemeColors.card(context),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.text(context),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppThemeColors.muted(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _actionButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(30),
+      onTap: onTap,
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: activeAccent.withValues(alpha: 0.15),
+            child: Icon(icon, color: activeAccent),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppThemeColors.text(context),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -1590,8 +3845,179 @@ class HistoryTab extends StatefulWidget {
 class _HistoryTabState extends State<HistoryTab> {
   String selectedPeriod = 'Week';
 
+  String get headerTitle {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Recent Deals';
+      case AppLanguage.hindi:
+        return 'हाल के सौदे';
+      case AppLanguage.marathi:
+        return 'नुकतेच झालेले सोदे';
+    }
+  }
+
+  String get periodTranslated {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return selectedPeriod == 'Week' ? 'सप्ताह' : (selectedPeriod == 'Month' ? 'महीना' : 'वर्ष');
+      case AppLanguage.marathi:
+        return selectedPeriod == 'Week' ? 'आठवडा' : (selectedPeriod == 'Month' ? 'महिना' : 'वर्ष');
+      case AppLanguage.english:
+      default:
+        return selectedPeriod;
+    }
+  }
+
+  String get showingSubtext {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Showing deals for $periodTranslated';
+      case AppLanguage.hindi:
+        return '$periodTranslated के लिए सौदे दिखाए जा रहे हैं';
+      case AppLanguage.marathi:
+        return '$periodTranslated साठीचे सोदे दाखवत आहे';
+    }
+  }
+
+  String get weekText {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return 'सप्ताह';
+      case AppLanguage.marathi:
+        return 'आठवडा';
+      case AppLanguage.english:
+      default:
+        return 'Week';
+    }
+  }
+
+  String get monthText {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return 'महीना';
+      case AppLanguage.marathi:
+        return 'महिना';
+      case AppLanguage.english:
+      default:
+        return 'Month';
+    }
+  }
+
+  String get yearText {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return 'वर्ष';
+      case AppLanguage.marathi:
+        return 'वर्ष';
+      case AppLanguage.english:
+      default:
+        return 'Year';
+    }
+  }
+
+  List<Map<String, dynamic>> get materials {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return [
+          {
+            'title': 'पीसीबी / सर्किट बोर्ड',
+            'date': '12 सितम्बर 2026',
+            'weight': '8.5 किग्रा',
+            'amount': '₹2,975',
+            'icon': Icons.memory,
+          },
+          {
+            'title': 'तांबे के तार',
+            'date': '08 सितम्बर 2026',
+            'weight': '12 किग्रा',
+            'amount': '₹3,000',
+            'icon': Icons.cable,
+          },
+          {
+            'title': 'लेड-एसिड बैटरियां',
+            'date': '04 सितम्बर 2026',
+            'weight': '20 किग्रा',
+            'amount': '₹1,800',
+            'icon': Icons.battery_full,
+          },
+          {
+            'title': 'सीआरटी कांच',
+            'date': '29 अगस्त 2026',
+            'weight': '25 किग्रा',
+            'amount': '₹750',
+            'icon': Icons.tv,
+          },
+        ];
+      case AppLanguage.marathi:
+        return [
+          {
+            'title': 'पीसीबी / सर्किट बोर्ड',
+            'date': '12 सप्टेंबर 2026',
+            'weight': '8.5 किलोग्रॅम',
+            'amount': '₹2,975',
+            'icon': Icons.memory,
+          },
+          {
+            'title': 'तांब्याच्या तारा',
+            'date': '08 सप्टेंबर 2026',
+            'weight': '12 किलोग्रॅम',
+            'amount': '₹3,000',
+            'icon': Icons.cable,
+          },
+          {
+            'title': 'लेड-ॲसिड बॅटऱ्या',
+            'date': '04 सप्टेंबर 2026',
+            'weight': '20 किलोग्रॅम',
+            'amount': '₹1,800',
+            'icon': Icons.battery_full,
+          },
+          {
+            'title': 'सीआरटी काच',
+            'date': '29 ऑगस्ट 2026',
+            'weight': '25 किलोग्रॅम',
+            'amount': '₹750',
+            'icon': Icons.tv,
+          },
+        ];
+      case AppLanguage.english:
+      default:
+        return [
+          {
+            'title': 'PCB / Circuit Boards',
+            'date': '12 Sep 2026',
+            'weight': '8.5 kg',
+            'amount': '₹2,975',
+            'icon': Icons.memory,
+          },
+          {
+            'title': 'Copper Cables',
+            'date': '08 Sep 2026',
+            'weight': '12 kg',
+            'amount': '₹3,000',
+            'icon': Icons.cable,
+          },
+          {
+            'title': 'Lead-Acid Batteries',
+            'date': '04 Sep 2026',
+            'weight': '20 kg',
+            'amount': '₹1,800',
+            'icon': Icons.battery_full,
+          },
+          {
+            'title': 'CRT Glass',
+            'date': '29 Aug 2026',
+            'weight': '25 kg',
+            'amount': '₹750',
+            'icon': Icons.tv,
+          },
+        ];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -1602,7 +4028,7 @@ class _HistoryTabState extends State<HistoryTab> {
             children: [
               Expanded(
                 child: Text(
-                  'Recent Transactions',
+                  headerTitle,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -1615,7 +4041,7 @@ class _HistoryTabState extends State<HistoryTab> {
               const SizedBox(width: 8),
               Container(
                 constraints: const BoxConstraints(
-                  maxWidth: 125,
+                  maxWidth: 135,
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8,
@@ -1635,22 +4061,22 @@ class _HistoryTabState extends State<HistoryTab> {
                     dropdownColor: AppThemeColors.card(
                       context,
                     ),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.keyboard_arrow_down,
-                      color: AppColors.primaryGold,
+                      color: activeAccent,
                     ),
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: 'Week',
-                        child: Text('Week'),
+                        child: Text(weekText),
                       ),
                       DropdownMenuItem(
                         value: 'Month',
-                        child: Text('Month'),
+                        child: Text(monthText),
                       ),
                       DropdownMenuItem(
                         value: 'Year',
-                        child: Text('Year'),
+                        child: Text(yearText),
                       ),
                     ],
                     onChanged: (value) {
@@ -1667,11 +4093,9 @@ class _HistoryTabState extends State<HistoryTab> {
               ),
             ],
           ),
-
           const SizedBox(height: 6),
-
           Text(
-            'Showing transactions for $selectedPeriod',
+            showingSubtext,
             style: TextStyle(
               color: AppThemeColors.faint(
                 context,
@@ -1679,40 +4103,14 @@ class _HistoryTabState extends State<HistoryTab> {
               fontSize: 12,
             ),
           ),
-
           const SizedBox(height: 18),
-
-          _historyCard(
-            'PCB / Circuit Boards',
-            '12 Sep 2026',
-            '8.5 kg',
-            '₹2,975',
-            Icons.memory,
-          ),
-
-          _historyCard(
-            'Copper Cables',
-            '08 Sep 2026',
-            '12 kg',
-            '₹3,000',
-            Icons.cable,
-          ),
-
-          _historyCard(
-            'Lead-Acid Batteries',
-            '04 Sep 2026',
-            '20 kg',
-            '₹1,800',
-            Icons.battery_full,
-          ),
-
-          _historyCard(
-            'CRT Glass',
-            '29 Aug 2026',
-            '25 kg',
-            '₹750',
-            Icons.tv,
-          ),
+          ...materials.map((m) => _historyCard(
+            m['title'] as String,
+            m['date'] as String,
+            m['weight'] as String,
+            m['amount'] as String,
+            m['icon'] as IconData,
+          )),
         ],
       ),
     );
@@ -1725,6 +4123,8 @@ class _HistoryTabState extends State<HistoryTab> {
     String amount,
     IconData icon,
   ) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     return Container(
       margin: const EdgeInsets.only(
         bottom: 12,
@@ -1740,12 +4140,12 @@ class _HistoryTabState extends State<HistoryTab> {
         children: [
           CircleAvatar(
             radius: 25,
-            backgroundColor: AppColors.primaryGold.withValues(
+            backgroundColor: activeAccent.withValues(
               alpha: 0.16,
             ),
             child: Icon(
               icon,
-              color: AppColors.primaryGold,
+              color: activeAccent,
             ),
           ),
           const SizedBox(width: 14),
@@ -1775,8 +4175,8 @@ class _HistoryTabState extends State<HistoryTab> {
           const SizedBox(width: 8),
           Text(
             amount,
-            style: const TextStyle(
-              color: AppColors.primaryGold,
+            style: TextStyle(
+              color: activeAccent,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1791,19 +4191,84 @@ class _HistoryTabState extends State<HistoryTab> {
 // ============================================================
 
 class EarningsTab extends StatelessWidget {
+  final AppLanguage language;
+
   const EarningsTab({
     super.key,
+    required this.language,
   });
+
+  String get titleText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Your Earnings';
+      case AppLanguage.hindi:
+        return 'आपकी कमाई';
+      case AppLanguage.marathi:
+        return 'तुमची कमाई';
+    }
+  }
+
+  String get thisMonthText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'This Month';
+      case AppLanguage.hindi:
+        return 'इस महीने';
+      case AppLanguage.marathi:
+        return 'या महिन्यात';
+    }
+  }
+
+  String get materialEarningsText {
+    switch (language) {
+      case AppLanguage.english:
+        return 'Material-wise Earnings';
+      case AppLanguage.hindi:
+        return 'सामग्री के अनुसार कमाई';
+      case AppLanguage.marathi:
+        return 'मालगोठ्यानुसार कमाई';
+    }
+  }
+
+  List<Map<String, dynamic>> get earningItems {
+    switch (language) {
+      case AppLanguage.hindi:
+        return [
+          {'title': 'तांबा (Copper)', 'amount': '₹7,200', 'icon': Icons.cable},
+          {'title': 'पीसीबी (PCB)', 'amount': '₹5,800', 'icon': Icons.memory},
+          {'title': 'बैटरियां (Batteries)', 'amount': '₹3,950', 'icon': Icons.battery_full},
+          {'title': 'सीआरटी (CRT)', 'amount': '₹1,500', 'icon': Icons.tv},
+        ];
+      case AppLanguage.marathi:
+        return [
+          {'title': 'तांबे (Copper)', 'amount': '₹7,200', 'icon': Icons.cable},
+          {'title': 'पीसीबी (PCB)', 'amount': '₹5,800', 'icon': Icons.memory},
+          {'title': 'बॅटऱ्या (Batteries)', 'amount': '₹3,950', 'icon': Icons.battery_full},
+          {'title': 'सीआरटी (CRT)', 'amount': '₹1,500', 'icon': Icons.tv},
+        ];
+      case AppLanguage.english:
+      default:
+        return [
+          {'title': 'Copper', 'amount': '₹7,200', 'icon': Icons.cable},
+          {'title': 'PCB', 'amount': '₹5,800', 'icon': Icons.memory},
+          {'title': 'Batteries', 'amount': '₹3,950', 'icon': Icons.battery_full},
+          {'title': 'CRT', 'amount': '₹1,500', 'icon': Icons.tv},
+        ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Your Earnings',
+            titleText,
             style: TextStyle(
               fontSize: 23,
               fontWeight: FontWeight.bold,
@@ -1812,9 +4277,7 @@ class EarningsTab extends StatelessWidget {
               ),
             ),
           ),
-
           const SizedBox(height: 18),
-
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(22),
@@ -1830,7 +4293,7 @@ class EarningsTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'This Month',
+                  thisMonthText,
                   style: TextStyle(
                     color: AppThemeColors.muted(
                       context,
@@ -1838,12 +4301,12 @@ class EarningsTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   '₹18,450',
                   style: TextStyle(
                     fontSize: 34,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primaryGold,
+                    color: activeAccent,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -1866,11 +4329,9 @@ class EarningsTab extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 20),
-
           Text(
-            'Material-wise Earnings',
+            materialEarningsText,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -1879,36 +4340,13 @@ class EarningsTab extends StatelessWidget {
               ),
             ),
           ),
-
           const SizedBox(height: 12),
-
-          _earningRow(
+          ...earningItems.map((item) => _earningRow(
             context,
-            'Copper',
-            '₹7,200',
-            Icons.cable,
-          ),
-
-          _earningRow(
-            context,
-            'PCB',
-            '₹5,800',
-            Icons.memory,
-          ),
-
-          _earningRow(
-            context,
-            'Batteries',
-            '₹3,950',
-            Icons.battery_full,
-          ),
-
-          _earningRow(
-            context,
-            'CRT',
-            '₹1,500',
-            Icons.tv,
-          ),
+            item['title'] as String,
+            item['amount'] as String,
+            item['icon'] as IconData,
+          )),
         ],
       ),
     );
@@ -1920,6 +4358,8 @@ class EarningsTab extends StatelessWidget {
     String amount,
     IconData icon,
   ) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     return Container(
       margin: const EdgeInsets.only(
         bottom: 10,
@@ -1935,7 +4375,7 @@ class EarningsTab extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: AppColors.primaryGold,
+            color: activeAccent,
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -1948,8 +4388,8 @@ class EarningsTab extends StatelessWidget {
           ),
           Text(
             amount,
-            style: const TextStyle(
-              color: AppColors.primaryGold,
+            style: TextStyle(
+              color: activeAccent,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1964,8 +4404,11 @@ class EarningsTab extends StatelessWidget {
 // ============================================================
 
 class PriceBoardTab extends StatefulWidget {
+  final AppLanguage language;
+
   const PriceBoardTab({
     super.key,
+    this.language = AppLanguage.english,
   });
 
   @override
@@ -1985,50 +4428,372 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
     'Pune',
   ];
 
-  final List<Map<String, dynamic>> prices = [
-    {
-      'material': 'Copper',
-      'rate': '₹620/kg',
-      'trend': '+4.2%',
-      'up': true,
-      'icon': Icons.cable,
-    },
-    {
-      'material': 'PCB',
-      'rate': '₹480/kg',
-      'trend': '+6.1%',
-      'up': true,
-      'icon': Icons.memory,
-    },
-    {
-      'material': 'Aluminium',
-      'rate': '₹165/kg',
-      'trend': '+1.8%',
-      'up': true,
-      'icon': Icons.settings,
-    },
-    {
-      'material': 'Lead Battery',
-      'rate': '₹95/kg',
-      'trend': '-1.4%',
-      'up': false,
-      'icon': Icons.battery_full,
-    },
-    {
-      'material': 'CRT Glass',
-      'rate': '₹30/kg',
-      'trend': '+0.8%',
-      'up': true,
-      'icon': Icons.tv,
-    },
-    {
-      'material': 'Mixed E-Waste',
-      'rate': '₹110/kg',
-      'trend': '+2.7%',
-      'up': true,
-      'icon': Icons.devices_other,
-    },
-  ];
+  String get headerTitle {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return 'वर्तमान खरीद दरें';
+      case AppLanguage.marathi:
+        return 'सध्याचे खरेदीचे दर';
+      case AppLanguage.english:
+      default:
+        return 'Current Buying Rates';
+    }
+  }
+
+  String get headerSubtitle {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return 'सांकेतिक स्थानीय दरें • लेनदेन से पहले सत्यापित करें';
+      case AppLanguage.marathi:
+        return 'स्थानिक दर • व्यवहारापूर्वी पडताळणी करा';
+      case AppLanguage.english:
+      default:
+        return 'Indicative local rates • verify before transaction';
+    }
+  }
+
+  String _t2(String en, String hi, String mr) {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return hi;
+      case AppLanguage.marathi:
+        return mr;
+      case AppLanguage.english:
+      default:
+        return en;
+    }
+  }
+
+  String get _weekRangeLabel {
+    final now = DateTime.now();
+    final monday = now.subtract(Duration(days: now.weekday - 1));
+    final sunday = monday.add(const Duration(days: 6));
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${monday.day} ${months[monday.month - 1]} - ${sunday.day} ${months[sunday.month - 1]}, ${sunday.year}';
+  }
+
+  final Map<String, double> _locationMultipliers = const {
+    'Bhubaneswar': 1.0,
+    'Cuttack': 0.95,
+    'Mumbai': 1.15,
+    'Delhi': 1.10,
+    'Pune': 1.05,
+  };
+
+  List<Map<String, dynamic>> get _weeklyBoardMaterials => [
+        {'material': _t2('Copper', 'तांबा', 'तांबे'), 'base': 620, 'unit': _t2('kg', 'किग्रा', 'किग्रॅ'), 'icon': Icons.cable},
+        {'material': 'PCB', 'base': 480, 'unit': _t2('kg', 'किग्रा', 'किग्रॅ'), 'icon': Icons.memory},
+        {'material': _t2('Aluminium', 'एल्युमीनियम', 'ॲल्युमिनियम'), 'base': 165, 'unit': _t2('kg', 'किग्रा', 'किग्रॅ'), 'icon': Icons.settings},
+        {'material': _t2('Lead Battery', 'लेड बैटरी', 'लेड बॅटरी'), 'base': 95, 'unit': _t2('kg', 'किग्रा', 'किग्रॅ'), 'icon': Icons.battery_full},
+        {'material': _t2('CRT Glass', 'सीआरटी कांच', 'सीआरटी काच'), 'base': 30, 'unit': _t2('kg', 'किग्रा', 'किग्रॅ'), 'icon': Icons.tv},
+        {'material': _t2('Mixed E-Waste', 'मिश्रित ई-कचरा', 'मिश्रित ई-कचरा'), 'base': 110, 'unit': _t2('kg', 'किग्रा', 'किग्रॅ'), 'icon': Icons.devices_other},
+      ];
+
+  Widget _weeklyPriceBoard(BuildContext context, Color accent) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppThemeColors.card(context),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: accent.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.calendar_month, color: accent, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _t2('This Week\'s Price Board', 'इस सप्ताह का मूल्य बोर्ड', 'या आठवड्याचा किंमत बोर्ड'),
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: AppThemeColors.text(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            _weekRangeLabel,
+            style: TextStyle(color: AppThemeColors.muted(context), fontSize: 12),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppThemeColors.background(context),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: selectedLocation,
+                isExpanded: true,
+                dropdownColor: AppThemeColors.card(context),
+                icon: Icon(Icons.location_on, color: accent),
+                items: locations.map(
+                  (location) {
+                    return DropdownMenuItem(
+                      value: location,
+                      child: Text(location),
+                    );
+                  },
+                ).toList(),
+                onChanged: (value) {
+                  if (value == null) {
+                    return;
+                  }
+                  setState(() {
+                    selectedLocation = value;
+                  });
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    _t2('Material', 'सामग्री', 'साहित्य'),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppThemeColors.muted(context),
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    _t2('Location', 'स्थान', 'स्थान'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppThemeColors.muted(context),
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    _t2('Standardized Market Price', 'मानकीकृत बाजार मूल्य', 'मानकीकृत बाजार किंमत'),
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppThemeColors.muted(context),
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          for (final item in _weeklyBoardMaterials)
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppThemeColors.background(context),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(item['icon'] as IconData, color: accent, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      item['material'] as String,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppThemeColors.text(context),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      selectedLocation,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppThemeColors.muted(context),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      '₹${((item['base'] as int) * (_locationMultipliers[selectedLocation] ?? 1.0)).round()}/${item['unit']}',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: accent,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> get prices {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return [
+          {
+            'material': 'तांबा (Copper)',
+            'rate': '₹620/किग्रा',
+            'trend': '+4.2%',
+            'up': true,
+            'icon': Icons.cable,
+          },
+          {
+            'material': 'पीसीबी (PCB)',
+            'rate': '₹480/किग्रा',
+            'trend': '+6.1%',
+            'up': true,
+            'icon': Icons.memory,
+          },
+          {
+            'material': 'एल्युमीनियम (Aluminium)',
+            'rate': '₹165/किग्रा',
+            'trend': '+1.8%',
+            'up': true,
+            'icon': Icons.settings,
+          },
+          {
+            'material': 'लेड बैटरी (Lead Battery)',
+            'rate': '₹95/किग्रा',
+            'trend': '-1.4%',
+            'up': false,
+            'icon': Icons.battery_full,
+          },
+          {
+            'material': 'सीआरटी कांच (CRT Glass)',
+            'rate': '₹30/किग्रा',
+            'trend': '+0.8%',
+            'up': true,
+            'icon': Icons.tv,
+          },
+          {
+            'material': 'मिश्रित ई-कचरा (Mixed E-Waste)',
+            'rate': '₹110/किग्रा',
+            'trend': '+2.7%',
+            'up': true,
+            'icon': Icons.devices_other,
+          },
+        ];
+      case AppLanguage.marathi:
+        return [
+          {
+            'material': 'तांबे (Copper)',
+            'rate': '₹620/किग्रॅ',
+            'trend': '+4.2%',
+            'up': true,
+            'icon': Icons.cable,
+          },
+          {
+            'material': 'पीसीबी (PCB)',
+            'rate': '₹480/किग्रॅ',
+            'trend': '+6.1%',
+            'up': true,
+            'icon': Icons.memory,
+          },
+          {
+            'material': 'ॲल्युमिनियम (Aluminium)',
+            'rate': '₹165/किग्रॅ',
+            'trend': '+1.8%',
+            'up': true,
+            'icon': Icons.settings,
+          },
+          {
+            'material': 'लेड बॅटरी (Lead Battery)',
+            'rate': '₹95/किग्रॅ',
+            'trend': '-1.4%',
+            'up': false,
+            'icon': Icons.battery_full,
+          },
+          {
+            'material': 'सीआरटी काच (CRT Glass)',
+            'rate': '₹30/किग्रॅ',
+            'trend': '+0.8%',
+            'up': true,
+            'icon': Icons.tv,
+          },
+          {
+            'material': 'मिश्रित ई-कचरा (Mixed E-Waste)',
+            'rate': '₹110/किग्रॅ',
+            'trend': '+2.7%',
+            'up': true,
+            'icon': Icons.devices_other,
+          },
+        ];
+      case AppLanguage.english:
+      default:
+        return [
+          {
+            'material': 'Copper',
+            'rate': '₹620/kg',
+            'trend': '+4.2%',
+            'up': true,
+            'icon': Icons.cable,
+          },
+          {
+            'material': 'PCB',
+            'rate': '₹480/kg',
+            'trend': '+6.1%',
+            'up': true,
+            'icon': Icons.memory,
+          },
+          {
+            'material': 'Aluminium',
+            'rate': '₹165/kg',
+            'trend': '+1.8%',
+            'up': true,
+            'icon': Icons.settings,
+          },
+          {
+            'material': 'Lead Battery',
+            'rate': '₹95/kg',
+            'trend': '-1.4%',
+            'up': false,
+            'icon': Icons.battery_full,
+          },
+          {
+            'material': 'CRT Glass',
+            'rate': '₹30/kg',
+            'trend': '+0.8%',
+            'up': true,
+            'icon': Icons.tv,
+          },
+          {
+            'material': 'Mixed E-Waste',
+            'rate': '₹110/kg',
+            'trend': '+2.7%',
+            'up': true,
+            'icon': Icons.devices_other,
+          },
+        ];
+    }
+  }
 
   @override
   void dispose() {
@@ -2039,20 +4804,33 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
   Future<void> _speak(
     String text,
   ) async {
-    await tts.setLanguage('en-IN');
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        await tts.setLanguage('hi-IN');
+        break;
+      case AppLanguage.marathi:
+        await tts.setLanguage('mr-IN');
+        break;
+      case AppLanguage.english:
+      default:
+        await tts.setLanguage('en-IN');
+        break;
+    }
     await tts.setSpeechRate(0.42);
     await tts.speak(text);
   }
 
   @override
   Widget build(BuildContext context) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Current Buying Rates',
+            headerTitle,
             style: TextStyle(
               fontSize: 23,
               fontWeight: FontWeight.bold,
@@ -2061,20 +4839,31 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
               ),
             ),
           ),
-
           const SizedBox(height: 6),
-
           Text(
-            'Indicative local rates • verify before transaction',
+            headerSubtitle,
             style: TextStyle(
               color: AppThemeColors.muted(
                 context,
               ),
             ),
           ),
-
-          const SizedBox(height: 15),
-
+          const SizedBox(height: 20),
+          _weeklyPriceBoard(context, activeAccent),
+          const SizedBox(height: 24),
+          Text(
+            _t2(
+              'Select a location for details',
+              'विवरण के लिए स्थान चुनें',
+              'तपशीलासाठी स्थान निवडा',
+            ),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.text(context),
+            ),
+          ),
+          const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -2094,9 +4883,9 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
                 dropdownColor: AppThemeColors.card(
                   context,
                 ),
-                icon: const Icon(
+                icon: Icon(
                   Icons.location_on,
-                  color: AppColors.primaryGold,
+                  color: activeAccent,
                 ),
                 items: locations.map(
                   (location) {
@@ -2118,22 +4907,18 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
               ),
             ),
           ),
-
           const SizedBox(height: 15),
-
           ...prices.map(
             (price) => _priceCard(
               context,
               price,
             ),
           ),
-
           const SizedBox(height: 10),
-
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.primaryGold.withValues(
+              color: activeAccent.withValues(
                 alpha: 0.10,
               ),
               borderRadius: BorderRadius.circular(
@@ -2143,9 +4928,9 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   Icons.info_outline,
-                  color: AppColors.primaryGold,
+                  color: activeAccent,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -2171,6 +4956,8 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
     BuildContext context,
     Map<String, dynamic> price,
   ) {
+    final activeAccent = AppThemeColors.isDark(context) ? AppColors.primaryGold : AppColors.featherGreen;
+
     return Container(
       margin: const EdgeInsets.only(
         bottom: 10,
@@ -2185,17 +4972,15 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: AppColors.primaryGold.withValues(
+            backgroundColor: activeAccent.withValues(
               alpha: 0.15,
             ),
             child: Icon(
               price['icon'] as IconData,
-              color: AppColors.primaryGold,
+              color: activeAccent,
             ),
           ),
-
           const SizedBox(width: 12),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2209,8 +4994,8 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
                 const SizedBox(height: 4),
                 Text(
                   price['rate'] as String,
-                  style: const TextStyle(
-                    color: AppColors.primaryGold,
+                  style: TextStyle(
+                    color: activeAccent,
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
                   ),
@@ -2218,7 +5003,6 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
               ],
             ),
           ),
-
           Column(
             children: [
               Icon(
@@ -2240,9 +5024,7 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
               ),
             ],
           ),
-
           const SizedBox(width: 8),
-
           IconButton(
             tooltip: 'Speak price',
             onPressed: () {
@@ -2266,8 +5048,11 @@ class _PriceBoardTabState extends State<PriceBoardTab> {
 // ============================================================
 
 class SafetyTab extends StatefulWidget {
+  final AppLanguage language;
+
   const SafetyTab({
     super.key,
+    this.language = AppLanguage.english,
   });
 
   @override
@@ -2286,97 +5071,206 @@ class _SafetyTabState extends State<SafetyTab> {
   Future<void> _speak(
     String text,
   ) async {
-    await tts.setLanguage('en-IN');
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        await tts.setLanguage('hi-IN');
+        break;
+      case AppLanguage.marathi:
+        await tts.setLanguage('mr-IN');
+        break;
+      case AppLanguage.english:
+      default:
+        await tts.setLanguage('en-IN');
+        break;
+    }
     await tts.setSpeechRate(0.42);
     await tts.speak(text);
   }
 
-  final guidance = const [
-    {
-      'title': 'Do not burn e-waste',
-      'description':
-          'Burning wires, plastic or electronic parts can release toxic fumes. Use authorized recycling channels instead.',
-      'icon': Icons.local_fire_department,
-      'danger': true,
-      'audio':
-          'Do not burn electronic waste, wires, batteries or plastic. Burning can release toxic fumes.',
-    },
-    {
-      'title': 'Do not open batteries',
-      'description':
-          'Do not cut, puncture or dismantle batteries. Keep damaged batteries isolated and contact an authorized recycler.',
-      'icon': Icons.battery_alert,
-      'danger': true,
-      'audio':
-          'Do not open, cut or puncture batteries. Keep damaged batteries isolated and contact an authorized recycler.',
-    },
-    {
-      'title': 'Handle CRTs carefully',
-      'description':
-          'CRT televisions and monitors can contain hazardous materials. Avoid breaking the glass and do not smash or burn CRTs.',
-      'icon': Icons.tv,
-      'danger': true,
-      'audio':
-          'Handle CRT televisions and monitors carefully. Do not smash, break or burn CRT glass.',
-    },
-    {
-      'title': 'Keep electronics dry',
-      'description':
-          'Store circuit boards and electronics in a dry, covered place before collection.',
-      'icon': Icons.water_drop,
-      'danger': false,
-      'audio':
-          'Keep circuit boards and electronic components dry and covered before collection.',
-    },
-    {
-      'title': 'Use basic protection',
-      'description':
-          'Use gloves, closed footwear and eye protection when handling sharp or damaged electronic parts.',
-      'icon': Icons.health_and_safety,
-      'danger': false,
-      'audio':
-          'Use gloves, closed footwear and eye protection when handling sharp or damaged electronic parts.',
-    },
-  ];
+  List<Map<String, dynamic>> get guidance {
+    switch (widget.language) {
+      case AppLanguage.hindi:
+        return [
+          {
+            'title': 'ई-कचरा न जलाएं',
+            'description': 'तार, प्लास्टिक या इलेक्ट्रॉनिक भागों को जलाने से जहरीला धुआं निकलता है। इसके बजाय अधिकृत रीसाइक्लिंग चैनलों का उपयोग करें।',
+            'icon': Icons.local_fire_department,
+            'danger': true,
+            'audio': 'इलेक्ट्रॉनिक कचरा, तार, बैटरी या प्लास्टिक न जलाएं। जलाने से जहरीला धुआं निकल सकता है।',
+          },
+          {
+            'title': 'बैटरी न खोलें',
+            'description': 'बैटरियों को काटें, छेद न करें या खोलें नहीं। क्षतिग्रस्त बैटरियों को अलग रखें और अधिकृत रीसायकलर से संपर्क करें।',
+            'icon': Icons.battery_alert,
+            'danger': true,
+            'audio': 'बैटरियों को न खोलें, काटें या छेदें। क्षतिग्रस्त बैटरियों को अलग रखें।',
+          },
+          {
+            'title': 'CRT को सावधानी से संभालें',
+            'description': 'CRT टीवी और मॉनिटर में खतरनाक सामग्री हो सकती है। कांच को तोड़ने से बचें और जलाएं नहीं।',
+            'icon': Icons.tv,
+            'danger': true,
+            'audio': 'CRT टीवी और मॉनिटर को सावधानी से संभालें। कांच न तोड़ें।',
+          },
+          {
+            'title': 'इलेक्ट्रॉनिक्स को सूखा रखें',
+            'description': 'संग्रहण से पहले सर्किट बोर्ड और इलेक्ट्रॉनिक्स को सूखे स्थान पर रखें।',
+            'icon': Icons.water_drop,
+            'danger': false,
+            'audio': 'सर्किट बोर्ड और इलेक्ट्रॉनिक घटकों को सूखा रखें।',
+          },
+          {
+            'title': 'सुरक्षा उपकरणों का प्रयोग करें',
+            'description': 'धारदार या क्षतिग्रस्त हिस्सों को संभालते समय दस्ताने और जूते पहनें।',
+            'icon': Icons.health_and_safety,
+            'danger': false,
+            'audio': 'धारदार हिस्सों को संभालते समय दस्ताने और जूते पहनें।',
+          },
+        ];
+      case AppLanguage.marathi:
+        return [
+          {
+            'title': 'ई-कचरा जाळू नका',
+            'description': 'इलेक्ट्रॉनिक भाग जाळल्याने विषारी वायू बाहेर पडतात. अधिकृत मार्गांचा वापर करा.',
+            'icon': Icons.local_fire_department,
+            'danger': true,
+            'audio': 'इलेक्ट्रॉनिक कचरा किंवा प्लास्टिक जाळू नका.',
+          },
+          {
+            'title': 'बॅटरी उघडू नका',
+            'description': 'बॅटरी कापू किंवा फोडू नका. खराब झालेल्या बॅटरी वेगळ्या ठेवा.',
+            'icon': Icons.battery_alert,
+            'danger': true,
+            'audio': 'बॅटरी उघडू नका किंवा कापू नका.',
+          },
+          {
+            'title': 'CRT काळजीपूर्वक हाताळा',
+            'description': 'CRT टीव्हीमधील काच फोडू नका किंवा जाळू नका.',
+            'icon': Icons.tv,
+            'danger': true,
+            'audio': 'CRT टीव्ही आणि मॉनिटर काळजीपूर्वक हाताळा.',
+          },
+          {
+            'title': 'इलेक्ट्रॉनिक्स कोरडे ठेवा',
+            'description': 'सर्किट बोर्ड कोरड्या जागी ठेवा.',
+            'icon': Icons.water_drop,
+            'danger': false,
+            'audio': 'इलेक्ट्रॉनिक वस्तू कोरड्या जागी ठेवा.',
+          },
+          {
+            'title': 'सुरक्षिततेची साधने वापरा',
+            'description': 'काम करताना हातमोजे आणि योग्य शूज वापरा.',
+            'icon': Icons.health_and_safety,
+            'danger': false,
+            'audio': 'हातमोजे आणि शूज वापरणे गरजेचे आहे.',
+          },
+        ];
+      case AppLanguage.english:
+      default:
+        return [
+          {
+            'title': 'Do not burn e-waste',
+            'description':
+                'Burning wires, plastic or electronic parts can release toxic fumes. Use authorized recycling channels instead.',
+            'icon': Icons.local_fire_department,
+            'danger': true,
+            'audio':
+                'Do not burn electronic waste, wires, batteries or plastic. Burning can release toxic fumes.',
+          },
+          {
+            'title': 'Do not open batteries',
+            'description':
+                'Do not cut, puncture or dismantle batteries. Keep damaged batteries isolated and contact an authorized recycler.',
+            'icon': Icons.battery_alert,
+            'danger': true,
+            'audio':
+                'Do not open, cut or puncture batteries. Keep damaged batteries isolated and contact an authorized recycler.',
+          },
+          {
+            'title': 'Handle CRTs carefully',
+            'description':
+                'CRT televisions and monitors can contain hazardous materials. Avoid breaking the glass and do not smash or burn CRTs.',
+            'icon': Icons.tv,
+            'danger': true,
+            'audio':
+                'Handle CRT televisions and monitors carefully. Do not smash, break or burn CRT glass.',
+          },
+          {
+            'title': 'Keep electronics dry',
+            'description':
+                'Store circuit boards and electronics in a dry, covered place before collection.',
+            'icon': Icons.water_drop,
+            'danger': false,
+            'audio':
+                'Keep circuit boards and electronic components dry and covered before collection.',
+          },
+          {
+            'title': 'Use basic protection',
+            'description':
+                'Use gloves, closed footwear and eye protection when handling sharp or damaged electronic parts.',
+            'icon': Icons.health_and_safety,
+            'danger': false,
+            'audio':
+                'Use gloves, closed footwear and eye protection when handling sharp or damaged electronic parts.',
+          },
+        ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Safety Guidance',
-            style: TextStyle(
-              fontSize: 23,
-              fontWeight: FontWeight.bold,
-              color: AppThemeColors.text(
-                context,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_LanguageText.t(
+          widget.language,
+          'Safety Guidance',
+          'सुरक्षा मार्गदर्शन',
+          'सुरक्षा मार्गदर्शन',
+        )),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _LanguageText.t(
+                widget.language,
+                'Safety Guidance',
+                'सुरक्षा मार्गदर्शन',
+                'सुरक्षा मार्गदर्शन',
+              ),
+              style: TextStyle(
+                fontSize: 23,
+                fontWeight: FontWeight.bold,
+                color: AppThemeColors.text(
+                  context,
+                ),
               ),
             ),
-          ),
-
-          const SizedBox(height: 6),
-
-          Text(
-            'Simple picture-based and audio guidance for safer e-waste handling.',
-            style: TextStyle(
-              color: AppThemeColors.muted(
-                context,
+            const SizedBox(height: 6),
+            Text(
+              _LanguageText.t(
+                widget.language,
+                'Simple picture-based and audio guidance for safer e-waste handling.',
+                'सुरक्षित ई-कचरा संभालने के लिए सरल चित्र और ऑडियो मार्गदर्शन।',
+                'सुरक्षित ई-कचरा हाताळणीसाठी सोपे चित्र आणि ऑडिओ मार्गदर्शन.',
+              ),
+              style: TextStyle(
+                color: AppThemeColors.muted(
+                  context,
+                ),
               ),
             ),
-          ),
-
-          const SizedBox(height: 18),
-
-          ...guidance.map(
-            (item) => _safetyCard(
-              context,
-              item,
+            const SizedBox(height: 18),
+            ...guidance.map(
+              (item) => _safetyCard(
+                context,
+                item,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -2386,6 +5280,8 @@ class _SafetyTabState extends State<SafetyTab> {
     Map<String, dynamic> item,
   ) {
     final danger = item['danger'] as bool;
+    final iconBoxSize = MediaQuery.of(context).size.width < 340 ? 46.0 : 58.0;
+    final iconSize = MediaQuery.of(context).size.width < 340 ? 24.0 : 30.0;
 
     return Container(
       margin: const EdgeInsets.only(
@@ -2413,8 +5309,8 @@ class _SafetyTabState extends State<SafetyTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                height: 58,
-                width: 58,
+                height: iconBoxSize,
+                width: iconBoxSize,
                 decoration: BoxDecoration(
                   color: danger
                       ? AppColors.danger.withValues(
@@ -2429,15 +5325,13 @@ class _SafetyTabState extends State<SafetyTab> {
                 ),
                 child: Icon(
                   item['icon'] as IconData,
-                  size: 30,
+                  size: iconSize,
                   color: danger
                       ? AppColors.danger
                       : AppColors.lightGreen,
                 ),
               ),
-
               const SizedBox(width: 14),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -2464,23 +5358,28 @@ class _SafetyTabState extends State<SafetyTab> {
               ),
             ],
           ),
-
           const SizedBox(height: 12),
-
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                _speak(
-                  item['audio'] as String,
-                );
-              },
-              icon: const Icon(
-                Icons.volume_up,
-                color: AppColors.mintGreen,
-              ),
-              label: const Text(
-                'Listen to guidance',
+          Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: 42,
+              height: 42,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  backgroundColor: AppColors.mintGreen,
+                  foregroundColor: AppColors.darkBackground,
+                  shape: const CircleBorder(),
+                ),
+                onPressed: () {
+                  _speak(
+                    item['audio'] as String,
+                  );
+                },
+                child: const Icon(
+                  Icons.volume_up,
+                  color: AppColors.darkBackground,
+                ),
               ),
             ),
           ),
@@ -2491,114 +5390,101 @@ class _SafetyTabState extends State<SafetyTab> {
 }
 
 // ============================================================
-// TAB 3 - PAYMENT
+// CLASSIFICATION, RECENT UPLOADS, PAYMENTS AND PICKUP UPLOAD
 // ============================================================
 
-class PaymentTab extends StatelessWidget {
+class _LanguageText {
+  static String t(AppLanguage language, String en, String hi, String mr) {
+    switch (language) {
+      case AppLanguage.hindi:
+        return hi;
+      case AppLanguage.marathi:
+        return mr;
+      case AppLanguage.english:
+      default:
+        return en;
+    }
+  }
+}
+
+class ClassifyResultScreen extends StatelessWidget {
+  final Map<String, dynamic> result;
   final AppLanguage language;
-  final String paymentPreference;
 
-  final ValueChanged<String> onPaymentPreferenceChanged;
-
-  const PaymentTab({
+  const ClassifyResultScreen({
     super.key,
+    required this.result,
     required this.language,
-    required this.paymentPreference,
-    required this.onPaymentPreferenceChanged,
   });
+
+  String _t(String en, String hi, String mr) =>
+      _LanguageText.t(language, en, hi, mr);
 
   @override
   Widget build(BuildContext context) {
-    final options = [
-      ['Cash', Icons.money],
-      [
-        'UPI / Digital Wallet',
-        Icons.qr_code,
-      ],
-      [
-        'Bank Transfer',
-        Icons.account_balance,
-      ],
-      [
-        'Direct Recycler Settlement',
-        Icons.factory,
-      ],
-      [
-        'Cheque',
-        Icons.receipt_long,
-      ],
-      [
-        'Post-Paid Digital Wallet',
-        Icons.wallet,
-      ],
-    ];
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    final imagePath = result['imagePath'] as String?;
+    final material = result['material'] as String? ?? 'E-Waste';
+    final weight = result['weight'] as String? ?? 'Approx. 2.5 kg';
+    final price = result['price'] as String? ?? '₹275';
+    final confidence = result['confidence'] as String? ?? '89%';
+    final date = result['date'] as String? ?? '';
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_t('AI Classification', 'AI वर्गीकरण', 'AI वर्गीकरण')),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          Text(
-            'Payment Preference',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: AppThemeColors.text(
-                context,
+          if (imagePath != null && File(imagePath).existsSync())
+            ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Image.file(
+                File(imagePath),
+                height: 240,
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            'Cash remains available. Digital payment is optional.',
-            style: TextStyle(
-              color: AppThemeColors.muted(
-                context,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          ...options.map(
-            (item) => _paymentOptionTile(
-              context,
-              item[0] as String,
-              item[1] as IconData,
-            ),
-          ),
-
           const SizedBox(height: 18),
-
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: AppColors.mintGreen.withValues(
-                alpha: 0.10,
-              ),
-              borderRadius: BorderRadius.circular(
-                16,
-              ),
+              color: AppThemeColors.card(context),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: accent.withValues(alpha: 0.25)),
             ),
-            child: const Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
               children: [
-                Icon(
-                  Icons.verified_user,
-                  color: AppColors.mintGreen,
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'ReNova prioritizes transparent and documented payments without forcing users to adopt digital payments.',
-                    style: TextStyle(
-                      color: AppColors.mintGreen,
-                    ),
-                  ),
-                ),
+                _resultRow(context, Icons.category,
+                    _t('Material', 'सामग्री', 'साहित्य'), material),
+                _resultRow(context, Icons.scale,
+                    _t('Approx. Weight', 'अनुमानित वजन', 'अंदाजे वजन'), weight),
+                _resultRow(context, Icons.currency_rupee,
+                    _t('Estimated Price', 'अनुमानित कीमत', 'अंदाजे किंमत'), price),
+                _resultRow(context, Icons.verified,
+                    _t('AI Confidence', 'AI विश्वास स्तर', 'AI विश्वास पातळी'), confidence),
+                _resultRow(context, Icons.calendar_today,
+                    _t('Picture Date', 'चित्र की तारीख', 'फोटोची तारीख'), date),
               ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text(
+              _t(
+                'AI results are estimates for the prototype. Confirm actual material, weight and market price with a verified recycler before completing a transaction.',
+                'AI परिणाम प्रोटोटाइप के लिए अनुमान हैं। लेनदेन पूरा करने से पहले सत्यापित रीसायकलर से वास्तविक सामग्री, वजन और बाजार मूल्य की पुष्टि करें।',
+                'AI परिणाम प्रोटोटाइपसाठी अंदाज आहेत. व्यवहार पूर्ण करण्यापूर्वी सत्यापित रीसायकलरकडून वास्तविक साहित्य, वजन आणि बाजारभावाची पुष्टी करा.',
+              ),
+              style: TextStyle(color: AppThemeColors.text(context), height: 1.35),
             ),
           ),
         ],
@@ -2606,80 +5492,153 @@ class PaymentTab extends StatelessWidget {
     );
   }
 
-  Widget _paymentOptionTile(
-    BuildContext context,
-    String option,
-    IconData icon,
-  ) {
-    final selected = paymentPreference == option;
-
-    return GestureDetector(
-      onTap: () => onPaymentPreferenceChanged(
-        option,
-      ),
-      child: Container(
-        margin: const EdgeInsets.only(
-          bottom: 12,
-        ),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: selected
-              ? AppColors.primaryGold.withValues(
-                  alpha: 0.18,
-                )
-              : AppThemeColors.card(
-                  context,
-                ),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: selected ? AppColors.primaryGold : Colors.transparent,
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: AppColors.primaryGold,
+  Widget _resultRow(BuildContext context, IconData icon, String label, String value) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      child: Row(
+        children: [
+          Icon(icon, color: accent),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(color: AppThemeColors.muted(context)),
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                option,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+          ),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: AppThemeColors.text(context),
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Icon(
-              selected ? Icons.check_circle : Icons.circle_outlined,
-              color: selected
-                  ? AppColors.primaryGold
-                  : AppThemeColors.veryFaint(
-                      context,
-                    ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ============================================================
-// TAB 4 - PICKUP + AI
-// ============================================================
+class _LocalAiClassifier {
+  static Map<String, dynamic> classify(String path, {bool bulk = false}) {
+    // Prototype-only local classifier. It intentionally does not claim to be a
+    // trained ML model; it provides an AI-style result until a backend/model is connected.
+    final name = path.toLowerCase();
+    String material;
+    String weight;
+    String price;
+    String confidence;
+
+    if (name.contains('battery')) {
+      material = 'Lead Battery';
+      weight = bulk ? 'Approx. 8.0 kg' : 'Approx. 2.0 kg';
+      price = bulk ? '₹760' : '₹190';
+      confidence = '91%';
+    } else if (name.contains('cable') || name.contains('wire')) {
+      material = 'Copper Cable';
+      weight = bulk ? 'Approx. 10.0 kg' : 'Approx. 2.5 kg';
+      price = bulk ? '₹2,800' : '₹700';
+      confidence = '88%';
+    } else if (name.contains('pcb') || name.contains('circuit')) {
+      material = 'PCB / Circuit Board';
+      weight = bulk ? 'Approx. 7.5 kg' : 'Approx. 1.8 kg';
+      price = bulk ? '₹3,600' : '₹864';
+      confidence = '93%';
+    } else if (name.contains('plastic')) {
+      material = 'Hard Plastic';
+      weight = bulk ? 'Approx. 12.0 kg' : 'Approx. 3.0 kg';
+      price = bulk ? '₹720' : '₹180';
+      confidence = '86%';
+    } else if (name.contains('aluminium') || name.contains('aluminum')) {
+      material = 'Aluminium';
+      weight = bulk ? 'Approx. 9.0 kg' : 'Approx. 2.5 kg';
+      price = bulk ? '₹1,485' : '₹413';
+      confidence = '89%';
+    } else {
+      material = bulk ? 'Mixed E-Waste' : 'Electronic Scrap';
+      weight = bulk ? 'Approx. 6.0 kg' : 'Approx. 2.5 kg';
+      price = bulk ? '₹660' : '₹275';
+      confidence = bulk ? '84%' : '87%';
+    }
+
+    return {
+      'material': material,
+      'weight': weight,
+      'price': price,
+      'confidence': confidence,
+      'imagePath': path,
+      'date': DateTime.now().toIso8601String(),
+      'mode': bulk ? 'bulk' : 'scrap',
+    };
+  }
+}
+
+Future<XFile?> _pickClassificationImage(BuildContext context, AppLanguage language) async {
+  final picker = ImagePicker();
+
+  return showModalBottomSheet<XFile?>(
+    context: context,
+    backgroundColor: AppThemeColors.card(context),
+    showDragHandle: true,
+    builder: (ctx) {
+      return SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: Text(_LanguageText.t(
+                language,
+                'Camera',
+                'कैमरा',
+                'कॅमेरा',
+              )),
+              onTap: () async {
+                final image = await picker.pickImage(
+                  source: ImageSource.camera,
+                  imageQuality: 80,
+                );
+                if (ctx.mounted) Navigator.pop(ctx, image);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text(_LanguageText.t(
+                language,
+                'Gallery',
+                'गैलरी',
+                'गॅलरी',
+              )),
+              onTap: () async {
+                final image = await picker.pickImage(
+                  source: ImageSource.gallery,
+                  imageQuality: 80,
+                );
+                if (ctx.mounted) Navigator.pop(ctx, image);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
 class PickupUploadTab extends StatefulWidget {
   final String? savedPhotoPath;
   final ReNovaStorage storage;
-
+  final AppLanguage language;
   final ValueChanged<String?> onPhotoUploaded;
 
   const PickupUploadTab({
     super.key,
-    required this.savedPhotoPath,
+    this.savedPhotoPath,
     required this.storage,
+    required this.language,
     required this.onPhotoUploaded,
   });
 
@@ -2688,1573 +5647,834 @@ class PickupUploadTab extends StatefulWidget {
 }
 
 class _PickupUploadTabState extends State<PickupUploadTab> {
-  final ImagePicker picker = ImagePicker();
+  bool loading = false;
 
-  bool isAnalysing = false;
+  String _t(String en, String hi, String mr) =>
+      _LanguageText.t(widget.language, en, hi, mr);
 
-  String detectedMaterial = 'E-Waste / Mixed Electronics';
-  String confidence = '92%';
-  String estimatedWeight = 'Approx. 8–10 kg';
-  String estimatedValue = '₹2,400 – ₹3,100';
-  String materialCategory = 'Recoverable Electronic Waste';
-  bool isHazardous = false;
-  String recommendation =
-      'Separate circuit boards, cables and batteries before handing over.';
-  String recyclerRecommendation = 'Authorized E-Waste Recycler';
+  Future<void> _classifyScrap() async {
+    final image = await _pickClassificationImage(context, widget.language);
+    if (image == null) return;
 
-  Future<void> _pickImage(
-    ImageSource source,
-  ) async {
-    try {
-      final image = await picker.pickImage(
-        source: source,
-        imageQuality: 75,
-      );
-
-      if (image == null) return;
-
-      final permanentPath = await widget.storage.saveImagePermanently(
-        image,
-        'renova_pickup.jpg',
-      );
-
-      await widget.storage.prefs.setString(
-        'pickup_image_path',
-        permanentPath,
-      );
-
-      widget.onPhotoUploaded(
-        permanentPath,
-      );
-
-      await _runAiClassification(
-        image,
-      );
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Unable to access image: $e',
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> _runAiClassification(
-    XFile image,
-  ) async {
-    setState(() {
-      isAnalysing = true;
-    });
-
-    await Future.delayed(
-      const Duration(seconds: 2),
+    setState(() => loading = true);
+    final path = await widget.storage.saveImagePermanently(
+      image,
+      'renova_classification_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
-
+    final result = _LocalAiClassifier.classify(path);
+    await widget.storage.saveClassification(result);
     if (!mounted) return;
-
-    final filename = image.name.toLowerCase();
-
-    if (filename.contains('battery')) {
-      detectedMaterial = 'Lead-Acid / Lithium Battery';
-      confidence = '94%';
-      estimatedWeight = 'Approx. 10–15 kg';
-      estimatedValue = '₹1,500 – ₹2,500';
-      materialCategory = 'Potentially Hazardous E-Waste';
-      isHazardous = true;
-      recommendation =
-          'Do not dismantle. Hand over to an authorized battery recycler.';
-      recyclerRecommendation = 'Authorized Battery Recycler';
-    } else if (filename.contains('cable') || filename.contains('copper')) {
-      detectedMaterial = 'Copper Cable / Wire';
-      confidence = '96%';
-      estimatedWeight = 'Approx. 8–12 kg';
-      estimatedValue = '₹2,500 – ₹4,000';
-      materialCategory = 'High-Value Recoverable Material';
-      isHazardous = false;
-      recommendation =
-          'Separate copper cables from plastic insulation for better recovery.';
-      recyclerRecommendation = 'Metal Recovery Recycler';
-    } else if (filename.contains('pcb') || filename.contains('circuit')) {
-      detectedMaterial = 'PCB / Circuit Boards';
-      confidence = '95%';
-      estimatedWeight = 'Approx. 5–8 kg';
-      estimatedValue = '₹2,000 – ₹3,500';
-      materialCategory = 'High-Value Electronic Waste';
-      isHazardous = false;
-      recommendation =
-          'Keep circuit boards dry and avoid unsafe backyard processing.';
-      recyclerRecommendation = 'Authorized E-Waste Recycler';
-    } else {
-      detectedMaterial = 'E-Waste / Mixed Electronics';
-      confidence = '92%';
-      estimatedWeight = 'Approx. 8–10 kg';
-      estimatedValue = '₹2,400 – ₹3,100';
-      materialCategory = 'Recoverable Electronic Waste';
-      isHazardous = false;
-      recommendation =
-          'Separate batteries and hazardous components before handover.';
-      recyclerRecommendation = 'Authorized E-Waste Recycler';
-    }
-
-    setState(() {
-      isAnalysing = false;
-    });
+    setState(() => loading = false);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ClassifyResultScreen(
+          result: result,
+          language: widget.language,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final path = widget.savedPhotoPath;
-    final hasPhoto = path != null && File(path).existsSync();
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
 
-    return SingleChildScrollView(
+    return ListView(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Scrap Pickup & AI Verification',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: AppThemeColors.text(
-                context,
-              ),
-            ),
+      children: [
+        Text(
+          _t('Classify Scrap', 'कबाड़ का वर्गीकरण', 'भंगाराचे वर्गीकरण'),
+          style: TextStyle(
+            fontSize: 23,
+            fontWeight: FontWeight.bold,
+            color: AppThemeColors.text(context),
           ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            'Upload a photo and ReNova can analyse the material, estimate value and recommend a recycling channel.',
-            style: TextStyle(
-              color: AppThemeColors.muted(
-                context,
-              ),
-            ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          _t(
+            'Upload one scrap image through Camera or Gallery and get an estimated material, weight, price and AI confidence.',
+            'कैमरा या गैलरी से एक कबाड़ की तस्वीर अपलोड करें और अनुमानित सामग्री, वजन, कीमत और AI विश्वास स्तर प्राप्त करें।',
+            'कॅमेरा किंवा गॅलरीमधून भंगाराचा फोटो अपलोड करून अंदाजे साहित्य, वजन, किंमत आणि AI विश्वास पातळी मिळवा.',
           ),
-
-          const SizedBox(height: 20),
-
-          Container(
-            width: double.infinity,
-            height: 250,
-            decoration: BoxDecoration(
-              color: AppThemeColors.card(
-                context,
-              ),
-              borderRadius: BorderRadius.circular(
-                16,
-              ),
-              border: Border.all(
-                color: AppColors.primaryGold,
-              ),
-            ),
-            child: hasPhoto
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                      16,
-                    ),
-                    child: Image.file(
-                      File(path),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.add_a_photo,
-                        size: 60,
-                        color: AppColors.primaryGold,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'No photo uploaded yet',
-                        style: TextStyle(
-                          color: AppThemeColors.faint(
-                            context,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+          style: TextStyle(color: AppThemeColors.muted(context)),
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppThemeColors.card(context),
+            borderRadius: BorderRadius.circular(20),
           ),
-
-          const SizedBox(height: 20),
-
-          Row(
+          child: Column(
             children: [
-              Expanded(
+              Icon(Icons.auto_awesome, size: 58, color: accent),
+              const SizedBox(height: 16),
+              Text(
+                _t('AI Scrap Classifier', 'AI कबाड़ वर्गीकरण', 'AI भंगार वर्गीकरण'),
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: AppThemeColors.text(context),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _t(
+                  'Take a clear photo of the scrap item.',
+                  'कबाड़ की साफ तस्वीर लें।',
+                  'भंगाराचा स्पष्ट फोटो काढा.',
+                ),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppThemeColors.muted(context)),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
                 child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
-                    foregroundColor: AppColors.darkBackground,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                    ),
-                  ),
-                  onPressed: () => _pickImage(
-                    ImageSource.camera,
-                  ),
-                  icon: const Icon(
-                    Icons.camera_alt,
-                  ),
-                  label: const Text(
-                    'Camera',
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              Expanded(
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primaryGold,
-                    side: const BorderSide(
-                      color: AppColors.primaryGold,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                    ),
-                  ),
-                  onPressed: () => _pickImage(
-                    ImageSource.gallery,
-                  ),
-                  icon: const Icon(
-                    Icons.photo_library,
-                  ),
-                  label: const Text(
-                    'Gallery',
+                  onPressed: loading ? null : _classifyScrap,
+                  icon: loading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.camera_alt),
+                  label: Text(
+                    loading
+                        ? _t('Analyzing...', 'विश्लेषण हो रहा है...', 'विश्लेषण सुरू आहे...')
+                        : _t('Upload Image', 'तस्वीर अपलोड करें', 'फोटो अपलोड करा'),
                   ),
                 ),
               ),
             ],
           ),
-
-          if (hasPhoto) ...[
-            const SizedBox(height: 24),
-
-            if (isAnalysing)
-              _buildAnalysingCard()
-            else
-              _buildAiResultCard(),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAnalysingCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: AppThemeColors.card(
-          context,
         ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppColors.mintGreen,
-        ),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 35,
-            width: 35,
-            child: CircularProgressIndicator(),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'AI is analysing your scrap...',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Identifying material, category and estimated value',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppThemeColors.muted(
-                context,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAiResultCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppThemeColors.card(
-          context,
-        ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppColors.mintGreen,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(
-                  10,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.mintGreen.withValues(
-                    alpha: 0.15,
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.auto_awesome,
-                  color: AppColors.mintGreen,
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'AI Classification',
-                      style: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Analysis complete',
-                      style: TextStyle(
-                        color: AppColors.mintGreen,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.mintGreen.withValues(
-                    alpha: 0.15,
-                  ),
-                  borderRadius: BorderRadius.circular(
-                    20,
-                  ),
-                ),
-                child: Text(
-                  confidence,
-                  style: const TextStyle(
-                    color: AppColors.mintGreen,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          _aiInfoRow(
-            Icons.category,
-            'Detected Material',
-            detectedMaterial,
-          ),
-
-          _aiInfoRow(
-            Icons.inventory_2,
-            'Category',
-            materialCategory,
-          ),
-
-          _aiInfoRow(
-            Icons.scale,
-            'Estimated Weight',
-            estimatedWeight,
-          ),
-
-          _aiInfoRow(
-            Icons.currency_rupee,
-            'Estimated Value',
-            estimatedValue,
-          ),
-
-          _aiInfoRow(
-            Icons.factory,
-            'Recommended Recycler',
-            recyclerRecommendation,
-          ),
-
-          const SizedBox(height: 10),
-
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: isHazardous
-                  ? AppColors.danger.withValues(
-                      alpha: 0.12,
-                    )
-                  : AppColors.lightGreen.withValues(
-                      alpha: 0.12,
-                    ),
-              borderRadius: BorderRadius.circular(
-                14,
-              ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  isHazardous ? Icons.warning_amber : Icons.verified,
-                  color: isHazardous ? AppColors.danger : AppColors.lightGreen,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isHazardous
-                            ? 'Potentially Hazardous'
-                            : 'Handling Status: Safe to Sort',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isHazardous ? AppColors.danger : AppColors.lightGreen,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        recommendation,
-                        style: TextStyle(
-                          color: AppThemeColors.muted(
-                            context,
-                          ),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    if (widget.savedPhotoPath != null) {
-                      _runAiClassification(
-                        XFile(
-                          widget.savedPhotoPath!,
-                        ),
-                      );
-                    }
-                  },
-                  icon: const Icon(
-                    Icons.refresh,
-                  ),
-                  label: const Text(
-                    'Re-analyse',
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 10),
-
-              Expanded(
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.mintGreen,
-                    foregroundColor: AppColors.darkBackground,
-                  ),
-                  onPressed: _removePhoto,
-                  icon: const Icon(
-                    Icons.delete,
-                  ),
-                  label: const Text(
-                    'Remove',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _removePhoto() async {
-    await widget.storage.removePickupImage();
-    widget.onPhotoUploaded(null);
-
-    if (!mounted) return;
-    setState(() {});
-  }
-
-  Widget _aiInfoRow(
-    IconData icon,
-    String title,
-    String value,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 14,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            size: 20,
-            color: AppColors.primaryGold,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: AppThemeColors.faint(
-                      context,
-                    ),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 }
 
-// ============================================================
-// SETTINGS
-// ============================================================
-
-class SettingsTab extends StatefulWidget {
-  final String collectorName;
-  final String location;
+class ClassifyBulkScreen extends StatefulWidget {
+  final ReNovaStorage storage;
   final AppLanguage language;
 
-  final String? profileImagePath;
-  final String paymentPreference;
-
-  final ReNovaThemeMode themeMode;
-  final ValueChanged<ReNovaThemeMode> onThemeChanged;
-  final ValueChanged<AppLanguage> onLanguageChanged;
-
-  final Function(
-    String,
-    String,
-    String,
-    XFile?,
-  ) onProfileUpdated;
-
-  const SettingsTab({
+  const ClassifyBulkScreen({
     super.key,
-    required this.collectorName,
-    required this.location,
-    required this.language,
-    required this.profileImagePath,
-    required this.paymentPreference,
-    required this.themeMode,
-    required this.onThemeChanged,
-    required this.onLanguageChanged,
-    required this.onProfileUpdated,
+    required this.storage,
+    this.language = AppLanguage.english,
   });
 
   @override
-  State<SettingsTab> createState() => _SettingsTabState();
+  State<ClassifyBulkScreen> createState() => _ClassifyBulkScreenState();
 }
 
-class _SettingsTabState extends State<SettingsTab> {
-  final ImagePicker picker = ImagePicker();
-  String? tempImagePath;
+class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
+  bool loading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    tempImagePath = widget.profileImagePath;
-  }
+  String _t(String en, String hi, String mr) =>
+      _LanguageText.t(widget.language, en, hi, mr);
 
-  @override
-  void didUpdateWidget(covariant SettingsTab oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.profileImagePath != oldWidget.profileImagePath) {
-      tempImagePath = widget.profileImagePath;
-    }
+  Future<void> _classifyBulk() async {
+    final image = await _pickClassificationImage(context, widget.language);
+    if (image == null) return;
+
+    setState(() => loading = true);
+    final path = await widget.storage.saveImagePermanently(
+      image,
+      'renova_bulk_${DateTime.now().millisecondsSinceEpoch}.jpg',
+    );
+    final result = _LocalAiClassifier.classify(path, bulk: true);
+    await widget.storage.saveClassification(result);
+    if (!mounted) return;
+    setState(() => loading = false);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ClassifyResultScreen(
+          result: result,
+          language: widget.language,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final hasValidImage = tempImagePath != null && File(tempImagePath!).existsSync();
-
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_t('Classify Bulk', 'बल्क वर्गीकरण', 'बल्क वर्गीकरण')),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          Center(
+          Text(
+            _t(
+              'Upload a photo of the bulk scrap.',
+              'बल्क कबाड़ की तस्वीर अपलोड करें।',
+              'बल्क भंगाराचा फोटो अपलोड करा.',
+            ),
+            style: TextStyle(color: AppThemeColors.muted(context)),
+          ),
+          const SizedBox(height: 18),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppThemeColors.card(context),
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 52,
-                  backgroundColor: AppColors.primaryGold,
-                  backgroundImage: hasValidImage ? FileImage(File(tempImagePath!)) : null,
-                  child: !hasValidImage
-                      ? const Icon(
-                          Icons.person,
-                          size: 62,
-                          color: AppColors.darkBackground,
-                        )
-                      : null,
-                ),
-
-                const SizedBox(height: 12),
-
+                const Icon(Icons.apps, size: 60),
+                const SizedBox(height: 16),
                 Text(
-                  widget.collectorName,
-                  style: const TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.bold,
+                  _t(
+                    'Bulk AI Analysis',
+                    'बल्क AI विश्लेषण',
+                    'बल्क AI विश्लेषण',
                   ),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-
+                const SizedBox(height: 10),
                 Text(
-                  widget.location,
-                  style: TextStyle(
-                    color: AppThemeColors.muted(context),
+                  _t(
+                    'The prototype estimates total material type, weight, price and confidence from the uploaded image.',
+                    'प्रोटोटाइप अपलोड की गई तस्वीर से सामग्री प्रकार, वजन, कीमत और विश्वास स्तर का अनुमान लगाता है।',
+                    'प्रोटोटाइप अपलोड केलेल्या फोटोवरून साहित्य प्रकार, वजन, किंमत आणि विश्वास पातळीचा अंदाज लावतो.',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 22),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: loading ? null : _classifyBulk,
+                    icon: loading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.photo_camera),
+                    label: Text(
+                      loading
+                          ? _t('Analyzing...', 'विश्लेषण हो रहा है...', 'विश्लेषण सुरू आहे...')
+                          : _t('Upload Bulk Image', 'बल्क तस्वीर अपलोड करें', 'बल्क फोटो अपलोड करा'),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-
-          const SizedBox(height: 25),
-
-          _settingsTile(
-            context,
-            Icons.person_outline,
-            'Edit Profile',
-            'Update your minimal collector profile',
-            () {
-              _openEditProfile(context);
-            },
-          ),
-
-          const SizedBox(height: 24),
-
-          _sectionTitle('Language Options'),
-
-          _langTile(context, 'English', AppLanguage.english),
-          _langTile(context, 'हिंदी', AppLanguage.hindi),
-          _langTile(context, 'मराठी', AppLanguage.marathi),
-
-          const SizedBox(height: 24),
-
-          _sectionTitle('Appearance'),
-
-          _themeTile(
-            context,
-            ReNovaThemeMode.light,
-            'Light Mode',
-            Icons.light_mode,
-          ),
-
-          _themeTile(
-            context,
-            ReNovaThemeMode.dark,
-            'Dark Mode',
-            Icons.dark_mode,
-          ),
-
-          const SizedBox(height: 24),
-
-          _sectionTitle('Collector Tools'),
-
-          _settingsTile(
-            context,
-            Icons.currency_rupee,
-            'Price Board',
-            'Current buying rates and price trends',
-            () {
-              _openPriceBoard(context);
-            },
-          ),
-
-          const SizedBox(height: 10),
-
-          _settingsTile(
-            context,
-            Icons.health_and_safety,
-            'Safety Guidance',
-            'Picture and audio safety instructions',
-            () {
-              _openSafety(context);
-            },
-          ),
-
-          const SizedBox(height: 24),
-
-          _sectionTitle('Account Settings'),
-
-          _settingsTile(
-            context,
-            Icons.lock,
-            'Security & Passcode',
-            'Manage account security',
-            () {
-              _showComingSoon(
-                context,
-                'Security & Passcode',
-              );
-            },
-          ),
-
-          const SizedBox(height: 10),
-
-          _settingsTile(
-            context,
-            Icons.notifications,
-            'Notifications',
-            'Pickup, payment and AI alerts',
-            () {
-              _showComingSoon(
-                context,
-                'Notification Settings',
-              );
-            },
-          ),
-
-          const SizedBox(height: 10),
-
-          _settingsTile(
-            context,
-            Icons.help_outline,
-            'Help & Support',
-            'Get help with ReNova',
-            () {
-              _showComingSoon(
-                context,
-                'Help & Support',
-              );
-            },
-          ),
-
-          const SizedBox(height: 10),
-
-          _settingsTile(
-            context,
-            Icons.info_outline,
-            'About ReNova',
-            'Version 1.0 • SIH Prototype',
-            () {
-              _showAbout(context);
-            },
-          ),
-
-          const SizedBox(height: 25),
-        ],
-      ),
-    );
-  }
-
-  Widget _sectionTitle(
-    String title,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 10,
-      ),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _themeTile(
-    BuildContext context,
-    ReNovaThemeMode mode,
-    String title,
-    IconData icon,
-  ) {
-    final selected = widget.themeMode == mode;
-
-    return Container(
-      margin: const EdgeInsets.only(
-        bottom: 8,
-      ),
-      decoration: BoxDecoration(
-        color: AppThemeColors.card(
-          context,
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: selected ? AppColors.primaryGold : Colors.transparent,
-        ),
-      ),
-      child: RadioListTile<ReNovaThemeMode>(
-        value: mode,
-        groupValue: widget.themeMode,
-        onChanged: (value) {
-          if (value != null) {
-            widget.onThemeChanged(value);
-          }
-        },
-        title: Text(title),
-        secondary: Icon(
-          icon,
-          color: AppColors.primaryGold,
-        ),
-        activeColor: AppColors.primaryGold,
-      ),
-    );
-  }
-
-  Widget _settingsTile(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String subtitle,
-    VoidCallback onTap,
-  ) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 15,
-        vertical: 5,
-      ),
-      tileColor: AppThemeColors.card(
-        context,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
-      leading: CircleAvatar(
-        backgroundColor: AppColors.primaryGold.withValues(
-          alpha: 0.15,
-        ),
-        child: Icon(
-          icon,
-          color: AppColors.primaryGold,
-        ),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          color: AppThemeColors.faint(
-            context,
-          ),
-          fontSize: 12,
-        ),
-      ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
-      ),
-      onTap: onTap,
-    );
-  }
-
-  Widget _langTile(
-    BuildContext context,
-    String label,
-    AppLanguage lang,
-  ) {
-    final selected = widget.language == lang;
-
-    return Container(
-      margin: const EdgeInsets.only(
-        bottom: 8,
-      ),
-      child: ListTile(
-        tileColor: AppThemeColors.card(
-          context,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: selected ? AppColors.primaryGold : Colors.transparent,
-          ),
-        ),
-        title: Text(label),
-        trailing: selected
-            ? const Icon(
-                Icons.check,
-                color: AppColors.primaryGold,
-              )
-            : null,
-        onTap: () => widget.onLanguageChanged(lang),
-      ),
-    );
-  }
-
-  Future<void> _openEditProfile(
-    BuildContext context,
-  ) async {
-    final result = await Navigator.push<Map<String, dynamic>>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => EditProfileScreen(
-          collectorName: widget.collectorName,
-          location: widget.location,
-          profileImagePath: tempImagePath,
-          paymentPreference: widget.paymentPreference,
-          themeMode: widget.themeMode,
-          onThemeChanged: widget.onThemeChanged,
-        ),
-      ),
-    );
-
-    if (result != null) {
-      widget.onProfileUpdated(
-        result['name'] as String,
-        result['location'] as String,
-        result['payment'] as String,
-        result['image'] as XFile?,
-      );
-    }
-  }
-
-  void _openPriceBoard(
-    BuildContext context,
-  ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const PriceBoardTab(),
-      ),
-    );
-  }
-
-  void _openSafety(
-    BuildContext context,
-  ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const SafetyTab(),
-      ),
-    );
-  }
-
-  void _showComingSoon(
-    BuildContext context,
-    String title,
-  ) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppThemeColors.card(
-          context,
-        ),
-        title: Text(title),
-        content: const Text(
-          'This feature will be connected to the ReNova backend in the next version.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(
-              context,
-            ),
-            child: const Text(
-              'OK',
-              style: TextStyle(
-                color: AppColors.primaryGold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAbout(
-    BuildContext context,
-  ) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppThemeColors.card(
-          context,
-        ),
-        title: const Text(
-          'ReNova',
-          style: TextStyle(
-            color: AppColors.primaryGold,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: const Text(
-          'A digital bridge connecting informal e-waste collectors with fair pricing, AI-assisted classification, safety guidance and authorized recycling channels.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(
-              context,
-            ),
-            child: const Text(
-              'Close',
-              style: TextStyle(
-                color: AppColors.primaryGold,
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 }
 
-// ============================================================
-// EDIT PROFILE
-// ============================================================
+class RecentUploadsScreen extends StatefulWidget {
+  final AppLanguage language;
+  final ReNovaStorage? storage;
 
-class EditProfileScreen extends StatefulWidget {
-  final String collectorName;
-  final String location;
-  final String? profileImagePath;
-  final String paymentPreference;
-
-  final ReNovaThemeMode themeMode;
-  final ValueChanged<ReNovaThemeMode> onThemeChanged;
-
-  const EditProfileScreen({
+  const RecentUploadsScreen({
     super.key,
-    required this.collectorName,
-    required this.location,
-    required this.profileImagePath,
-    required this.paymentPreference,
-    required this.themeMode,
-    required this.onThemeChanged,
+    this.language = AppLanguage.english,
+    this.storage,
   });
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  State<RecentUploadsScreen> createState() => _RecentUploadsScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
-  late TextEditingController nameController;
-  late TextEditingController locationController;
+class _RecentUploadsScreenState extends State<RecentUploadsScreen> {
+  String selectedPeriod = 'Week';
 
-  final ImagePicker picker = ImagePicker();
-  String? profileImagePath;
-  String paymentPreference = 'Cash';
-  late ReNovaThemeMode selectedTheme;
+  String _t(String en, String hi, String mr) =>
+      _LanguageText.t(widget.language, en, hi, mr);
+
+  List<Map<String, dynamic>> get items =>
+      widget.storage?.classificationHistory ?? [];
+
+  List<Map<String, dynamic>> get filteredItems {
+    final now = DateTime.now();
+    final list = items.where((item) {
+      final raw = item['date'] as String?;
+      final date = raw == null ? null : DateTime.tryParse(raw);
+      if (date == null) return false;
+
+      if (selectedPeriod == 'Week') {
+        return now.difference(date).inDays <= 7;
+      }
+      if (selectedPeriod == 'Month') {
+        return now.difference(date).inDays <= 31;
+      }
+      return date.year == now.year;
+    }).toList();
+
+    return list;
+  }
+
+  String _formatDate(String? raw) {
+    final date = raw == null ? null : DateTime.tryParse(raw);
+    if (date == null) return raw ?? '';
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_t('Recent Classifications', 'हाल के वर्गीकरण', 'अलीकडील वर्गीकरण')),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          DropdownButtonFormField<String>(
+            value: selectedPeriod,
+            items: [
+              DropdownMenuItem(
+                value: 'Week',
+                child: Text(_t('Week', 'सप्ताह', 'आठवडा')),
+              ),
+              DropdownMenuItem(
+                value: 'Month',
+                child: Text(_t('Month', 'महीना', 'महिना')),
+              ),
+              DropdownMenuItem(
+                value: 'Year',
+                child: Text(_t('Year', 'वर्ष', 'वर्ष')),
+              ),
+            ],
+            onChanged: (value) {
+              if (value != null) setState(() => selectedPeriod = value);
+            },
+            decoration: InputDecoration(
+              labelText: _t('Show uploads by', 'अपलोड दिखाएं', 'अपलोड दाखवा'),
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (filteredItems.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(30),
+              child: Center(
+                child: Text(
+                  _t(
+                    'No classified images in this period yet.',
+                    'इस अवधि में अभी कोई वर्गीकृत तस्वीर नहीं है।',
+                    'या कालावधीत अजून वर्गीकृत फोटो नाहीत.',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ...filteredItems.map(
+            (item) => Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(10),
+                leading: SizedBox(
+                  width: 62,
+                  height: 62,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: item['imagePath'] != null &&
+                            File(item['imagePath'] as String).existsSync()
+                        ? Image.file(
+                            File(item['imagePath'] as String),
+                            fit: BoxFit.cover,
+                          )
+                        : Icon(Icons.image, color: accent),
+                  ),
+                ),
+                title: Text(
+                  item['material'] as String? ?? 'Electronic Scrap',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  '${_formatDate(item['date'] as String?)}\n'
+                  '${_t('Weight', 'वजन', 'वजन')}: ${item['weight']} • '
+                  '${_t('Price', 'कीमत', 'किंमत')}: ${item['price']}\n'
+                  '${_t('Confidence', 'विश्वास', 'विश्वास')}: ${item['confidence']}',
+                ),
+                isThreeLine: true,
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ClassifyResultScreen(
+                      result: item,
+                      language: widget.language,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PaymentTab extends StatefulWidget {
+  final AppLanguage language;
+  final String paymentPreference;
+  final ValueChanged<String> onPaymentPreferenceChanged;
+  final ReNovaStorage? storage;
+
+  const PaymentTab({
+    super.key,
+    required this.language,
+    required this.paymentPreference,
+    required this.onPaymentPreferenceChanged,
+    this.storage,
+  });
+
+  @override
+  State<PaymentTab> createState() => _PaymentTabState();
+}
+
+class _PaymentTabState extends State<PaymentTab> {
+  late String selectedMode;
+  final TextEditingController upiController = TextEditingController();
+  final TextEditingController accountController = TextEditingController();
+  final TextEditingController amountController = TextEditingController();
+  bool saveUpiDetails = true;
+  String cashStatus = 'received';
+  bool qrGenerated = false;
+
+  String _t(String en, String hi, String mr) =>
+      _LanguageText.t(widget.language, en, hi, mr);
 
   @override
   void initState() {
     super.initState();
-
-    nameController = TextEditingController(
-      text: widget.collectorName,
-    );
-
-    locationController = TextEditingController(
-      text: widget.location,
-    );
-
-    profileImagePath = widget.profileImagePath;
-    paymentPreference = widget.paymentPreference;
-    selectedTheme = widget.themeMode;
+    selectedMode = widget.paymentPreference == 'UPI / Digital Wallet'
+        ? 'UPI'
+        : 'Cash';
   }
 
   @override
   void dispose() {
-    nameController.dispose();
-    locationController.dispose();
+    upiController.dispose();
+    accountController.dispose();
+    amountController.dispose();
     super.dispose();
   }
 
-  Future<void> _changeImage() async {
-    final image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 75,
-    );
+  String _upiQrData() {
+    final upiId = upiController.text.trim();
+    final amount = amountController.text.trim();
 
-    if (image == null) return;
+    if (upiId.isEmpty) return '';
 
-    final storage = _getStorage(context);
+    final params = <String>[
+      'pa=${Uri.encodeComponent(upiId)}',
+      'pn=${Uri.encodeComponent('ReNova')}',
+      if (amount.isNotEmpty) 'am=${Uri.encodeComponent(amount)}',
+      'cu=INR',
+    ];
 
-    final savedPath = await storage.saveImagePermanently(
-      image,
-      'renova_profile.jpg',
-    );
-
-    setState(() {
-      profileImagePath = savedPath;
-    });
+    return 'upi://pay?${params.join('&')}';
   }
 
-  void _save() {
-    final name = nameController.text.trim();
-    final location = locationController.text.trim();
+  Future<void> _recordPayment() async {
+    final mode = selectedMode;
+    final details = mode == 'Cash'
+        ? (cashStatus == 'received'
+            ? _t('Cash received', 'नकद प्राप्त हुआ', 'रोख मिळाली')
+            : _t('Cash yet to receive', 'नकद प्राप्त होना बाकी है', 'रोख अजून मिळायची आहे'))
+        : (upiController.text.trim().isEmpty
+            ? _t('UPI details not entered', 'UPI विवरण दर्ज नहीं किया गया', 'UPI तपशील दिलेला नाही')
+            : upiController.text.trim());
 
-    if (name.isEmpty || location.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Name and location cannot be empty.'),
-        ),
-      );
-      return;
+    final item = {
+      'mode': mode,
+      'details': details,
+      'amount': amountController.text.trim().isEmpty
+          ? '₹1,750'
+          : '₹${amountController.text.trim()}',
+      'date': DateTime.now().toIso8601String(),
+    };
+
+    await widget.storage?.savePayment(item);
+    widget.onPaymentPreferenceChanged(
+      mode == 'Cash' ? 'Cash' : 'UPI / Digital Wallet',
+    );
+
+    if (mode == 'UPI' && saveUpiDetails && upiController.text.trim().isNotEmpty) {
+      await widget.storage?.saveUpiId(upiController.text.trim());
     }
 
-    final storage = _getStorage(context);
-
-    storage.saveProfile(
-      name: name,
-      location: location,
-      language: storage.language ?? 'english',
-      paymentPreference: paymentPreference,
-      profileImagePath: profileImagePath,
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_t(
+          'Payment preference saved.',
+          'भुगतान पसंद सहेजी गई।',
+          'पेमेंट पसंती जतन झाली.',
+        )),
+      ),
     );
+    setState(() {});
+  }
 
-    Navigator.pop(
-      context,
-      {
-        'name': name,
-        'location': location,
-        'payment': paymentPreference,
-        'image': profileImagePath != null ? XFile(profileImagePath!) : null,
-      },
-    );
+  String _formatDate(String? raw) {
+    final date = raw == null ? null : DateTime.tryParse(raw);
+    if (date == null) return raw ?? '';
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
   @override
   Widget build(BuildContext context) {
-    final hasValidImage = profileImagePath != null && File(profileImagePath!).existsSync();
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    final history = widget.storage?.paymentHistory ?? [];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-        actions: [
-          TextButton(
-            onPressed: _save,
-            child: const Text(
-              'SAVE',
-              style: TextStyle(
-                color: AppColors.primaryGold,
-                fontWeight: FontWeight.bold,
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          _t('Payments', 'भुगतान', 'पेमेंट'),
+          style: TextStyle(
+            fontSize: 23,
+            fontWeight: FontWeight.bold,
+            color: AppThemeColors.text(context),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          _t(
+            'Choose how you want to receive payment.',
+            'भुगतान प्राप्त करने का तरीका चुनें।',
+            'पेमेंट कसे घ्यायचे ते निवडा.',
+          ),
+          style: TextStyle(color: AppThemeColors.muted(context)),
+        ),
+        const SizedBox(height: 18),
+        Row(
+          children: [
+            Expanded(
+              child: _paymentModeCard(
+                context,
+                'Cash',
+                Icons.payments_outlined,
+                _t('Cash', 'नकद', 'रोख'),
+                accent,
               ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _paymentModeCard(
+                context,
+                'UPI',
+                Icons.qr_code_2,
+                'UPI',
+                accent,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: selectedMode == 'Cash'
+              ? _cashDetails(context)
+              : _upiDetails(context),
+        ),
+        const SizedBox(height: 22),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _recordPayment,
+            icon: const Icon(Icons.save),
+            label: Text(_t('Save Payment Mode', 'भुगतान तरीका सहेजें', 'पेमेंट पद्धत जतन करा')),
+          ),
+        ),
+        const SizedBox(height: 26),
+        Text(
+          _t('Payment History', 'भुगतान इतिहास', 'पेमेंट इतिहास'),
+          style: TextStyle(
+            fontSize: 19,
+            fontWeight: FontWeight.bold,
+            color: AppThemeColors.text(context),
+          ),
+        ),
+        const SizedBox(height: 10),
+        if (history.isEmpty)
+          Text(
+            _t(
+              'No payments recorded yet.',
+              'अभी कोई भुगतान दर्ज नहीं है।',
+              'अजून कोणतेही पेमेंट नोंदलेले नाही.',
+            ),
+            style: TextStyle(color: AppThemeColors.muted(context)),
+          ),
+        ...history.map(
+          (item) => Card(
+            child: ListTile(
+              leading: Icon(
+                item['mode'] == 'UPI' ? Icons.qr_code_2 : Icons.payments_outlined,
+                color: accent,
+              ),
+              title: Text(
+                '${item['mode']} • ${item['amount']}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                '${_t('Mode', 'तरीका', 'पद्धत')}: ${item['mode']}\n'
+                '${_t('Date', 'तारीख', 'तारीख')}: ${_formatDate(item['date'] as String?)}',
+              ),
+              isThreeLine: true,
             ),
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
+        ),
+      ],
+    );
+  }
+
+  Widget _paymentModeCard(
+    BuildContext context,
+    String mode,
+    IconData icon,
+    String title,
+    Color accent,
+  ) {
+    final selected = selectedMode == mode;
+    return InkWell(
+      onTap: () => setState(() => selectedMode = mode),
+      borderRadius: BorderRadius.circular(18),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
         padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: selected
+              ? accent.withValues(alpha: 0.15)
+              : AppThemeColors.card(context),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: selected ? accent : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  CircleAvatar(
-                    radius: 58,
-                    backgroundColor: AppColors.primaryGold,
-                    backgroundImage: hasValidImage ? FileImage(File(profileImagePath!)) : null,
-                    child: !hasValidImage
-                        ? const Icon(
-                            Icons.person,
-                            size: 65,
-                            color: AppColors.darkBackground,
-                          )
-                        : null,
-                  ),
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: AppColors.accentCoral,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: _changeImage,
-                      icon: const Icon(
-                        Icons.camera_alt,
-                        size: 19,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            Icon(icon, size: 34, color: accent),
+            const SizedBox(height: 8),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: accent,
+              size: 18,
             ),
-
-            const SizedBox(height: 25),
-
-            _sectionTitle('Personal Details'),
-
-            _field(
-              'Full Name',
-              nameController,
-              Icons.person,
-            ),
-
-            _field(
-              'General Location',
-              locationController,
-              Icons.location_on,
-            ),
-
-            const SizedBox(height: 18),
-
-            _sectionTitle('Collector Dataset'),
-
-            _infoCard(
-              Icons.badge,
-              'Collector ID',
-              'RN-COL-2026-01428',
-            ),
-
-            _infoCard(
-              Icons.translate,
-              'Preferred Language',
-              'Selected in the ReNova language setup',
-            ),
-
-            _infoCard(
-              Icons.history,
-              'Transaction History',
-              '87 recorded transactions',
-            ),
-
-            _infoCard(
-              Icons.currency_rupee,
-              'Earnings History',
-              '₹1,84,750 total earnings',
-            ),
-
-            const SizedBox(height: 18),
-
-            _sectionTitle('Pickup Preferences'),
-
-            _paymentDropdown(),
-
-            const SizedBox(height: 22),
-
-            _sectionTitle('Appearance'),
-
-            _themeTile(
-              ReNovaThemeMode.light,
-              'Light Mode',
-              Icons.light_mode,
-            ),
-
-            _themeTile(
-              ReNovaThemeMode.dark,
-              'Dark Mode',
-              Icons.dark_mode,
-            ),
-
-            const SizedBox(height: 22),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.mintGreen.withValues(
-                  alpha: 0.10,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppColors.mintGreen.withValues(
-                    alpha: 0.35,
-                  ),
-                ),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.shield,
-                    color: AppColors.mintGreen,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'ReNova keeps the collector profile minimal and focuses on information needed for recycling transactions.',
-                      style: TextStyle(
-                        color: AppThemeColors.muted(
-                          context,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGold,
-                  foregroundColor: AppColors.darkBackground,
-                ),
-                onPressed: _save,
-                icon: const Icon(
-                  Icons.save,
-                ),
-                label: const Text(
-                  'Save Profile',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 25),
           ],
         ),
       ),
     );
   }
 
-  Widget _sectionTitle(
-    String title,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 12,
-      ),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 19,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _field(
-    String label,
-    TextEditingController controller,
-    IconData icon,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 14,
-      ),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(
-            icon,
-            color: AppColors.primaryGold,
-          ),
-          filled: true,
-          fillColor: AppThemeColors.card(
-            context,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(
-              13,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _infoCard(
-    IconData icon,
-    String title,
-    String value,
-  ) {
+  Widget _cashDetails(BuildContext context) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
     return Container(
-      margin: const EdgeInsets.only(
-        bottom: 10,
-      ),
-      padding: const EdgeInsets.all(15),
+      key: const ValueKey('cash'),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppThemeColors.card(
-          context,
-        ),
-        borderRadius: BorderRadius.circular(14),
+        color: AppThemeColors.card(context),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            backgroundColor: AppColors.primaryGold.withValues(
-              alpha: 0.15,
-            ),
-            child: Icon(
-              icon,
-              color: AppColors.primaryGold,
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.payments, size: 34),
+            title: Text(_t('Cash Payment', 'नकद भुगतान', 'रोख पेमेंट')),
+            subtitle: Text(
+              _t(
+                'Receive the amount in cash and keep the transaction record.',
+                'राशि नकद प्राप्त करें और लेनदेन का रिकॉर्ड रखें।',
+                'रक्कम रोख घ्या आणि व्यवहाराची नोंद ठेवा.',
+              ),
             ),
           ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: AppThemeColors.faint(
-                      context,
-                    ),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 10),
+          Text(
+            _t('Payment Status', 'भुगतान स्थिति', 'पेमेंट स्थिती'),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.text(context),
             ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            children: [
+              ChoiceChip(
+                label: Text(_t('Cash received', 'नकद प्राप्त हुआ', 'रोख मिळाली')),
+                selected: cashStatus == 'received',
+                selectedColor: accent.withValues(alpha: 0.25),
+                onSelected: (_) => setState(() => cashStatus = 'received'),
+              ),
+              ChoiceChip(
+                label: Text(_t('Cash yet to receive', 'नकद प्राप्त होना बाकी है', 'रोख अजून मिळायची आहे')),
+                selected: cashStatus == 'pending',
+                selectedColor: accent.withValues(alpha: 0.25),
+                onSelected: (_) => setState(() => cashStatus = 'pending'),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _paymentDropdown() {
-    final methods = [
-      'Cash',
-      'UPI / Digital Wallet',
-      'Bank Transfer',
-      'Direct Recycler Settlement',
-      'Cheque',
-      'Post-Paid Digital Wallet',
-    ];
-
+  Widget _upiDetails(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 15,
-      ),
+      key: const ValueKey('upi'),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppThemeColors.card(
-          context,
-        ),
-        borderRadius: BorderRadius.circular(13),
+        color: AppThemeColors.card(context),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: paymentPreference,
-          isExpanded: true,
-          dropdownColor: AppThemeColors.card(
-            context,
+      child: Column(
+        children: [
+          TextField(
+            controller: upiController,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.alternate_email),
+              labelText: _t('UPI ID', 'UPI आईडी', 'UPI आयडी'),
+              hintText: 'name@upi',
+            ),
+            onChanged: (_) => setState(() => qrGenerated = false),
           ),
-          items: methods
-              .map(
-                (method) => DropdownMenuItem(
-                  value: method,
-                  child: Text(method),
+          if ((widget.storage?.savedUpiId ?? '').isNotEmpty &&
+              widget.storage!.savedUpiId != upiController.text.trim()) ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ActionChip(
+                avatar: const Icon(Icons.history, size: 16),
+                label: Text(
+                  '${_t('Recently used', 'हाल ही में उपयोग किया गया', 'अलीकडे वापरलेले')}: ${widget.storage!.savedUpiId}',
                 ),
-              )
-              .toList(),
-          onChanged: (value) {
-            if (value == null) {
-              return;
-            }
-
-            setState(() {
-              paymentPreference = value;
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _themeTile(
-    ReNovaThemeMode mode,
-    String title,
-    IconData icon,
-  ) {
-    final selected = selectedTheme == mode;
-
-    return Container(
-      margin: const EdgeInsets.only(
-        bottom: 8,
-      ),
-      decoration: BoxDecoration(
-        color: AppThemeColors.card(
-          context,
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: selected ? const Color.fromARGB(255, 1, 15, 53) : Colors.transparent,
-        ),
-      ),
-      child: RadioListTile<ReNovaThemeMode>(
-        value: mode,
-        groupValue: selectedTheme,
-        activeColor: const Color.fromARGB(255, 50, 161, 226),
-        secondary: Icon(
-          icon,
-          color: const Color.fromARGB(255, 74, 124, 215),
-        ),
-        title: Text(title),
-        onChanged: (value) {
-          if (value == null) {
-            return;
-          }
-
-          setState(() {
-            selectedTheme = value;
-          });
-
-          widget.onThemeChanged(
-            value,
-          );
-        },
+                onPressed: () {
+                  setState(() {
+                    upiController.text = widget.storage!.savedUpiId!;
+                  });
+                },
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          TextField(
+            controller: accountController,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.account_balance),
+              labelText: _t('Bank / Wallet Reference (optional)', 'बैंक / वॉलेट संदर्भ (वैकल्पिक)', 'बँक / वॉलेट संदर्भ (पर्यायी)'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: amountController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.currency_rupee),
+              labelText: _t('Amount (₹)', 'राशि (₹)', 'रक्कम (₹)'),
+              hintText: 'e.g. 500',
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: 18),
+          if (upiController.text.trim().isNotEmpty)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => setState(() => qrGenerated = true),
+                icon: const Icon(Icons.qr_code_2),
+                label: Text(_t('Generate UPI', 'UPI जनरेट करें', 'UPI तयार करा')),
+              ),
+            ),
+          if (qrGenerated && _upiQrData().isNotEmpty) ...[
+            const SizedBox(height: 18),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: QrImageView(
+                data: _upiQrData(),
+                version: QrVersions.auto,
+                size: 220,
+                backgroundColor: Colors.white,
+              ),
+            ),
+          ],
+          if (qrGenerated && _upiQrData().isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              _t('Scan with any UPI app', 'किसी भी UPI ऐप से स्कैन करें', 'कोणत्याही UPI अॅपने स्कॅन करा'),
+              style: TextStyle(
+                color: AppThemeColors.muted(context),
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _t('Save UPI details?', 'UPI विवरण सहेजें?', 'UPI तपशील जतन करायचे?'),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppThemeColors.text(context),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                ChoiceChip(
+                  label: Text(_t('Yes', 'हाँ', 'होय')),
+                  selected: saveUpiDetails,
+                  onSelected: (_) => setState(() => saveUpiDetails = true),
+                ),
+                const SizedBox(width: 10),
+                ChoiceChip(
+                  label: Text(_t('No', 'नहीं', 'नाही')),
+                  selected: !saveUpiDetails,
+                  onSelected: (_) => setState(() => saveUpiDetails = false),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _t(
+                'For a real QR/UPI transaction flow, connect a payment gateway in the production backend.',
+                'वास्तविक QR/UPI लेनदेन के लिए उत्पादन बैकएंड में पेमेंट गेटवे जोड़ें।',
+                'वास्तविक QR/UPI व्यवहारासाठी उत्पादन बॅकएंडमध्ये पेमेंट गेटवे जोडा.',
+              ),
+              style: TextStyle(
+                color: AppThemeColors.muted(context),
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
