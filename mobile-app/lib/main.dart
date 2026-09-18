@@ -150,6 +150,21 @@ class ReNovaStorage {
   String get collectorId =>
       prefs.getString('collector_id') ?? 'RN-COL-2026-01428';
 
+  Map<String, dynamic>? get recyclerData {
+    final raw = prefs.getString('recycler_data');
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      return Map<String, dynamic>.from(jsonDecode(raw) as Map);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveRecyclerData(Map<String, dynamic> data) async {
+    await prefs.setString('recycler_data', jsonEncode(data));
+    await prefs.setString('user_type', 'recycler');
+  }
+
   Future<void> saveProfile({
     required String name,
     required String location,
@@ -1243,6 +1258,22 @@ class _CollectorProfileScreenState extends State<CollectorProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter your name and location.'),
+        ),
+      );
+      return;
+    }
+
+    if (selectedUserType == UserType.recycler) {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RecyclerAccessScreen(
+            storage: widget.storage,
+            language: widget.language,
+            themeMode: widget.themeMode,
+            onThemeChanged: widget.onThemeChanged,
+          ),
         ),
       );
       return;
@@ -3212,6 +3243,1647 @@ class PickupTab extends StatelessWidget {
 }
 
 // ============================================================
+
+// ============================================================
+// RECYCLER FLOW - LOGIN / ACCOUNT / DASHBOARD
+// This section is isolated from the Scrap Collector dashboard.
+// ============================================================
+
+class RecyclerAccessScreen extends StatelessWidget {
+  final ReNovaStorage storage;
+  final AppLanguage language;
+  final ReNovaThemeMode themeMode;
+  final ValueChanged<ReNovaThemeMode> onThemeChanged;
+
+  const RecyclerAccessScreen({
+    super.key,
+    required this.storage,
+    required this.language,
+    required this.themeMode,
+    required this.onThemeChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    return Scaffold(
+      appBar: AppBar(
+        actions: [themeSwitchButton(context, themeMode, onThemeChanged)],
+      ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Icon(Icons.recycling, size: 72, color: accent),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Recycler',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: AppThemeColors.text(context),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Access your ReNova recycler account',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppThemeColors.muted(context)),
+                  ),
+                  const SizedBox(height: 30),
+                  _action(
+                    context,
+                    'Sign in',
+                    Icons.login,
+                    () => _openDashboard(context),
+                  ),
+                  const SizedBox(height: 14),
+                  _action(
+                    context,
+                    'Continue as Guest',
+                    Icons.person_outline,
+                    () => _openDashboard(context),
+                  ),
+                  const SizedBox(height: 14),
+                  _action(
+                    context,
+                    'Create a new account',
+                    Icons.add_business_outlined,
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => RecyclerRegistrationScreen(
+                            storage: storage,
+                            language: language,
+                            themeMode: themeMode,
+                            onThemeChanged: onThemeChanged,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _action(
+    BuildContext context,
+    String text,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    return SizedBox(
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon),
+        label: Text(
+          text,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: accent,
+          foregroundColor: AppColors.darkBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openDashboard(BuildContext context) {
+    if (storage.recyclerData == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please create your recycler account first.'),
+        ),
+      );
+      return;
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RecyclerMainDashboard(
+          storage: storage,
+          language: language,
+          themeMode: themeMode,
+          onThemeChanged: onThemeChanged,
+        ),
+      ),
+    );
+  }
+}
+
+class RecyclerRegistrationScreen extends StatefulWidget {
+  final ReNovaStorage storage;
+  final AppLanguage language;
+  final ReNovaThemeMode themeMode;
+  final ValueChanged<ReNovaThemeMode> onThemeChanged;
+
+  const RecyclerRegistrationScreen({
+    super.key,
+    required this.storage,
+    required this.language,
+    required this.themeMode,
+    required this.onThemeChanged,
+  });
+
+  @override
+  State<RecyclerRegistrationScreen> createState() =>
+      _RecyclerRegistrationScreenState();
+}
+
+class _RecyclerRegistrationScreenState
+    extends State<RecyclerRegistrationScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final Map<String, TextEditingController> c = {};
+
+  bool pickupAvailable = true;
+  bool dropOffAvailable = true;
+  String? logoPath;
+  String? authCertPath;
+  String? gstCertPath;
+  String? companyCertPath;
+  String preferredLanguage = 'English';
+
+  final Set<String> requiredFields = {
+    'Company / Recycler Name',
+    'Company Type',
+    'Authorized Representative Name',
+    'Designation / Role',
+    'Mobile Number',
+    'Email Address',
+    'Password',
+    'Confirm Password',
+    'Recycler Authorization / Registration Number',
+    'Facility / Plant Name',
+    'Facility Address',
+    'City',
+    'State',
+    'PIN Code',
+    'Materials Accepted',
+  };
+
+  static const List<String> fields = [
+    'Company / Recycler Name',
+    'Company Type',
+    'Company Logo',
+    'Year Established',
+    'Company Description',
+    'Website',
+    'Authorized Representative Name',
+    'Designation / Role',
+    'Mobile Number',
+    'Email Address',
+    'Password',
+    'Confirm Password',
+    'Preferred Language',
+    'Business Registration Number',
+    'GSTIN',
+    'PAN',
+    'CIN / LLPIN',
+    'Udyam Registration Number',
+    'Recycler Authorization / Registration Number',
+    'State Pollution Control Board / PCC',
+    'Authorization Certificate Upload',
+    'GST Certificate Upload',
+    'Company Registration Certificate Upload',
+    'Facility / Plant Name',
+    'Facility Address',
+    'City',
+    'District',
+    'State',
+    'PIN Code',
+    'Facility Location / Map Location',
+    'Facility Contact Number',
+    'Processing / Recycling Capacity',
+    'Operating Days',
+    'Operating Hours',
+    'Materials Accepted',
+    'Minimum Quantity Accepted',
+    'Pickup Available?',
+    'Pickup Radius',
+    'Drop-off Available?',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final old = widget.storage.recyclerData ?? <String, dynamic>{};
+
+    for (final field in fields) {
+      if (field == 'Preferred Language' ||
+          field.contains('Upload') ||
+          field == 'Pickup Available?' ||
+          field == 'Drop-off Available?' ||
+          field == 'Company Logo') {
+        continue;
+      }
+      c[field] = TextEditingController(text: '${old[field] ?? ''}');
+    }
+
+    preferredLanguage = '${old['Preferred Language'] ?? 'English'}';
+    pickupAvailable = old['Pickup Available?'] != false;
+    dropOffAvailable = old['Drop-off Available?'] != false;
+    logoPath = old['Company Logo']?.toString();
+    authCertPath = old['Authorization Certificate Upload']?.toString();
+    gstCertPath = old['GST Certificate Upload']?.toString();
+    companyCertPath =
+        old['Company Registration Certificate Upload']?.toString();
+  }
+
+  @override
+  void dispose() {
+    for (final controller in c.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  String _value(String key) => c[key]?.text.trim() ?? '';
+
+  Future<void> _pick(String key) async {
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (image == null || !mounted) return;
+
+    final path = await widget.storage.saveImagePermanently(
+      image,
+      'recycler_${key.hashCode}.jpg',
+    );
+
+    if (!mounted) return;
+    setState(() {
+      if (key == 'Company Logo') {
+        logoPath = path;
+      } else if (key == 'Authorization Certificate Upload') {
+        authCertPath = path;
+      } else if (key == 'GST Certificate Upload') {
+        gstCertPath = path;
+      } else {
+        companyCertPath = path;
+      }
+    });
+  }
+
+  Future<void> _save() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    if (authCertPath == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Authorization Certificate Upload is required.'),
+        ),
+      );
+      return;
+    }
+
+    if (_value('Password') != _value('Confirm Password')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match.')),
+      );
+      return;
+    }
+
+    final data = <String, dynamic>{};
+    for (final field in fields) {
+      if (field == 'Preferred Language') {
+        data[field] = preferredLanguage;
+      } else if (field == 'Pickup Available?') {
+        data[field] = pickupAvailable;
+      } else if (field == 'Drop-off Available?') {
+        data[field] = dropOffAvailable;
+      } else if (field == 'Company Logo') {
+        data[field] = logoPath;
+      } else if (field == 'Authorization Certificate Upload') {
+        data[field] = authCertPath;
+      } else if (field == 'GST Certificate Upload') {
+        data[field] = gstCertPath;
+      } else if (field == 'Company Registration Certificate Upload') {
+        data[field] = companyCertPath;
+      } else {
+        data[field] = _value(field);
+      }
+    }
+
+    await widget.storage.saveRecyclerData(data);
+    if (!mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('🎉 SUCCESS'),
+          content: const Text(
+            'YAY ACCOUNT CREATED SUCESSFULLY 🎉Your Recycler Account Is Ready — Let’s Build a Cleaner Future',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RecyclerMainDashboard(
+          storage: widget.storage,
+          language: widget.language,
+          themeMode: widget.themeMode,
+          onThemeChanged: widget.onThemeChanged,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    final generalFields = fields.where(
+      (field) =>
+          !{
+            'Preferred Language',
+            'Company Logo',
+            'Authorization Certificate Upload',
+            'GST Certificate Upload',
+            'Company Registration Certificate Upload',
+            'Pickup Available?',
+            'Drop-off Available?',
+          }.contains(field) &&
+          !field.startsWith('Facility '),
+    );
+
+    final facilityFields = fields.where(
+      (field) =>
+          field == 'Facility / Plant Name' ||
+          field == 'Facility Address' ||
+          field == 'City' ||
+          field == 'District' ||
+          field == 'State' ||
+          field == 'PIN Code' ||
+          field == 'Facility Location / Map Location' ||
+          field == 'Facility Contact Number' ||
+          field == 'Processing / Recycling Capacity' ||
+          field == 'Operating Days' ||
+          field == 'Operating Hours' ||
+          field == 'Materials Accepted' ||
+          field == 'Minimum Quantity Accepted',
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Create Recycler Account'),
+        actions: [
+          themeSwitchButton(
+            context,
+            widget.themeMode,
+            widget.onThemeChanged,
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
+            children: [
+              Text(
+                'Company & Representative',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: accent,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ...generalFields.map(_textField),
+              _pickerTile('Company Logo', logoPath, false),
+              _dropdown(),
+              const SizedBox(height: 8),
+              Text(
+                'Compliance & Certificates',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: accent,
+                ),
+              ),
+              _pickerTile(
+                'Authorization Certificate Upload',
+                authCertPath,
+                true,
+              ),
+              _pickerTile('GST Certificate Upload', gstCertPath, false),
+              _pickerTile(
+                'Company Registration Certificate Upload',
+                companyCertPath,
+                false,
+              ),
+              ...facilityFields.map(_textField),
+              _switchTile(
+                'Pickup Available?',
+                pickupAvailable,
+                (value) => setState(() => pickupAvailable = value),
+              ),
+              _textFieldByKey('Pickup Radius'),
+              _switchTile(
+                'Drop-off Available?',
+                dropOffAvailable,
+                (value) => setState(() => dropOffAvailable = value),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 56,
+                child: ElevatedButton.icon(
+                  onPressed: _save,
+                  icon: const Icon(Icons.save),
+                  label: const Text(
+                    'Save and Continue',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accent,
+                    foregroundColor: AppColors.darkBackground,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _textField(String key) => _textFieldByKey(key);
+
+  Widget _textFieldByKey(String key) {
+    final isPassword = key == 'Password' || key == 'Confirm Password';
+    final required = requiredFields.contains(key);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        controller: c[key],
+        obscureText: isPassword,
+        keyboardType: key.contains('Number') || key == 'PIN Code'
+            ? TextInputType.phone
+            : TextInputType.text,
+        validator: (value) {
+          if (required && (value == null || value.trim().isEmpty)) {
+            return 'Required field';
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          labelText: required ? '$key *' : key,
+          filled: true,
+          fillColor: AppThemeColors.card(context),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          prefixIcon: Icon(_icon(key)),
+        ),
+      ),
+    );
+  }
+
+  Widget _dropdown() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: DropdownButtonFormField<String>(
+        initialValue: preferredLanguage,
+        items: const ['English', 'Hindi', 'Marathi']
+            .map(
+              (value) => DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              ),
+            )
+            .toList(),
+        onChanged: (value) {
+          setState(() => preferredLanguage = value ?? 'English');
+        },
+        decoration: InputDecoration(
+          labelText: 'Preferred Language',
+          filled: true,
+          fillColor: AppThemeColors.card(context),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _pickerTile(String title, String? path, bool required) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    return Card(
+      color: AppThemeColors.card(context),
+      child: ListTile(
+        leading: Icon(Icons.upload_file, color: accent),
+        title: Text(required ? '$title *' : title),
+        subtitle: Text(path == null ? 'Not uploaded' : 'Uploaded'),
+        trailing: IconButton(
+          icon: const Icon(Icons.attach_file),
+          onPressed: () => _pick(title),
+        ),
+      ),
+    );
+  }
+
+  Widget _switchTile(
+    String title,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
+    return SwitchListTile(
+      title: Text(title),
+      value: value,
+      onChanged: onChanged,
+      contentPadding: EdgeInsets.zero,
+    );
+  }
+
+  IconData _icon(String key) {
+    if (key.contains('Name')) return Icons.business;
+    if (key.contains('Address') ||
+        key == 'City' ||
+        key == 'District' ||
+        key == 'State') {
+      return Icons.location_on_outlined;
+    }
+    if (key.contains('Email')) return Icons.email_outlined;
+    if (key.contains('Phone') || key.contains('Mobile')) {
+      return Icons.phone_outlined;
+    }
+    if (key.contains('Password')) return Icons.lock_outline;
+    if (key.contains('Website')) return Icons.language;
+    if (key.contains('GST') ||
+        key.contains('PAN') ||
+        key.contains('CIN') ||
+        key.contains('Registration')) {
+      return Icons.badge_outlined;
+    }
+    if (key.contains('Capacity') ||
+        key.contains('Quantity') ||
+        key.contains('Radius') ||
+        key == 'PIN Code') {
+      return Icons.numbers;
+    }
+    return Icons.edit_outlined;
+  }
+}
+
+class RecyclerMainDashboard extends StatefulWidget {
+  final ReNovaStorage storage;
+  final AppLanguage language;
+  final ReNovaThemeMode themeMode;
+  final ValueChanged<ReNovaThemeMode> onThemeChanged;
+
+  const RecyclerMainDashboard({
+    super.key,
+    required this.storage,
+    required this.language,
+    required this.themeMode,
+    required this.onThemeChanged,
+  });
+
+  @override
+  State<RecyclerMainDashboard> createState() => _RecyclerMainDashboardState();
+}
+
+class _RecyclerMainDashboardState extends State<RecyclerMainDashboard> {
+  int index = 0;
+  late Map<String, dynamic> data;
+  bool bankSaved = false;
+
+  static const List<String> titles = [
+    'Dashboard',
+    'Pickup Management',
+    'Rider Management',
+    'Area / Route Management',
+    'Kabadiwala Payments',
+    'Collection Records',
+    'Inventory',
+    'Processing Management',
+    'Recovery / Material Output',
+    'Compliance Records',
+    'Documents',
+    'Reports & Analytics',
+    'Transactions',
+    'Notifications',
+    'Company Profile',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    data = widget.storage.recyclerData ?? <String, dynamic>{};
+    bankSaved = widget.storage.prefs.getBool('recycler_bank_saved') ?? false;
+  }
+
+  String get company {
+    final value = data['Company / Recycler Name']?.toString().trim() ?? '';
+    return value.isEmpty ? 'Recycler Company' : value;
+  }
+
+  void _refreshData() {
+    setState(() {
+      data = widget.storage.recyclerData ?? <String, dynamic>{};
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.recycling, color: accent),
+              const SizedBox(width: 8),
+              Text(
+                'HI $company COMPANY',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: accent,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: _settings,
+          ),
+          themeSwitchButton(
+            context,
+            widget.themeMode,
+            widget.onThemeChanged,
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(12),
+            children: [
+              DrawerHeader(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.recycling, size: 48, color: accent),
+                    const SizedBox(height: 8),
+                    Text(
+                      company,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ...List.generate(
+                titles.length,
+                (i) => ListTile(
+                  leading: Icon(_menuIcon(i)),
+                  title: Text(titles[i]),
+                  selected: index == i,
+                  onTap: () {
+                    setState(() => index = i);
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.add_business),
+                title: const Text('Create New Account'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecyclerRegistrationScreen(
+                        storage: widget.storage,
+                        language: widget.language,
+                        themeMode: widget.themeMode,
+                        onThemeChanged: widget.onThemeChanged,
+                      ),
+                    ),
+                  ).then((_) => _refreshData());
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _page(index),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: index > 4 ? 0 : index,
+        onDestinationSelected: (value) {
+          setState(() => index = value);
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard_outlined),
+            label: 'Dashboard',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.local_shipping_outlined),
+            label: 'Pickups',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.two_wheeler_outlined),
+            label: 'Riders',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.inventory_2_outlined),
+            label: 'Inventory',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.precision_manufacturing_outlined),
+            label: 'Processing',
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _menuIcon(int i) {
+    const icons = [
+      Icons.dashboard_outlined,
+      Icons.local_shipping_outlined,
+      Icons.two_wheeler_outlined,
+      Icons.location_on_outlined,
+      Icons.payments_outlined,
+      Icons.inventory_outlined,
+      Icons.bar_chart,
+      Icons.settings_applications_outlined,
+      Icons.recycling,
+      Icons.fact_check_outlined,
+      Icons.description_outlined,
+      Icons.analytics_outlined,
+      Icons.account_balance_wallet_outlined,
+      Icons.notifications_outlined,
+      Icons.business_outlined,
+    ];
+    return icons[i];
+  }
+
+  Widget _page(int value) {
+    switch (value) {
+      case 0:
+        return _dashboard();
+      case 1:
+        return _pickups();
+      case 2:
+        return _riders();
+      case 3:
+        return _section(
+          'Area / Route Management',
+          [
+            'Service areas',
+            'PIN codes covered',
+            'Districts covered',
+            'Pickup radius',
+            'Rider assigned to area',
+            'Number of kabadiwalas in area',
+            'Pending pickups by area',
+            'Daily collection by area',
+            'Bhubaneswar Zone 1 • Riders: 3 • Kabadiwalas: 42 • Pending pickups: 8 • Today: 184 kg',
+          ],
+        );
+      case 4:
+        return _payments();
+      case 5:
+        return _section(
+          'Collection Records',
+          [
+            'Unique Collection ID',
+            'Kabadiwala',
+            'Rider',
+            'Pickup location',
+            'Date & time',
+            'Material category',
+            'Weight',
+            'Price/kg',
+            'Total amount',
+            'Payment method',
+            'Payment status',
+            'Photos',
+            'Remarks',
+          ],
+        );
+      case 6:
+        return _inventory();
+      case 7:
+        return _processing();
+      case 8:
+        return _section(
+          'Recovery / Material Output',
+          [
+            'Copper — XX kg',
+            'Aluminium — XX kg',
+            'Iron — XX kg',
+            'Gold — XX g',
+            'Silver — XX g',
+            'Plastic — XX kg',
+            'Input: 25 kg • Recovered: 23 kg • Residual: 2 kg',
+          ],
+        );
+      case 9:
+        return _compliance();
+      case 10:
+        return _documents();
+      case 11:
+        return _section(
+          'Reports & Analytics',
+          [
+            'Collection Analytics: Daily / Weekly / Monthly / Yearly',
+            'Material Analytics: Mobile phones / Batteries / PCBs / Computers',
+            'Processing Analytics: Total received / processed / recovered / residual waste',
+            'Financial Analytics: Kabadiwala payments / cash / online / procurement cost',
+            'Rider Analytics: Collections per rider / weight per rider / areas covered',
+          ],
+        );
+      case 12:
+        return _section(
+          'Transactions',
+          [
+            'Kabadiwala payments',
+            'Rider payments / incentives',
+            'Recycler purchases',
+            'Recovered-material sales',
+            'Invoices',
+            'Refunds / disputes',
+          ],
+        );
+      case 13:
+        return _section(
+          'Notifications',
+          [
+            'New pickup request received.',
+            'Ravi Kumar has accepted pickup RN-00183.',
+            'Pickup completed.',
+            'Payment of ₹1,125 completed.',
+            '42 kg of e-waste has arrived at your facility.',
+            'Compliance record RN-00183 is ready.',
+            'Authorization document expires in 30 days.',
+          ],
+        );
+      case 14:
+        return _profile();
+      default:
+        return _dashboard();
+    }
+  }
+
+  Widget _dashboard() {
+    return ListView(
+      key: const ValueKey('recycler-dashboard'),
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          'Dashboard',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppThemeColors.text(context),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Company overview & operations',
+          style: TextStyle(color: AppThemeColors.muted(context)),
+        ),
+        const SizedBox(height: 16),
+        _banner(),
+        const SizedBox(height: 12),
+        _heading('Today'),
+        _grid([
+          ["Today's collections", '127 kg', Icons.local_shipping],
+          ["Today's processing", '89 kg', Icons.precision_manufacturing],
+          ["Today's payments", '₹18,450', Icons.currency_rupee],
+          ['Pending pickups', '14', Icons.pending_actions],
+        ]),
+        _heading('This Month'),
+        _grid([
+          ['Collected quantity', '3,840 kg', Icons.scale],
+          ['Processed quantity', '2,960 kg', Icons.recycling],
+          ['Pending payments', '₹18,450', Icons.account_balance_wallet],
+          ['Active riders', '8 / 10', Icons.two_wheeler],
+        ]),
+        _heading('Operations'),
+        _cardList([
+          'Inventory alerts — 3 categories need attention',
+          'Compliance status — Documents on file',
+          'Recent collection records — RN-00183 • RN-00184 • RN-00185',
+        ]),
+      ],
+    );
+  }
+
+  Widget _banner() {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    final facility =
+        data['Facility / Plant Name']?.toString().trim().isNotEmpty == true
+            ? data['Facility / Plant Name'].toString()
+            : 'Main Facility';
+    final city = data['City']?.toString() ?? '';
+    final state = data['State']?.toString() ?? '';
+    final materials =
+        data['Materials Accepted']?.toString() ?? 'Not specified';
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundColor: accent,
+              child: const Icon(
+                Icons.business,
+                color: AppColors.darkBackground,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    company,
+                    style: const TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text('$facility • $city, $state'),
+                  Text('Materials: $materials'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _pickups() {
+    return _pageWithTitle(
+      'Pickup Management',
+      'Manage the complete pickup lifecycle.',
+      [
+        _actionButton('New pickup requests', Icons.add_box_outlined),
+        ...[
+          ['Pending pickups', '14'],
+          ['Assigned pickups', '9'],
+          ['Pickups in progress', '6'],
+          ['Completed pickups', '103'],
+          ['Cancelled pickups', '2'],
+        ].map(
+          (item) => _status(item[0], item[1], Icons.local_shipping_outlined),
+        ),
+        _heading('Latest Request'),
+        _cardList([
+          'Collection ID — RN-00183',
+          'Kabadiwala name — Ravi Kumar',
+          'Kabadiwala phone number — +91 98XXXXXX21',
+          'Estimated quantity — 25 kg',
+          'E-waste category — Mixed e-waste',
+          'Preferred pickup time — Today • 4:00 PM',
+          'Assigned rider — Ravi Kumar',
+          'Pickup status — Requested → Assigned → Rider En Route → Collected → Payment Completed → Received at Facility',
+        ]),
+      ],
+    );
+  }
+
+  Widget _riders() {
+    return _pageWithTitle(
+      'Rider Management',
+      'Rider list, assignments and pickup performance.',
+      [
+        _actionButton('Add rider', Icons.person_add_alt_1_outlined),
+        _rider('Ravi Kumar', 'RN-R017', 'Bhubaneswar North', '7', '5', '2', true),
+        _rider('Amit Das', 'RN-R021', 'Bhubaneswar South', '6', '6', '0', true),
+        _rider('Sanjay Mishra', 'RN-R024', 'Cuttack', '4', '3', '1', false),
+      ],
+    );
+  }
+
+  Widget _inventory() {
+    return _pageWithTitle(
+      'Inventory',
+      'Track received, processed and pending e-waste.',
+      [
+        _heading('Category Inventory'),
+        ...[
+          ['Mobile phones', '184 kg'],
+          ['PCBs', '327 kg'],
+          ['Batteries', '215 kg'],
+          ['Laptops', '142 kg'],
+          ['Cables', '96 kg'],
+          ['Computers', '208 kg'],
+          ['Monitors', '119 kg'],
+          ['Mixed e-waste', '401 kg'],
+        ].map(
+          (item) => _status(item[0], item[1], Icons.recycling),
+        ),
+      ],
+    );
+  }
+
+  Widget _processing() {
+    return _pageWithTitle(
+      'Processing Management',
+      'Received → Sorting → Dismantling → Processing → Recovery → Completed',
+      [
+        ...[
+          ['Received', '42 batches'],
+          ['Sorting', '11 batches'],
+          ['Dismantling', '8 batches'],
+          ['Processing', '14 batches'],
+          ['Recovery', '7 batches'],
+          ['Completed', '103 batches'],
+        ].map(
+          (item) => _status(
+            item[0],
+            item[1],
+            Icons.precision_manufacturing_outlined,
+          ),
+        ),
+        _heading('Current Batch'),
+        _cardList([
+          'Processing ID — PROC-00042',
+          'Collection ID — RN-00183',
+          'Material — Mixed e-waste',
+          'Input quantity — 25 kg',
+          'Processing date — 19 Sept 2026',
+          'Processing status — Processing',
+          'Output quantity — 23 kg',
+          'Recovery quantity — 21 kg',
+          'Residual quantity — 2 kg',
+        ]),
+      ],
+    );
+  }
+
+  Widget _compliance() {
+    return _pageWithTitle(
+      'Compliance Records',
+      'Maintain collection, processing and recovery records.',
+      [
+        ...[
+          ['RN-00183', '25 kg', 'Processed'],
+          ['RN-00184', '18 kg', 'Processed'],
+          ['RN-00185', '42 kg', 'Processing'],
+          ['RN-00186', '31 kg', 'Received'],
+        ].map(
+          (item) => Card(
+            child: ListTile(
+              leading: const Icon(Icons.receipt_long_outlined),
+              title: Text(item[0]),
+              subtitle: Text(item[1]),
+              trailing: Text(item[2]),
+            ),
+          ),
+        ),
+        _heading('Example Record'),
+        _cardList([
+          'Collection ID: RN-00183',
+          'Collector: Ravi Kumar',
+          'Received: 25 kg',
+          'Material: E-waste',
+          'Date: 19 Sept 2026',
+          'Processed: 23 kg',
+          'Recovery: Completed',
+          'Recovered Materials: Copper — XX kg • Aluminium — XX kg • Iron — XX kg',
+        ]),
+        ElevatedButton.icon(
+          onPressed: () {},
+          icon: const Icon(Icons.description_outlined),
+          label: const Text('Generate Compliance Record'),
+        ),
+      ],
+    );
+  }
+
+  Widget _documents() {
+    return _pageWithTitle(
+      'Documents',
+      'Manage registration and compliance documents.',
+      [
+        ...[
+          'Recycler registration • Verified',
+          'EPR registration • Verified',
+          'Authorization documents • Expiring Soon',
+          'GST documents • Verified',
+          'Pollution-control documents • Verified',
+          'Collection records',
+          'Processing records',
+          'Invoices',
+          'Recovery records',
+          'Other compliance documents',
+          'Statuses: Verified / Expiring Soon / Expired',
+        ].map(_documentCard),
+      ],
+    );
+  }
+
+  Widget _profile() {
+    final entries = data.entries
+        .where(
+          (entry) =>
+              entry.key != 'Password' &&
+              entry.key != 'Confirm Password' &&
+              entry.value != null &&
+              entry.value.toString().isNotEmpty,
+        )
+        .toList();
+
+    return ListView(
+      key: const ValueKey('recycler-profile'),
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          'Company Profile',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppThemeColors.text(context),
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...entries.map((entry) => _profileCard(entry.key, entry.value.toString())),
+        const SizedBox(height: 8),
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => RecyclerRegistrationScreen(
+                  storage: widget.storage,
+                  language: widget.language,
+                  themeMode: widget.themeMode,
+                  onThemeChanged: widget.onThemeChanged,
+                ),
+              ),
+            ).then((_) => _refreshData());
+          },
+          icon: const Icon(Icons.edit),
+          label: const Text('Create New Account / Edit Details'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _settings() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: AppThemeColors.card(context),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(18),
+            children: [
+              const Text(
+                'Recycler Settings',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                leading: const Icon(Icons.verified_user_outlined),
+                title: const Text('CPCB Certificate Storage & Verification'),
+                subtitle: const Text(
+                  'Store certificate and track verification status. Uploading a certificate alone does not prove government approval; real CPCB/SPCB verification requires an official service or backend.',
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _cpcb();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Edit company details'),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecyclerRegistrationScreen(
+                        storage: widget.storage,
+                        language: widget.language,
+                        themeMode: widget.themeMode,
+                        onThemeChanged: widget.onThemeChanged,
+                      ),
+                    ),
+                  ).then((_) => _refreshData());
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _cpcb() async {
+    final number = TextEditingController(
+      text: widget.storage.prefs.getString('recycler_cpcb_certificate_number') ?? '',
+    );
+    final authority = TextEditingController(
+      text: widget.storage.prefs.getString('recycler_cpcb_authority') ??
+          'CPCB / relevant authority',
+    );
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('CPCB Certificate Verification'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Store the certificate/reference information here. This app does not independently certify government approval.',
+              ),
+              TextField(
+                controller: number,
+                decoration: const InputDecoration(
+                  labelText: 'CPCB Certificate / Reference Number',
+                ),
+              ),
+              TextField(
+                controller: authority,
+                decoration: const InputDecoration(
+                  labelText: 'Issuing Authority',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await widget.storage.prefs.setString(
+                  'recycler_cpcb_certificate_number',
+                  number.text.trim(),
+                );
+                await widget.storage.prefs.setString(
+                  'recycler_cpcb_authority',
+                  authority.text.trim(),
+                );
+                await widget.storage.prefs.setBool(
+                  'recycler_cpcb_verification_submitted',
+                  number.text.trim().isNotEmpty,
+                );
+                if (dialogContext.mounted) {
+                  Navigator.pop(dialogContext);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    number.dispose();
+    authority.dispose();
+  }
+
+  Widget _section(String title, List<String> rows) {
+    return _pageWithTitle(
+      title,
+      'Front-end preview — sample data only.',
+      [
+        _cardList(rows),
+      ],
+    );
+  }
+
+  Widget _payments() {
+    return _pageWithTitle(
+      'Kabadiwala Payments',
+      'Track payment records and payment status.',
+      [
+        _actionButton('Record payment', Icons.add_card_outlined),
+        _status('Pending payments', '₹18,450', Icons.pending_actions),
+        _status('Paid today', '₹12,600', Icons.check_circle_outline),
+        _status('This month', '₹84,250', Icons.payments_outlined),
+        _heading('Recent Payments'),
+        _cardList([
+          'Payment ID — PAY-00142',
+          'Kabadiwala — Ravi Kumar',
+          'Collection ID — RN-00183',
+          'Amount — ₹1,125',
+          'Method — UPI',
+          'Status — Completed',
+          'Payment ID — PAY-00143',
+          'Kabadiwala — Amit Das',
+          'Collection ID — RN-00184',
+          'Amount — ₹980',
+          'Method — Bank Transfer',
+          'Status — Pending',
+        ]),
+      ],
+    );
+  }
+
+  Widget _pageWithTitle(
+    String title,
+    String subtitle,
+    List<Widget> children,
+  ) {
+    return SafeArea(
+      child: ListView(
+        key: ValueKey(title),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 5),
+          Text(subtitle, style: const TextStyle(fontSize: 13)),
+          const SizedBox(height: 18),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _heading(String text) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: accent,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+
+  Widget _grid(List<List<dynamic>> items) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 1.35,
+      ),
+      itemBuilder: (_, i) {
+        final accent = AppThemeColors.isDark(context)
+            ? AppColors.primaryGold
+            : AppColors.featherGreen;
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(items[i][2] as IconData, color: accent),
+                const SizedBox(height: 8),
+                Text(
+                  items[i][1] as String,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  items[i][0] as String,
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _cardList(List<String> rows) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    return Card(
+      child: Column(
+        children: rows
+            .map(
+              (row) => ListTile(
+                dense: true,
+                leading: Icon(Icons.chevron_right, color: accent),
+                title: Text(row),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _status(String title, String value, IconData icon) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    return Card(
+      child: ListTile(
+        leading: Icon(icon, color: accent),
+        title: Text(title),
+        trailing: Text(
+          value,
+          style: TextStyle(color: accent, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget _actionButton(String text, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () {},
+          icon: Icon(icon),
+          label: Text(text),
+        ),
+      ),
+    );
+  }
+
+  Widget _rider(
+    String name,
+    String id,
+    String area,
+    String today,
+    String done,
+    String pending,
+    bool active,
+  ) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: accent.withValues(alpha: 0.15),
+                  child: Icon(Icons.person, color: accent),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Text(active ? '🟢 Active' : '⚪ Inactive'),
+              ],
+            ),
+            Text('Rider ID: $id'),
+            Text('Area: $area'),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text('Today: $today'),
+                Text('Completed: $done'),
+                Text('Pending: $pending'),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {},
+                    child: const Text('View Rider Location'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    child: const Text('Assign Pickup'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _documentCard(String text) {
+    final accent = AppThemeColors.isDark(context)
+        ? AppColors.primaryGold
+        : AppColors.featherGreen;
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.description_outlined, color: accent),
+        title: Text(text),
+        trailing: const Text('On file'),
+      ),
+    );
+  }
+
+  Widget _profileCard(String title, String value) {
+    return Card(
+      child: ListTile(
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(value),
+      ),
+    );
+  }
+}
+
+
 // RECYCLER NEARBY MAP (PROTOTYPE, FRONT-END DATA ONLY)
 // ============================================================
 
