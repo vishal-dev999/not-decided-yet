@@ -5,12 +5,17 @@ import 'package:flutter/foundation.dart';
 
 import 'storage_service.dart';
 import 'sync_service.dart';
+import '../services/database_helper.dart';
 
 class SyncWorker {
   static StreamSubscription<List<ConnectivityResult>>?
   _connectivitySubscription;
   static Timer? _pollingTimer;
   static bool _isSyncing = false;
+
+  /// In-memory cache for weighed lot transactions: backend lot_id -> transaction map
+  /// Prevents spamming /status on every 20-second tick once scale values are known.
+  static final Map<String, Map<String, dynamic>> _txnCache = {};
 
   /// Holds the latest remote lots fetched from the backend. UI can listen to this!
   static final ValueNotifier<List<Map<String, dynamic>>> latestLotsNotifier =
@@ -73,14 +78,70 @@ class SyncWorker {
   ) async {
     final remoteLots = await SyncService.fetchCollectorLots(storage: storage);
 
-    // Filter out terminal states so background ticks don't reintroduce cancelled lots
     final activeLots = remoteLots.where((lot) {
       final s = (lot['status'] ?? '').toString().toUpperCase();
       return s != 'CANCELLED' && s != 'WITHDRAWN' && s != 'ARCHIVED';
     }).toList();
 
-    latestLotsNotifier.value = activeLots;
-    return activeLots;
+    // Query SQLite queue to preserve local photo paths
+    final localRows = await DatabaseHelper.instance.getQueuedLots(limit: 100);
+    final Map<String, String> localImageMap = {};
+    for (final row in localRows) {
+      final img = (row['image_path'] ?? row['photo_path'] ?? '') as String;
+      if (img.isNotEmpty) {
+        final uid = (row['lot_uid'] ?? '').toString();
+        final clientUid = (row['client_lot_id'] ?? '').toString();
+        if (uid.isNotEmpty) localImageMap[uid] = img;
+        if (clientUid.isNotEmpty) localImageMap[clientUid] = img;
+      }
+    }
+
+    final enrichedLots = await Future.wait(
+      activeLots.map((lot) async {
+        final status = (lot['status'] ?? '').toString().toUpperCase();
+        final backendId = (lot['id'] ?? '').toString();
+        final clientUid = (lot['client_lot_id'] ?? '').toString();
+        final lotUid = (lot['lot_uid'] ?? '').toString();
+
+        final mutable = Map<String, dynamic>.from(lot);
+
+        // Check all possible identifiers for the image path
+        if (clientUid.isNotEmpty && localImageMap.containsKey(clientUid)) {
+          mutable['image_path'] = localImageMap[clientUid];
+        } else if (lotUid.isNotEmpty && localImageMap.containsKey(lotUid)) {
+          mutable['image_path'] = localImageMap[lotUid];
+        } else if (backendId.isNotEmpty &&
+            localImageMap.containsKey(backendId)) {
+          mutable['image_path'] = localImageMap[backendId];
+        }
+
+        if (status == 'WEIGHED' && backendId.isNotEmpty) {
+          // Check in-memory cache first
+          if (_txnCache.containsKey(backendId)) {
+            mutable['transaction'] = _txnCache[backendId];
+          } else {
+            // Fetch once from backend, then store in cache
+            final details = await SyncService.fetchLotStatus(
+              storage: storage,
+              lotId: backendId,
+            );
+            if (details != null && details['transaction'] != null) {
+              final txn = details['transaction'] as Map<String, dynamic>;
+              _txnCache[backendId] = txn;
+              mutable['transaction'] = txn;
+            }
+          }
+        } else {
+          // Clean up cache entry if the lot moved past WEIGHED (e.g., VERIFIED_COMPLETED)
+          _txnCache.remove(backendId);
+        }
+
+        return mutable;
+      }),
+    );
+
+    latestLotsNotifier.value = enrichedLots;
+    return enrichedLots;
   }
 
   static void dispose() {
@@ -88,5 +149,6 @@ class SyncWorker {
     _connectivitySubscription = null;
     _pollingTimer?.cancel();
     _pollingTimer = null;
+    _txnCache.clear();
   }
 }

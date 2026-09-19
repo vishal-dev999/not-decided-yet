@@ -334,10 +334,11 @@ class DatabaseHelper {
   ) async {
     final db = await database;
 
-    // Only consider lots that are ACTIVE (exclude CANCELLED and COMPLETED from the active queue)
     final activeRemoteLots = remoteLots.where((r) {
       final status = (r['status'] ?? '').toString().toUpperCase();
-      return status != 'CANCELLED';
+      return status != 'CANCELLED' &&
+          status != 'WITHDRAWN' &&
+          status != 'ARCHIVED';
     }).toList();
 
     final remoteUids = activeRemoteLots
@@ -346,7 +347,7 @@ class DatabaseHelper {
         .toSet();
 
     await db.transaction((txn) async {
-      // 1. Remove any local synced row that is cancelled or gone from active backend lots
+      // 1. Remove synced records no longer active on the backend
       final localRows = await txn.query(
         'sync_queue',
         where: 'status != ?',
@@ -364,7 +365,7 @@ class DatabaseHelper {
         }
       }
 
-      // 2. Update the remaining active lots
+      // 2. Update status of active lots while preserving local image_path
       for (final r in activeRemoteLots) {
         final uid = (r['client_lot_id'] ?? r['lot_uid'] ?? '').toString();
         final status = (r['status'] ?? 'SYNCED').toString();

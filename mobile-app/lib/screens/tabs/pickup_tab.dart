@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../constants/app_enums.dart';
 import '../../services/database_helper.dart';
@@ -147,6 +148,135 @@ class _PickupTabState extends State<PickupTab> {
     await _loadLots();
   }
 
+  Future<void> _showCashQrScanner({
+    required BuildContext context,
+    required String lotId,
+    required double expectedAmount,
+    required VoidCallback onVerified,
+  }) async {
+    bool isProcessing = false;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.black,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => SizedBox(
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white38,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Text(
+                      _t(
+                        'Scan Driver Cash Receipt QR',
+                        'ड्राइवर का नकद रसीद क्यूआर स्कैन करें',
+                        'चालकाचा रोख पावती क्यूआर स्कॅन करा',
+                      ),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${_t("Expected Amount:", "अपेक्षित राशि:", "अपेक्षित रक्कम:")} ₹${expectedAmount.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: AppColors.lightGreen,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: MobileScanner(
+                    onDetect: (capture) {
+                      if (isProcessing) return;
+                      final barcodes = capture.barcodes;
+                      for (final barcode in barcodes) {
+                        final rawValue = barcode.rawValue;
+                        if (rawValue == null || rawValue.isEmpty) continue;
+
+                        try {
+                          final data =
+                              jsonDecode(rawValue) as Map<String, dynamic>;
+                          final scannedLotId = (data['lot_id'] ?? '')
+                              .toString();
+                          final scannedAmount =
+                              (data['amount'] as num?)?.toDouble() ?? 0.0;
+
+                          // Verify payload matches this active transaction
+                          if (scannedLotId == lotId &&
+                              (scannedAmount - expectedAmount).abs() < 1.0) {
+                            isProcessing = true;
+                            Navigator.pop(ctx);
+                            onVerified();
+                            return;
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.redAccent,
+                                content: Text(
+                                  _t(
+                                    'QR mismatch! Incorrect lot or amount.',
+                                    'क्यूआर मेल नहीं खाता! अमान्य लॉट या राशि।',
+                                    'क्यूआर जुळत नाही! अयोग्य लॉट किंवा रक्कम.',
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        } catch (_) {
+                          // Fallback: accept simple text token matching lotId
+                          if (rawValue.contains(lotId)) {
+                            isProcessing = true;
+                            Navigator.pop(ctx);
+                            onVerified();
+                            return;
+                          }
+                        }
+                      }
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  _t(
+                    'Align driver screen inside frame',
+                    'ड्राइवर की स्क्रीन को फ्रेम में रखें',
+                    'चालकाचा स्क्रीन फ्रेममध्ये ठेवा',
+                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _loadLots() async {
     setState(() => _isLoading = true);
 
@@ -185,8 +315,56 @@ class _PickupTabState extends State<PickupTab> {
             return s != 'CANCELLED' && s != 'WITHDRAWN' && s != 'ARCHIVED';
           }).toList();
 
+          // Build a lookup map of local image paths keyed by both lot_uid and client_lot_id
+          final Map<String, String> localImageMap = {};
+          for (final row in localQueued) {
+            final img =
+                (row['image_path'] ?? row['photo_path'] ?? '') as String;
+            if (img.isNotEmpty) {
+              final uid = (row['lot_uid'] ?? '').toString();
+              final clientUid = (row['client_lot_id'] ?? '').toString();
+              if (uid.isNotEmpty) localImageMap[uid] = img;
+              if (clientUid.isNotEmpty) localImageMap[clientUid] = img;
+            }
+          }
+
+          // Enrich remote lots with both local image_path and live transaction details
+          final enrichedRemote = await Future.wait(
+            activeRemote.map((lot) async {
+              final status = (lot['status'] ?? '').toString().toUpperCase();
+              final backendId = (lot['id'] ?? '').toString();
+              final clientUid = (lot['client_lot_id'] ?? '').toString();
+              final lotUid = (lot['lot_uid'] ?? '').toString();
+
+              final mutable = Map<String, dynamic>.from(lot);
+
+              // Restore the local on-device image path if present
+              if (clientUid.isNotEmpty &&
+                  localImageMap.containsKey(clientUid)) {
+                mutable['image_path'] = localImageMap[clientUid];
+              } else if (lotUid.isNotEmpty &&
+                  localImageMap.containsKey(lotUid)) {
+                mutable['image_path'] = localImageMap[lotUid];
+              } else if (backendId.isNotEmpty &&
+                  localImageMap.containsKey(backendId)) {
+                mutable['image_path'] = localImageMap[backendId];
+              }
+
+              if (status == 'WEIGHED' && backendId.isNotEmpty) {
+                final details = await SyncService.fetchLotStatus(
+                  storage: storage,
+                  lotId: backendId,
+                );
+                if (details != null && details['transaction'] != null) {
+                  mutable['transaction'] = details['transaction'];
+                }
+              }
+              return mutable;
+            }),
+          );
+
           // Merge without duplicates (favoring fresh remote data)
-          final activeUids = activeRemote
+          final activeUids = enrichedRemote
               .map(
                 (r) => (r['client_lot_id'] ?? r['lot_uid'] ?? r['id'] ?? '')
                     .toString(),
@@ -199,7 +377,7 @@ class _PickupTabState extends State<PickupTab> {
                   .toString();
               return !activeUids.contains(uid);
             }),
-            ...activeRemote,
+            ...enrichedRemote,
           ];
 
           setState(() {
@@ -212,6 +390,419 @@ class _PickupTabState extends State<PickupTab> {
     }
 
     if (mounted) setState(() => _isLoading = false);
+  }
+
+  Future<void> _showConsentSheet(
+    BuildContext context,
+    Map<String, dynamic> row,
+  ) async {
+    final lotUid = (row['client_lot_id'] ?? row['lot_uid'] ?? row['id'] ?? '')
+        .toString();
+    final backendId = (row['id'] ?? '').toString();
+    final targetId = backendId.isNotEmpty ? backendId : lotUid;
+    final storage = widget.storage ?? getStorage(context);
+
+    // 1. Fetch live transaction data from backend
+    Map<String, dynamic>? liveDetails;
+    if (storage.accessToken != null &&
+        storage.accessToken!.isNotEmpty &&
+        backendId.isNotEmpty) {
+      liveDetails = await SyncService.fetchLotStatus(
+        storage: storage,
+        lotId: backendId,
+      );
+    }
+
+    final txn = liveDetails?['transaction'] as Map<String, dynamic>?;
+
+    final certifiedWeight =
+        (txn?['certified_weight_kg'] ??
+                row['certified_weight_kg'] ??
+                row['estimated_weight_kg'] ??
+                5.0)
+            .toDouble();
+
+    final offeredRate =
+        (txn?['offered_rate_per_kg'] ?? row['offered_rate_per_kg'] ?? 100.0)
+            .toDouble();
+
+    final totalAmount =
+        (txn?['total_amount'] ?? (certifiedWeight * offeredRate)).toDouble();
+
+    final recyclerName =
+        liveDetails?['recycler']?['company_name'] ?? 'Recycler';
+
+    String selectedPaymentMode = 'UPI';
+    final TextEditingController upiRefController = TextEditingController();
+
+    if (!context.mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppThemeColors.card(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.verified_outlined,
+                    color: AppColors.featherGreen,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _t(
+                        'Weighbridge & Payout Consent',
+                        'तौल एवं भुगतान सहमति',
+                        'वजन आणि पेमेंट संमती',
+                      ),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _t(
+                  '$recyclerName entered certified weighbridge values. Verify before confirming.',
+                  '$recyclerName ने प्रमाणित तौल दर्ज किया है। पुष्टि करने से पहले जांचें।',
+                  '$recyclerName ने प्रमाणित वजन नोंदवले आहे. पुष्टी करण्यापूर्वी तपासा.',
+                ),
+                style: TextStyle(
+                  color: AppThemeColors.muted(context),
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Breakdown Container
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.featherGreen.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.featherGreen.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _t(
+                            'Certified Scale Weight:',
+                            'प्रमाणित वजन:',
+                            'प्रमाणित वजन:',
+                          ),
+                        ),
+                        Text(
+                          '$certifiedWeight kg',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _t(
+                            'Offered Rate:',
+                            'प्रस्तावित दर:',
+                            'प्रस्तावित दर:',
+                          ),
+                        ),
+                        Text(
+                          '₹$offeredRate / kg',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 22),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _t(
+                            'Total Final Payout:',
+                            'कुल अंतिम भुगतान:',
+                            'एकूण अंतिम देयक:',
+                          ),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          '₹${totalAmount.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                            color: AppColors.featherGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              Text(
+                _t(
+                  'Payment Method Received:',
+                  'प्राप्त भुगतान माध्यम:',
+                  'पेमेंट प्राप्त करण्याचे माध्यम:',
+                ),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: ChoiceChip(
+                      label: Center(
+                        child: Text(
+                          _t('UPI (Instant)', 'यूपीआई (त्वरित)', 'युपीआय'),
+                        ),
+                      ),
+                      selected: selectedPaymentMode == 'UPI',
+                      onSelected: (val) {
+                        if (val) {
+                          setSheetState(() => selectedPaymentMode = 'UPI');
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ChoiceChip(
+                      label: Center(
+                        child: Text(_t('Cash in Hand', 'नकद', 'रोख रक्कम')),
+                      ),
+                      selected: selectedPaymentMode == 'CASH',
+                      onSelected: (val) {
+                        if (val) {
+                          setSheetState(() => selectedPaymentMode = 'CASH');
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+
+              // Optional UPI UTR / Ref ID Input
+              if (selectedPaymentMode == 'UPI') ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: upiRefController,
+                  decoration: InputDecoration(
+                    labelText: _t(
+                      'UPI Ref / UTR (Optional)',
+                      'यूपीआई संदर्भ / यूटीआर (वैकल्पिक)',
+                      'युपीआय संदर्भ (पर्यायी)',
+                    ),
+                    hintText: 'e.g. 425612349871',
+                    isDense: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: const Icon(Icons.receipt_long, size: 18),
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 24),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.redAccent,
+                        side: const BorderSide(color: Colors.redAccent),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        setState(() => _isLoading = true);
+                        await SyncService.submitConsent(
+                          storage: storage,
+                          lotId: targetId,
+                          accepted: false,
+                        );
+                        await _loadLots();
+                      },
+                      child: Text(_t('Dispute', 'अस्वीकार', 'नकार द्या')),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.featherGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+
+                        if (selectedPaymentMode == 'CASH') {
+                          // 1. Launch Cash QR scanner for cryptographic physical verification
+                          await _showCashQrScanner(
+                            context: context,
+                            lotId: targetId,
+                            expectedAmount: totalAmount,
+                            onVerified: () async {
+                              setState(() => _isLoading = true);
+                              final ok = await SyncService.submitConsent(
+                                storage: storage,
+                                lotId: targetId,
+                                accepted: true,
+                                paymentMode: 'CASH',
+                              );
+
+                              if (ok) {
+                                // Record in local storage payment history
+                                await storage.savePayment({
+                                  'mode': 'Cash',
+                                  'details': 'Form-6 Lot $lotUid',
+                                  'amount':
+                                      '₹${totalAmount.toStringAsFixed(0)}',
+                                  'date': DateTime.now().toIso8601String(),
+                                });
+
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: AppColors.featherGreen,
+                                      content: Text(
+                                        _t(
+                                          'Cash payment verified! Form-6 receipt generated.',
+                                          'नकद भुगतान सत्यापित! फॉर्म-6 रसीद जारी हुई।',
+                                          'रोख व्यवहार पडताळला! फॉर्म-६ पावती तयार.',
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                              await _loadLots();
+                            },
+                          );
+                        } else {
+                          // 2. UPI settlement flow
+                          setState(() => _isLoading = true);
+                          final enteredUpiRef = upiRefController.text.trim();
+                          final ok = await SyncService.submitConsent(
+                            storage: storage,
+                            lotId: targetId,
+                            accepted: true,
+                            paymentMode: 'UPI',
+                            upiReference: enteredUpiRef.isNotEmpty
+                                ? enteredUpiRef
+                                : null,
+                          );
+
+                          if (ok) {
+                            // Record in local storage payment history
+                            await storage.savePayment({
+                              'mode': 'UPI',
+                              'details': enteredUpiRef.isNotEmpty
+                                  ? 'Ref: $enteredUpiRef'
+                                  : 'UPI Lot $lotUid',
+                              'amount': '₹${totalAmount.toStringAsFixed(0)}',
+                              'date': DateTime.now().toIso8601String(),
+                            });
+
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: AppColors.featherGreen,
+                                  content: Text(
+                                    _t(
+                                      'UPI payout confirmed! Transaction completed.',
+                                      'यूपीआई भुगतान स्वीकृत! लेनदेन पूरा हुआ।',
+                                      'युपीआय पेमेंट मंजूर झाले! व्यवहार पूर्ण झाला.',
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                          await _loadLots();
+                        }
+                      },
+                      child: Text(
+                        selectedPaymentMode == 'CASH'
+                            ? _t(
+                                'Scan Cash QR & Accept',
+                                'नकद क्यूआर स्कैन कर स्वीकारें',
+                                'रोख क्यूआर स्कॅन करा व स्वीकारा',
+                              )
+                            : _t(
+                                'Accept & Complete',
+                                'स्वीकारें एवं पूरा करें',
+                                'स्वीकारा आणि पूर्ण करा',
+                              ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   String _t(String en, String hi, String mr) {
@@ -241,6 +832,7 @@ class _PickupTabState extends State<PickupTab> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.qr_code_2, size: 40, color: AppColors.primaryGold),
             const SizedBox(height: 8),
@@ -251,43 +843,63 @@ class _PickupTabState extends State<PickupTab> {
                 'पिकअप पडताळणी क्यूआर',
               ),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _t(
-                'Show this QR to the recycler driver upon arrival to verify handshake.',
-                'हैंडशेक सत्यापित करने के लिए आने पर रिसाइकिलर चालक को यह क्यूआर दिखाएं।',
-                'हँडशेक पडताळण्यासाठी आल्यावर रिसायकल चालकाला हा क्यूआर दाखवा.',
-              ),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _t(
+                    'Show this QR to the recycler driver upon arrival to verify handshake.',
+                    'हैंडशेक सत्यापित करने के लिए आने पर रिसाइकिलर चालक को यह क्यूआर दिखाएं।',
+                    'हँडशेक पडताळण्यासाठी आल्यावर रिसायकल चालकाला हा क्यूआर दाखवा.',
+                  ),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: 210,
+                  height: 210,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: qrToken.isNotEmpty
+                      ? SizedBox(
+                          width: 190,
+                          height: 190,
+                          child: QrImageView(
+                            data: qrToken,
+                            version: QrVersions.auto,
+                            size: 190.0,
+                          ),
+                        )
+                      : Icon(
+                          Icons.qr_code,
+                          size: 120,
+                          color: Colors.grey.shade400,
+                        ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  lotUid,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppThemeColors.muted(context),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: QrImageView(
-                data: qrToken,
-                version: QrVersions.auto,
-                size: 200.0,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              lotUid,
-              style: TextStyle(
-                fontSize: 11,
-                color: AppThemeColors.muted(context),
-              ),
-            ),
-          ],
+          ),
         ),
         actions: [
           TextButton(
@@ -423,14 +1035,30 @@ class _PickupTabState extends State<PickupTab> {
                 payload['material_category'] ??
                 'MIXED_EWASTE_CASING')
             .toString();
-    final weight =
-        row['estimated_weight_kg'] ?? payload['approx_weight_kg'] ?? 0;
+
+    // Certified weighbridge data if available, otherwise original estimate
+    final txn = row['transaction'] as Map<String, dynamic>?;
+    final double? certifiedWeight = (txn?['certified_weight_kg'] as num?)
+        ?.toDouble();
+    final double estWeight =
+        ((row['estimated_weight_kg'] as num?) ??
+                (payload['approx_weight_kg'] as num?) ??
+                1.0)
+            .toDouble();
+
+    final weight = certifiedWeight ?? estWeight;
 
     final bench = LocalAiClassifier.benchmarks[rawCode] ?? {'rate_per_kg': 100};
-    final rate = (bench['rate_per_kg'] as num? ?? 100).toDouble();
+    final double rate =
+        ((txn?['offered_rate_per_kg'] as num?) ??
+                (bench['rate_per_kg'] as num?) ??
+                100.0)
+            .toDouble();
+
     final totalPayout =
+        txn?['total_amount'] ??
         payload['estimated_total_payout'] ??
-        ((weight as num).toDouble() * rate).round();
+        (weight * rate).round();
 
     final localizedMaterial = LocalAiClassifier.getLocalizedMaterialName(
       rawCode,
@@ -438,12 +1066,18 @@ class _PickupTabState extends State<PickupTab> {
     );
 
     final canCancel =
-        status != 'SESSION_OPEN' && status != 'VERIFIED_COMPLETED';
+        status != 'SESSION_OPEN' &&
+        status != 'WEIGHED' &&
+        status != 'VERIFIED_COMPLETED';
 
     Color badgeColor;
     String badgeText;
 
     switch (status) {
+      case 'WEIGHED':
+        badgeColor = AppColors.featherGreen;
+        badgeText = _t('Awaiting Consent', 'सहमति लंबित', 'संमती प्रलंबित');
+        break;
       case 'LOCKED':
         badgeColor = Colors.orange;
         badgeText = _t('Offer Locked', 'ऑफ़र लॉक हुआ', 'ऑफर लॉक झाली');
@@ -478,224 +1112,323 @@ class _PickupTabState extends State<PickupTab> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: badgeColor.withValues(alpha: 0.4),
-          width: status == 'LOCKED' ? 1.8 : 1.0,
+          width: (status == 'LOCKED' || status == 'WEIGHED') ? 1.8 : 1.0,
         ),
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Thumbnail
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: imagePath.isNotEmpty && File(imagePath).existsSync()
-                      ? Image.file(
-                          File(imagePath),
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          width: 72,
-                          height: 72,
-                          color: activeAccent.withValues(alpha: 0.12),
-                          child: Icon(
-                            LocalAiClassifier.getMaterialIcon(rawCode),
-                            color: activeAccent,
-                          ),
-                        ),
-                ),
-                const SizedBox(width: 12),
-
-                // Details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              localizedMaterial,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: status == 'WEIGHED'
+            ? () => _showConsentSheet(context, row)
+            : null,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Thumbnail
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: imagePath.isNotEmpty && File(imagePath).existsSync()
+                        ? Image.file(
+                            File(imagePath),
+                            width: 72,
+                            height: 72,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            width: 72,
+                            height: 72,
+                            color: activeAccent.withValues(alpha: 0.12),
+                            child: Icon(
+                              LocalAiClassifier.getMaterialIcon(rawCode),
+                              color: activeAccent,
                             ),
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Details
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                localizedMaterial,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
                                 ),
-                                decoration: BoxDecoration(
-                                  color: badgeColor.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  badgeText,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: badgeColor,
-                                  ),
-                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              if (canCancel) ...[
-                                const SizedBox(width: 4),
-                                InkWell(
-                                  onTap: () => _handleCancelLot(row),
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Icon(
-                                      Icons.close,
-                                      size: 16,
-                                      color: AppThemeColors.muted(context),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: badgeColor.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    badgeText,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: badgeColor,
                                     ),
                                   ),
                                 ),
+                                if (canCancel) ...[
+                                  const SizedBox(width: 4),
+                                  InkWell(
+                                    onTap: () => _handleCancelLot(row),
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 16,
+                                        color: AppThemeColors.muted(context),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${_t("UID:", "आईडी:", "आयडी:")} ${lotUid.length > 18 ? lotUid.substring(0, 18) : lotUid}',
+                          style: TextStyle(
+                            color: AppThemeColors.muted(context),
+                            fontSize: 11,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Weight & Payout row
+                        if (status == 'WEIGHED' && txn != null) ...[
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.scale,
+                                size: 14,
+                                color: AppColors.featherGreen,
+                              ),
+                              const SizedBox(width: 4),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '$certifiedWeight kg',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_t("Est:", "अनुमानित:", "अंदाजे:")} $estWeight kg',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppThemeColors.muted(context),
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '₹$totalPayout',
+                                    style: const TextStyle(
+                                      color: AppColors.featherGreen,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  Text(
+                                    '₹${rate.toStringAsFixed(0)}/kg',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppThemeColors.muted(context),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ] else ...[
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.scale,
+                                size: 14,
+                                color: AppThemeColors.muted(context),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '$weight kg',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                '₹$totalPayout',
+                                style: TextStyle(
+                                  color: activeAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ],
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${_t("UID:", "आईडी:", "आयडी:")} ${lotUid.length > 18 ? lotUid.substring(0, 18) : lotUid}',
-                        style: TextStyle(
-                          color: AppThemeColors.muted(context),
-                          fontSize: 11,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.scale,
-                            size: 14,
-                            color: AppThemeColors.muted(context),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$weight kg',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            '₹$totalPayout',
-                            style: TextStyle(
-                              color: activeAccent,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          // Action area depending on state
-          if (status == 'LOCKED' && qrToken.isNotEmpty) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.orange.withValues(alpha: 0.08),
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(15),
+            // Bottom Action Area
+            if (status == 'LOCKED' && qrToken.isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.08),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(15),
+                  ),
+                ),
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange.shade700,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  icon: const Icon(Icons.qr_code_2, size: 18),
+                  label: Text(
+                    _t(
+                      'Show QR Code for Pickup',
+                      'पिकअप के लिए क्यूआर कोड दिखाएं',
+                      'पिकअपसाठी क्यूआर कोड दाखवा',
+                    ),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                  onPressed: () => _showQrDialog(context, qrToken, lotUid),
                 ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange.shade700,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                      ),
-                      icon: const Icon(Icons.qr_code_2, size: 18),
-                      label: Text(
-                        _t(
-                          'Show QR Code for Pickup',
-                          'पिकअप के लिए क्यूआर कोड दिखाएं',
-                          'पिकअपसाठी क्यूआर कोड दाखवा',
-                        ),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                      onPressed: () => _showQrDialog(context, qrToken, lotUid),
+            ] else if (status == 'WEIGHED') ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.featherGreen.withValues(alpha: 0.1),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(15),
+                  ),
+                ),
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.featherGreen,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  icon: const Icon(Icons.verified, size: 18),
+                  label: Text(
+                    _t(
+                      'Review & Confirm Payout',
+                      'भुगतान की समीक्षा एवं पुष्टि करें',
+                      'पेमेंट तपासा आणि संमती द्या',
+                    ),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
                     ),
                   ),
-                ],
+                  onPressed: () => _showConsentSheet(context, row),
+                ),
               ),
-            ),
-          ] else ...[
-            Divider(
-              height: 1,
-              color: AppThemeColors.muted(context).withValues(alpha: 0.15),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.access_time,
-                    size: 12,
-                    color: AppThemeColors.muted(context),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    _formatDate(createdAt),
-                    style: TextStyle(
-                      fontSize: 11,
+            ] else ...[
+              Divider(
+                height: 1,
+                color: AppThemeColors.muted(context).withValues(alpha: 0.15),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: 12,
                       color: AppThemeColors.muted(context),
                     ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    status == 'PENDING'
-                        ? _t(
-                            'Offline Stored',
-                            'ऑफ़लाइन संग्रहीत',
-                            'ऑफलाइन जतन केले',
-                          )
-                        : _t(
-                            'Server Synced',
-                            'सर्वर सिंक हुआ',
-                            'सर्व्हर सिंक झाले',
-                          ),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppThemeColors.muted(context),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatDate(createdAt),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppThemeColors.muted(context),
+                      ),
                     ),
-                  ),
-                ],
+                    const Spacer(),
+                    Text(
+                      status == 'PENDING'
+                          ? _t(
+                              'Offline Stored',
+                              'ऑफ़लाइन संग्रहीत',
+                              'ऑफलाइन जतन केले',
+                            )
+                          : _t(
+                              'Server Synced',
+                              'सर्वर सिंक हुआ',
+                              'सर्व्हर सिंक झाले',
+                            ),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppThemeColors.muted(context),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

@@ -237,6 +237,74 @@ class SyncService {
     }
   }
 
+  /// Submits collector dual-consent and payment confirmation for a weighed lot
+  static Future<bool> submitConsent({
+    required ReNovaStorage storage,
+    required String lotId,
+    required bool accepted,
+    String paymentMode = 'UPI',
+    String? upiReference,
+  }) async {
+    final token = storage.accessToken;
+    if (token == null || token.isEmpty) return false;
+
+    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/$lotId/consent');
+
+    try {
+      final res = await http
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode({
+              'accepted': accepted,
+              'payment_mode': paymentMode,
+              'upi_reference':
+                  upiReference ??
+                  'UPI_${DateTime.now().millisecondsSinceEpoch}',
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      return res.statusCode == 200;
+    } catch (e) {
+      debugPrint('[SyncService] Failed to submit consent: $e');
+      return false;
+    }
+  }
+
+  /// Fetches real-time status and transaction breakdown (certified weight & rate)
+  static Future<Map<String, dynamic>?> fetchLotStatus({
+    required ReNovaStorage storage,
+    required String lotId,
+  }) async {
+    final token = storage.accessToken;
+    if (token == null || token.isEmpty) return null;
+
+    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/$lotId/status');
+    try {
+      final res = await http
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 8));
+
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(res.body);
+        return decoded['data'] as Map<String, dynamic>?;
+      }
+    } catch (e) {
+      debugPrint('[SyncService] Failed to fetch lot status: $e');
+    }
+    return null;
+  }
+
   /// Fetches latest lots from backend to pull lifecycle status (BROADCASTED, LOCKED, SESSION_OPEN, etc.)
   static Future<List<Map<String, dynamic>>> fetchCollectorLots({
     required ReNovaStorage storage,
