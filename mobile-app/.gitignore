@@ -46,3 +46,17 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Flutter engine & platform symlinks (auto-generated)
+.flutter-plugins
+**/flutter/ephemeral/
+**/Flutter/ephemeral/
+linux/flutter/generated_plugin_registrant.*
+windows/flutter/generated_plugin_registrant.*
+macos/Runner/GeneratedPluginRegistrant.*
+
+# Gradle / Android build files
+.gradle/
+android/.gradle/
+**/android/app/build/
+**/android/captures/

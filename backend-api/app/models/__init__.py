@@ -1,0 +1,15 @@
+from app.models.entities import (  # noqa: F401
+    Collector,
+    Recycler,
+    Material,
+    PriceQuote,
+    PriceHistory,
+    Lot,
+    MatchOffer,
+    Transaction,
+    LedgerEntry,
+    TraceabilitySeal,
+    FraudAlert,
+    SafetyCard,
+    OTPChallenge,
+)
