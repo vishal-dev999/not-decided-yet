@@ -19,81 +19,74 @@ from app.models.entities import (
 )
 
 MATERIALS = [
-    ("pcb", "PCB / Circuit boards", "सर्किट बोर्ड", "सर्किट बोर्ड", "ITEW2", True, "chip"),
-    ("copper_wires", "Copper wires", "तांबे की तारें", "तांब्याच्या तारा", "ITEW", False, "wire"),
-    ("aluminum", "Aluminum", "एल्युमिनियम", "अॅल्युमिनियम", "ITEW", False, "metal"),
-    ("hard_plastics", "Hard plastics", "कठोर प्लास्टिक", "कठीण प्लास्टिक", "ITEW", False, "plastic"),
-    ("batteries", "Batteries", "बैटरी", "बॅटरी", "BATT", True, "battery"),
-    ("cables", "Cables", "केबल", "केबल्स", "ITEW", False, "cable"),
-    ("mixed_ewaste", "Mixed e-waste", "मिश्र ई-कचरा", "मिश्र ई-कचरा", "ITEW", True, "mixed"),
-    ("steel", "Steel", "स्टील", "स्टील", "ITEW", False, "steel"),
-    ("glass", "CRT / Glass", "काँच", "काच", "CEEW1", True, "glass"),
-    ("motors", "Motors", "मोटर", "मोटार", "CEEW", False, "motor"),
+    ("MOTHERBOARD_HIGH_GRADE", "High Grade PCB", "हाई-ग्रेड मदरबोर्ड (पीसीबी)", "हाय-ग्रेड मदरबोर्ड (पीसीबी)", "ITEW2", False, "chip"),
+    ("POWER_SUPPLY_LOW_GRADE", "Low Grade PCB", "लो-ग्रेड पीसीबी (एसएमपीएस)", "लो-ग्रेड पीसीबी (एसएमपीएस)", "ITEW2", False, "chip"),
+    ("BATTERY_LITHIUM_PORTABLE", "Lithium Batteries", "लिथियम-आयन बैटरी", "लिथियम-आयन बॅटरी", "BATT", True, "battery"),
+    ("LEAD_ACID", "Lead Batteries", "लेड-एसिड बैटरी", "लेड-अ‍ॅसिड बॅटरी", "BATT", True, "battery"),
+    ("CRT_MONITOR", "CRT Monitors", "सीआरटी मॉनिटर", "सीआरटी मॉनिटर", "CEEW1", True, "glass"),
+    ("LCD_PANEL_INTACT", "LCD/LED Flat Panel", "एलसीडी/एलईडी डिस्प्ले", "एलसीडी/एलईडी डिस्प्ले", "CEEW1", False, "glass"),
+    ("MIXED_EWASTE_CASING", "Mixed Plastic", "मिश्रित ई-कचरा प्लास्टिक", "मिश्र ई-कचरा प्लास्टिक", "ITEW", False, "plastic"),
+    ("COPPER_HEAVY_INSULATED", "Copper Wire", "तांबे का तार", "तांब्याची तार", "ITEW", False, "wire"),
+    ("ALUMINIUM_WIRE", "Aluminium Wire", "एल्युमिनियम तार", "अ‍ॅल्युमिनियम तार", "ITEW", False, "wire"),
 ]
 
-# Approximate informal-market buy rates (₹/kg) — placeholder until field research
-# Cuttack / Bhubaneswar focused, plus a couple of metros for location demos.
+# Approximate informal-market buy rates (₹/kg)
+# Cuttack / Bhubaneswar focused, plus metros for location demos.
 RATES = {
     # material: (cuttack, bhubaneswar, mumbai, delhi) as (buy, min, max)
-    "pcb": {
-        "Cuttack": (220, 160, 380),
-        "Bhubaneswar": (230, 170, 400),
-        "Mumbai": (260, 190, 450),
-        "Delhi": (250, 180, 430),
+    "MOTHERBOARD_HIGH_GRADE": {
+        "Cuttack": (290, 240, 360),
+        "Bhubaneswar": (305, 250, 380),
+        "Mumbai": (340, 280, 420),
+        "Delhi": (330, 270, 410),
     },
-    "copper_wires": {
-        "Cuttack": (480, 400, 620),
-        "Bhubaneswar": (490, 410, 630),
-        "Mumbai": (530, 450, 680),
-        "Delhi": (520, 440, 670),
+    "POWER_SUPPLY_LOW_GRADE": {
+        "Cuttack": (50, 38, 68),
+        "Bhubaneswar": (54, 40, 72),
+        "Mumbai": (62, 45, 82),
+        "Delhi": (60, 44, 80),
     },
-    "aluminum": {
-        "Cuttack": (125, 95, 160),
-        "Bhubaneswar": (128, 98, 165),
-        "Mumbai": (140, 110, 180),
-        "Delhi": (138, 108, 175),
+    "BATTERY_LITHIUM_PORTABLE": {
+        "Cuttack": (135, 105, 175),
+        "Bhubaneswar": (142, 110, 185),
+        "Mumbai": (158, 120, 205),
+        "Delhi": (152, 115, 198),
     },
-    "hard_plastics": {
-        "Cuttack": (22, 12, 35),
-        "Bhubaneswar": (24, 14, 38),
-        "Mumbai": (28, 16, 42),
-        "Delhi": (26, 15, 40),
+    "LEAD_ACID": {
+        "Cuttack": (88, 72, 110),
+        "Bhubaneswar": (92, 75, 115),
+        "Mumbai": (102, 82, 128),
+        "Delhi": (98, 80, 122),
     },
-    "batteries": {
-        "Cuttack": (78, 60, 95),
-        "Bhubaneswar": (80, 62, 98),
-        "Mumbai": (88, 70, 110),
-        "Delhi": (85, 68, 105),
+    "CRT_MONITOR": {
+        "Cuttack": (18, 12, 26),
+        "Bhubaneswar": (20, 14, 28),
+        "Mumbai": (24, 16, 34),
+        "Delhi": (22, 15, 32),
     },
-    "cables": {
-        "Cuttack": (90, 60, 140),
-        "Bhubaneswar": (95, 65, 145),
-        "Mumbai": (110, 75, 160),
-        "Delhi": (105, 72, 155),
+    "LCD_PANEL_INTACT": {
+        "Cuttack": (78, 60, 102),
+        "Bhubaneswar": (82, 64, 108),
+        "Mumbai": (94, 72, 122),
+        "Delhi": (90, 70, 118),
     },
-    "mixed_ewaste": {
-        "Cuttack": (32, 18, 55),
-        "Bhubaneswar": (34, 20, 58),
-        "Mumbai": (40, 22, 65),
-        "Delhi": (38, 21, 62),
+    "MIXED_EWASTE_CASING": {
+        "Cuttack": (20, 14, 30),
+        "Bhubaneswar": (22, 15, 32),
+        "Mumbai": (26, 18, 38),
+        "Delhi": (25, 17, 36),
     },
-    "steel": {
-        "Cuttack": (28, 20, 38),
-        "Bhubaneswar": (29, 21, 39),
-        "Mumbai": (32, 24, 42),
-        "Delhi": (31, 23, 41),
+    "COPPER_HEAVY_INSULATED": {
+        "Cuttack": (440, 380, 520),
+        "Bhubaneswar": (455, 390, 540),
+        "Mumbai": (490, 420, 580),
+        "Delhi": (480, 410, 570),
     },
-    "glass": {
-        "Cuttack": (6, 2, 12),
-        "Bhubaneswar": (6, 2, 12),
-        "Mumbai": (8, 3, 14),
-        "Delhi": (7, 3, 13),
-    },
-    "motors": {
-        "Cuttack": (55, 35, 80),
-        "Bhubaneswar": (58, 38, 85),
-        "Mumbai": (70, 45, 95),
-        "Delhi": (66, 42, 90),
+    "ALUMINIUM_WIRE": {
+        "Cuttack": (118, 92, 150),
+        "Bhubaneswar": (124, 96, 158),
+        "Mumbai": (138, 108, 175),
+        "Delhi": (134, 104, 170),
     },
 }
 
@@ -105,7 +98,6 @@ CITY_STATE = {
 }
 
 RECYCLERS = [
-    # Cuttack / Odisha cluster — these will typically win distance for demo lots
     dict(
         recycler_code="OD-CTC-001",
         company_name="Mahanadi E-Waste Recyclers",
@@ -155,7 +147,7 @@ RECYCLERS = [
         pickup_available=True,
         karma_points=64.0,
         price_multiplier=0.97,
-        accepted_categories="pcb,copper_wires,cables,mixed_ewaste",
+        accepted_categories="MOTHERBOARD_HIGH_GRADE,POWER_SUPPLY_LOW_GRADE,COPPER_HEAVY_INSULATED,ALUMINIUM_WIRE",
     ),
     dict(
         recycler_code="OD-BBSR-004",
@@ -172,7 +164,7 @@ RECYCLERS = [
         pickup_available=False,
         karma_points=71.0,
         price_multiplier=1.12,
-        accepted_categories="batteries,pcb,motors",
+        accepted_categories="BATTERY_LITHIUM_PORTABLE,LEAD_ACID,MOTHERBOARD_HIGH_GRADE",
     ),
     dict(
         recycler_code="MH-MUM-005",
@@ -223,7 +215,7 @@ RECYCLERS = [
         pickup_available=True,
         karma_points=55.0,
         price_multiplier=0.92,
-        accepted_categories="hard_plastics,cables,mixed_ewaste,steel",
+        accepted_categories="MIXED_EWASTE_CASING,CRT_MONITOR,LCD_PANEL_INTACT",
     ),
 ]
 

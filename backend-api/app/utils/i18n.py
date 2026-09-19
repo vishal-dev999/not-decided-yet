@@ -174,6 +174,54 @@ def success_spoken(amount: float) -> dict[str, str]:
 
 
 MATERIAL_NAMES = {
+    # 9 Distinct Target Categories
+    "MOTHERBOARD_HIGH_GRADE": {
+        "en": "high grade PCB motherboards",
+        "hi": "हाई-ग्रेड मदरबोर्ड पीसीबी",
+        "mr": "हाय-ग्रेड मदरबोर्ड पीसीबी",
+    },
+    "POWER_SUPPLY_LOW_GRADE": {
+        "en": "low grade PCB power supplies",
+        "hi": "लो-ग्रेड पीसीबी व एसएमपीएस",
+        "mr": "लो-ग्रेड पीसीबी आणि एसएमपीएस",
+    },
+    "BATTERY_LITHIUM_PORTABLE": {
+        "en": "lithium ion batteries",
+        "hi": "लिथियम बैटरी",
+        "mr": "लिथियम बॅटरी",
+    },
+    "LEAD_ACID": {
+        "en": "lead acid batteries",
+        "hi": "लेड-एसिड बैटरी",
+        "mr": "लेड-अ‍ॅसिड बॅटरी",
+    },
+    "CRT_MONITOR": {
+        "en": "CRT monitors",
+        "hi": "सीआरटी मॉनिटर",
+        "mr": "सीआरटी मॉनिटर",
+    },
+    "LCD_PANEL_INTACT": {
+        "en": "LCD flat panel displays",
+        "hi": "एलसीडी फ्लैट डिस्प्ले",
+        "mr": "एलसीडी फ्लॅट डिस्प्ले",
+    },
+    "MIXED_EWASTE_CASING": {
+        "en": "mixed e-waste plastic casing",
+        "hi": "मिश्रित ई-कचरा प्लास्टिक",
+        "mr": "मिश्र ई-कचरा प्लास्टिक",
+    },
+    "COPPER_HEAVY_INSULATED": {
+        "en": "copper insulated wires",
+        "hi": "तांबे का तार",
+        "mr": "तांब्याची तार",
+    },
+    "ALUMINIUM_WIRE": {
+        "en": "aluminium wires",
+        "hi": "एल्युमिनियम तार",
+        "mr": "अ‍ॅल्युमिनियम तार",
+    },
+
+    # Legacy & Shorthand Aliases (Prevents KeyErrors on older endpoints)
     "pcb": {"en": "PCB circuit boards", "hi": "सर्किट बोर्ड", "mr": "सर्किट बोर्ड"},
     "copper_wires": {"en": "copper wires", "hi": "तांबे की तारें", "mr": "तांब्याच्या तारा"},
     "aluminum": {"en": "aluminum", "hi": "एल्युमिनियम", "mr": "अॅल्युमिनियम"},
