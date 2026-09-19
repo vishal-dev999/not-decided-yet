@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.schemas.common import ORMModel
 
@@ -15,19 +15,43 @@ class ClassificationIn(BaseModel):
 class LotSyncItem(BaseModel):
     """One queued lot from the collector's offline local database."""
 
-    client_lot_id: str = Field(..., description="UUID generated on device; used for idempotent sync")
-    material_category: str = Field(..., examples=["pcb"])
-    estimated_weight_kg: float = Field(..., gt=0, le=5000)
+    # Accepts either "lot_uid" (from Flutter) or "client_lot_id"
+    client_lot_id: str = Field(
+        ...,
+        validation_alias="lot_uid",
+        description="UUID generated on device; used for idempotent sync",
+    )
+    material_category: str = Field(..., examples=["MOTHERBOARD_HIGH_GRADE"])
+
+    # Accepts either "approx_weight_kg" (from Flutter) or "estimated_weight_kg"
+    estimated_weight_kg: float = Field(
+        ...,
+        gt=0,
+        le=5000,
+        validation_alias="approx_weight_kg",
+    )
+
     classification: Optional[ClassificationIn] = None
     latitude: Optional[float] = Field(None, ge=-90, le=90)
     longitude: Optional[float] = Field(None, ge=-180, le=180)
-    city: Optional[str] = None
+    city: Optional[str] = "Bhubaneswar"
     notes: Optional[str] = None
     qr_token: Optional[str] = Field(
         None, description="Offline-generated QR payload token. Server stores and later verifies it."
     )
     photo_base64: Optional[str] = Field(None, description="Optional JPEG/PNG as base64 (no data: prefix)")
-    created_at_local: Optional[datetime] = None
+
+    # Accepts either "created_at" (from Flutter) or "created_at_local"
+    created_at_local: Optional[datetime] = Field(
+        None,
+        validation_alias="created_at",
+    )
+
+    # Allow passing either field name or alias in Pydantic v2
+    model_config = ConfigDict(
+        populate_by_name=True,
+        extra="ignore",  # safely ignores 'estimated_rate_per_kg' and 'estimated_total_payout' sent from Flutter
+    )
 
 
 class LotSyncIn(BaseModel):
