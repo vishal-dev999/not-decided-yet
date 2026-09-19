@@ -5,6 +5,7 @@ import 'screens/collector_login_screen.dart';
 import 'screens/language_selection_screen.dart';
 import 'screens/main_dashboard_container.dart';
 import 'screens/role_selection_screen.dart';
+import 'screens/rider/rider_login_screen.dart';
 import 'services/database_helper.dart';
 import 'services/storage_service.dart';
 import 'themes/app_colors.dart';
@@ -110,17 +111,17 @@ class ReNovaAppState extends State<ReNovaApp> {
 
   Widget _getInitialHome() {
     // ==========================================================
-    // ALWAYS SHOW ROLE SELECTION FIRST
+    // ROLE SELECTION
     // ==========================================================
     //
     // Every time the app starts:
     //
-    // RecyLink
+    // ReNova
     // Select Role
     //
     // Then:
     //
-    // ScrapCollector
+    // Scrap Collector
     //     |
     //     |-- Already logged in --> Dashboard
     //     |
@@ -128,7 +129,7 @@ class ReNovaAppState extends State<ReNovaApp> {
     //
     // Rider
     //     |
-    //     --> Rider module placeholder
+    //     --> Rider Login
     //
     // ==========================================================
 
@@ -143,10 +144,7 @@ class ReNovaAppState extends State<ReNovaApp> {
       // SCRAP COLLECTOR SELECTED
       // ========================================================
       //
-      // IMPORTANT:
-      // The BuildContext comes from RoleSelectionScreen.
-      // This allows Navigator.of(context) to correctly find
-      // the MaterialApp Navigator.
+      // THIS FLOW IS UNCHANGED.
       //
 
       onScrapCollectorSelected: (context) {
@@ -200,20 +198,25 @@ class ReNovaAppState extends State<ReNovaApp> {
       // ========================================================
       // RIDER SELECTED
       // ========================================================
+      //
+      // Rider has its own separate UI/UX flow.
+      //
+      // ========================================================
 
-      onRiderSelected: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              language == AppLanguage.hindi
-                  ? 'Rider मॉड्यूल जल्द उपलब्ध होगा'
-                  : language == AppLanguage.marathi
-                      ? 'Rider मॉड्यूल लवकरच उपलब्ध होईल'
-                      : 'Rider module will be available soon',
-            ),
-          ),
-        );
-      },
+      onRiderSelected: (context) {
+  debugPrint('RIDER BUTTON PRESSED');
+
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) => RiderLoginScreen(
+        language: language,
+        themeMode: themeMode,
+        onThemeChanged: changeTheme,
+        storage: widget.storage,
+      ),
+    ),
+  );
+},
     );
   }
 
@@ -337,4 +340,3 @@ class ReNovaAppState extends State<ReNovaApp> {
     );
   }
 }
-

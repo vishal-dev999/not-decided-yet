@@ -411,6 +411,20 @@ class _MainDashboardContainerState
       ),
     ];
 
+    // -------------------------------------------------------
+    // HOME MENU HIGHLIGHT
+    // -------------------------------------------------------
+    //
+    // When Home is active:
+    //   - Hamburger button gets highlighted.
+    //   - Bottom taskbar has NO highlighted destination.
+    //
+    // When another tab is active:
+    //   - Hamburger returns to normal.
+    //   - The selected taskbar destination is highlighted.
+    //
+    final bool homeIsHighlighted = isHome;
+
     return PopScope(
       // -------------------------------------------------------
       // BACK BUTTON BEHAVIOR
@@ -451,14 +465,31 @@ class _MainDashboardContainerState
                 ),
               );
             },
-            child: IconButton(
-              tooltip: 'Home',
-              icon: Icon(
-                Icons.menu,
-                color: activeAccent,
-                size: 28,
+
+            // -------------------------------------------------
+            // HOME HIGHLIGHT
+            // -------------------------------------------------
+            //
+            // The hamburger button gets a subtle circular
+            // background when Dashboard/Home is active.
+            // -------------------------------------------------
+            child: Container(
+              margin: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: homeIsHighlighted
+                    ? activeAccent.withValues(alpha: 0.15)
+                    : Colors.transparent,
+                shape: BoxShape.circle,
               ),
-              onPressed: _goHome,
+              child: IconButton(
+                tooltip: homeText,
+                icon: Icon(
+                  Icons.menu,
+                  color: activeAccent,
+                  size: homeIsHighlighted ? 29 : 28,
+                ),
+                onPressed: _goHome,
+              ),
             ),
           ),
 
@@ -614,12 +645,27 @@ class _MainDashboardContainerState
         //
         // Market Rates | My Lots | Payment | Recyclers | Classify
         //
-        // IMPORTANT:
-        // On Home, NO taskbar item is visually highlighted.
+        // HOME:
+        //   No taskbar destination is visually highlighted.
+        //
+        // OTHER TABS:
+        //   The currently selected destination is highlighted.
         // -------------------------------------------------------
         bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(
             height: 72,
+
+            // -------------------------------------------------
+            // IMPORTANT:
+            // Hide the NavigationBar selection indicator while
+            // Dashboard/Home is active.
+            //
+            // When a real tab is selected, the normal indicator
+            // appears again.
+            // -------------------------------------------------
+            indicatorColor: isHome
+                ? Colors.transparent
+                : activeAccent.withValues(alpha: 0.15),
 
             labelTextStyle:
                 WidgetStateProperty.resolveWith<TextStyle>(
@@ -670,10 +716,15 @@ class _MainDashboardContainerState
           child: NavigationBar(
             height: 72,
 
-            // Flutter's NavigationBar requires a selectedIndex.
-            // We use 0 internally on Home, but the theme above
-            // prevents Market Rates from visually appearing
-            // selected while Home is active.
+            // -------------------------------------------------
+            // Flutter requires a valid selectedIndex.
+            //
+            // We keep 0 internally while Home is active, but:
+            // - indicator is transparent
+            // - selected icon/text are muted
+            //
+            // Therefore Market Rates does NOT look selected.
+            // -------------------------------------------------
             selectedIndex: isHome ? 0 : currentIndex,
 
             onDestinationSelected: (index) {
