@@ -1,74 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kabadiwala - Recycler Facility Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              900: '#064e3b',
+              950: '#022c22'
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-6 font-sans">
-  <div class="max-w-7xl mx-auto space-y-6">
+<body class="bg-[#090d16] text-slate-100 min-h-screen font-sans selection:bg-emerald-500 selection:text-slate-950 antialiased">
+  
+  <!-- Subtle Background Glows -->
+  <div class="fixed top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
 
     <!-- Header & Auth Bar -->
-    <header class="flex flex-wrap justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-xl shadow">
-      <div>
-        <h1 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
-          <span>♻️</span> Recycler Facility Operator Portal
-        </h1>
-        <p class="text-xs text-slate-400">Live Matching, Physical Handshake & Certified Weighbridge Settlement</p>
+    <header class="relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 p-6 rounded-2xl shadow-2xl shadow-black/40 gap-4">
+      <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-blue-500/5 pointer-events-none"></div>
+      
+      <div class="relative z-10 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-2xl">
+          ♻️
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+            Recycler Facility Operator Portal
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Live Matching, Physical Handshake & Certified Weighbridge Settlement</p>
+        </div>
       </div>
 
-      <div id="authBar" class="flex items-center gap-2 mt-3 sm:mt-0">
-        <input id="recEmail" type="email" value="mahanadi@demo.kabadiwala" class="bg-slate-950 border border-slate-700 px-3 py-1.5 rounded text-xs text-slate-200 focus:outline-none focus:border-emerald-500" placeholder="Email" />
-        <input id="recPass" type="password" value="recycle123" class="bg-slate-950 border border-slate-700 px-3 py-1.5 rounded text-xs text-slate-200 focus:outline-none focus:border-emerald-500" placeholder="Password" />
-        <button onclick="loginRecycler()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3 py-1.5 rounded transition">
-          Authenticate
+      <div id="authBar" class="relative z-10 flex flex-wrap items-center gap-2.5 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-slate-800">
+        <div class="relative flex-1 sm:flex-initial">
+          <input id="recEmail" type="email" value="mahanadi@demo.kabadiwala" class="w-full sm:w-52 bg-slate-950/80 border border-slate-700/80 px-3.5 py-2 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition shadow-inner" placeholder="Email" />
+        </div>
+        <div class="relative flex-1 sm:flex-initial">
+          <input id="recPass" type="password" value="recycle123" class="w-full sm:w-40 bg-slate-950/80 border border-slate-700/80 px-3.5 py-2 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition shadow-inner" placeholder="Password" />
+        </div>
+        <button onclick="loginRecycler()" class="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center justify-center gap-1.5">
+          <span>Authenticate</span>
         </button>
       </div>
     </header>
 
     <!-- Notification Toast -->
-    <div id="toast" class="hidden p-3 rounded-lg text-xs font-semibold shadow"></div>
+    <div id="toast" class="hidden fixed bottom-6 right-6 z-50 p-4 rounded-xl text-xs font-semibold shadow-2xl backdrop-blur-md transition-all duration-300 animate-bounce"></div>
 
     <!-- Main Workspace -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8">
 
       <!-- Left 2 Columns: Opportunities Feed & Claimed Worklist -->
       <div class="lg:col-span-2 space-y-6">
 
         <!-- Feed 1: Broadcast Opportunities -->
-        <div class="space-y-3">
-          <div class="flex justify-between items-center">
-            <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <span>📡</span> Live Broadcast Opportunities (Top-3 Match)
-              <span id="oppCount" class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-full">0</span>
+        <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-800/80">
+            <h2 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2.5">
+              <span class="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">📡</span> Live Broadcast Opportunities (Top-3 Match)
+              <span id="oppCount" class="bg-blue-500/20 text-blue-300 font-mono text-xs px-2.5 py-0.5 rounded-full border border-blue-500/30">0</span>
             </h2>
-            <button onclick="loadOpportunities()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs px-2.5 py-1 rounded transition">
-              Refresh Feed
+            <button onclick="loadOpportunities()" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 active:scale-95">
+              <span>🔄</span> Refresh Feed
             </button>
           </div>
           <div id="oppContainer" class="space-y-3">
-            <div class="p-6 text-center text-slate-500 text-xs bg-slate-900/60 rounded-xl border border-slate-800/80">
-              Sign in to view active scrap broadcasting in your area.
+            <div class="p-8 text-center text-slate-500 text-xs bg-slate-950/50 rounded-xl border border-slate-800/50 flex flex-col items-center justify-center gap-2">
+              <span class="text-2xl">🔒</span>
+              <span>Sign in to view active scrap broadcasting in your area.</span>
             </div>
           </div>
         </div>
 
         <!-- Feed 2: Claimed Lots Worklist -->
-        <div class="space-y-3">
-          <div class="flex justify-between items-center">
-            <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <span>📋</span> Claimed Pickup Worklist
-              <span id="claimedCount" class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-full">0</span>
+        <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-800/80">
+            <h2 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2.5">
+              <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">📋</span> Claimed Pickup Worklist
+              <span id="claimedCount" class="bg-emerald-500/20 text-emerald-300 font-mono text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/30">0</span>
             </h2>
-            <button onclick="loadClaimedLots()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs px-2.5 py-1 rounded transition">
-              Refresh Lots
+            <button onclick="loadClaimedLots()" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 active:scale-95">
+              <span>🔄</span> Refresh Lots
             </button>
           </div>
           <div id="claimedContainer" class="space-y-3">
-            <div class="p-6 text-center text-slate-500 text-xs bg-slate-900/60 rounded-xl border border-slate-800/80">
-              No claimed lots currently assigned.
+            <div class="p-8 text-center text-slate-500 text-xs bg-slate-950/50 rounded-xl border border-slate-800/50 flex flex-col items-center justify-center gap-2">
+              <span class="text-2xl">📦</span>
+              <span>No claimed lots currently assigned.</span>
             </div>
           </div>
         </div>
@@ -76,79 +113,90 @@
       </div>
 
       <!-- Right Column: Step Handshake Execution Deck -->
-      <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-5 h-fit shadow">
-        <h2 class="text-sm font-bold text-slate-200 pb-3 border-b border-slate-800 flex items-center gap-2">
-          <span>⚙️</span> Physical Lot Processing Deck
+      <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl space-y-6 h-fit shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+        <h2 class="text-sm sm:text-base font-bold text-slate-100 pb-3 border-b border-slate-800 flex items-center gap-2.5">
+          <span class="p-1.5 rounded-lg bg-purple-500/10 text-purple-400">⚙️</span> Physical Lot Processing Deck
         </h2>
 
         <!-- Active Lot Context Card -->
-        <div id="activeContextCard" class="text-xs text-slate-400 bg-slate-950 p-3 rounded-lg border border-slate-800">
+        <div id="activeContextCard" class="text-xs text-slate-400 bg-slate-950/80 p-4 rounded-xl border border-slate-800/80 shadow-inner">
           Select a claimed lot from the worklist to operate physical check-in.
         </div>
 
         <!-- Step 5: QR Handshake -->
-        <div id="stepVerifySection" class="space-y-2 opacity-40 pointer-events-none transition">
+        <div id="stepVerifySection" class="space-y-2.5 opacity-40 pointer-events-none transition duration-300">
           <div class="flex justify-between items-center">
-            <span class="text-xs font-bold text-slate-300">Step 5: Physical QR Handshake</span>
-            <span class="text-[10px] text-blue-400 font-mono">POST /qr/verify</span>
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px] font-mono border border-blue-500/30">1</span>
+              Physical QR Handshake
+            </span>
+            <span class="text-[10px] text-blue-400 font-mono bg-blue-950/60 px-2 py-0.5 rounded border border-blue-800/50">POST /qr/verify</span>
           </div>
-          <input id="qrTokenInput" type="text" placeholder="Paste or scan collector's QR token" class="w-full bg-slate-950 border border-slate-700 px-3 py-1.5 rounded text-xs text-slate-200 font-mono focus:outline-none focus:border-blue-500" />
-          <button onclick="verifyHandshake()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs py-2 rounded transition">
+          <input id="qrTokenInput" type="text" placeholder="Paste or scan collector's QR token" class="w-full bg-slate-950 border border-slate-700/80 px-3.5 py-2 rounded-xl text-xs text-slate-200 font-mono focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-inner" />
+          <button onclick="verifyHandshake()" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold text-xs py-2.5 rounded-xl shadow-lg shadow-blue-600/25 transition active:scale-95">
             Verify QR (Open Weighing Session)
           </button>
         </div>
 
         <!-- Step 6-7: Weighbridge Form -->
-        <div id="stepWeighSection" class="space-y-2 opacity-40 pointer-events-none transition">
+        <div id="stepWeighSection" class="space-y-2.5 opacity-40 pointer-events-none transition duration-300">
           <div class="flex justify-between items-center">
-            <span class="text-xs font-bold text-slate-300">Step 6–7: Weighbridge & Pricing</span>
-            <span class="text-[10px] text-amber-400 font-mono">POST /weighbridge</span>
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-mono border border-amber-500/30">2</span>
+              Weighbridge & Pricing
+            </span>
+            <span class="text-[10px] text-amber-400 font-mono bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/50">POST /weighbridge</span>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <span class="text-[10px] text-slate-400">Scale Weight (kg)</span>
-              <input id="scaleWeight" type="number" step="0.1" value="12.5" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 rounded text-xs text-slate-200 font-bold focus:outline-none focus:border-amber-500" />
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <span class="text-[10px] text-slate-400 font-medium">Scale Weight (kg)</span>
+              <input id="scaleWeight" type="number" step="0.1" value="12.5" class="w-full bg-slate-950 border border-slate-700/80 px-3 py-2 rounded-xl text-xs text-slate-200 font-bold focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition shadow-inner" />
             </div>
-            <div>
-              <span class="text-[10px] text-slate-400">Offered Rate (₹/kg)</span>
-              <input id="scaleRate" type="number" step="1" value="220" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 rounded text-xs text-slate-200 font-bold focus:outline-none focus:border-amber-500" />
+            <div class="space-y-1">
+              <span class="text-[10px] text-slate-400 font-medium">Offered Rate (₹/kg)</span>
+              <input id="scaleRate" type="number" step="1" value="220" class="w-full bg-slate-950 border border-slate-700/80 px-3 py-2 rounded-xl text-xs text-slate-200 font-bold focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition shadow-inner" />
             </div>
           </div>
-          <button onclick="submitWeighbridge()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs py-2 rounded transition">
+          <button onclick="submitWeighbridge()" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-semibold text-xs py-2.5 rounded-xl shadow-lg shadow-amber-600/25 transition active:scale-95">
             Push Weighbridge Readings to Mobile
           </button>
         </div>
 
         <!-- Step 9: Proximity Cash Receipt QR Display -->
-        <div id="stepCashQrSection" class="space-y-3 opacity-40 pointer-events-none transition">
+        <div id="stepCashQrSection" class="space-y-3 opacity-40 pointer-events-none transition duration-300">
           <div class="flex justify-between items-center">
-            <span class="text-xs font-bold text-slate-300">Step 9: Cash Receipt Handshake</span>
-            <span class="text-[10px] text-emerald-400 font-mono">Display QR</span>
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono border border-emerald-500/30">3</span>
+              Cash Receipt Handshake
+            </span>
+            <span class="text-[10px] text-emerald-400 font-mono bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/50">Display QR</span>
           </div>
-          <p class="text-[11px] text-slate-400">Hand physical cash to the collector, then have them scan this verification QR from their app.</p>
-          <div class="bg-white p-3 rounded-lg flex justify-center items-center mx-auto w-44 h-44 shadow" id="qrContainer">
-            <span class="text-slate-400 text-xs">Awaiting weighbridge</span>
+          <p class="text-[11px] text-slate-400 leading-relaxed">Hand physical cash to the collector, then have them scan this verification QR from their app.</p>
+          <div class="bg-white p-4 rounded-xl flex flex-col justify-center items-center mx-auto w-44 h-44 shadow-2xl border border-slate-200" id="qrContainer">
+            <span class="text-slate-400 text-xs text-center font-medium">Awaiting weighbridge</span>
           </div>
-          <div id="qrAmountTag" class="text-center font-bold text-emerald-400 text-xs"></div>
+          <div id="qrAmountTag" class="text-center font-extrabold text-emerald-400 text-xs tracking-wide"></div>
         </div>
 
         <!-- Step 10: Complete & Seal -->
-        <div id="stepCompleteSection" class="space-y-2 opacity-40 pointer-events-none transition border-t border-slate-800 pt-3">
-          <button onclick="sealLot()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs py-2 rounded transition flex items-center justify-center gap-2">
+        <div id="stepCompleteSection" class="space-y-2 opacity-40 pointer-events-none transition duration-300 border-t border-slate-800 pt-4">
+          <button onclick="sealLot()" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-xs py-3 rounded-xl shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center justify-center gap-2">
             <span>🛡️</span> Complete & Generate Form-6 Manifest
           </button>
         </div>
 
         <!-- CPCB Compliance & Exports -->
-        <div class="space-y-2 border-t border-slate-800 pt-3">
-          <span class="text-xs font-bold text-slate-300">CPCB Compliance Documents</span>
+        <div class="space-y-2.5 border-t border-slate-800 pt-4">
+          <span class="text-xs font-bold text-slate-300 block">CPCB Compliance Documents</span>
           
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="downloadForm6Csv()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 px-2 rounded border border-slate-700 font-semibold transition flex items-center justify-center gap-1.5">
+          <div class="grid grid-cols-2 gap-2.5">
+            <button onclick="downloadForm6Csv()" class="bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs py-2.5 px-3 rounded-xl border border-slate-700/80 font-semibold transition flex items-center justify-center gap-2 active:scale-95 shadow-sm">
               <span>📄</span> Form-6 CSV
             </button>
 
-            <button onclick="downloadTraceabilityCsv()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 px-2 rounded border border-slate-700 font-semibold transition flex items-center justify-center gap-1.5">
+            <button onclick="downloadTraceabilityCsv()" class="bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs py-2.5 px-3 rounded-xl border border-slate-700/80 font-semibold transition flex items-center justify-center gap-2 active:scale-95 shadow-sm">
               <span>📊</span> EPR Traceability
             </button>
           </div>
@@ -172,7 +220,7 @@
 
     function showToast(msg, isError = false) {
       const el = document.getElementById('toast');
-      el.className = `p-3 rounded-lg text-xs font-semibold ${isError ? 'bg-red-950 text-red-300 border border-red-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}`;
+      el.className = `fixed bottom-6 right-6 z-50 p-4 rounded-xl text-xs font-semibold shadow-2xl backdrop-blur-md transition-all duration-300 ${isError ? 'bg-red-950/90 text-red-300 border border-red-800/80 shadow-red-950/50' : 'bg-emerald-950/90 text-emerald-300 border border-emerald-800/80 shadow-emerald-950/50'}`;
       el.innerText = msg;
       el.classList.remove('hidden');
       setTimeout(() => el.classList.add('hidden'), 5000);
@@ -181,11 +229,13 @@
     function updateAuthUI() {
       if (token) {
         document.getElementById('authBar').innerHTML = `
-          <span class="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            Authenticated Recycler
-          </span>
-          <button onclick="logout()" class="text-xs text-slate-400 hover:text-slate-200 underline ml-2">Logout</button>
+          <div class="flex items-center justify-between w-full md:w-auto gap-4 bg-slate-950/60 border border-slate-800 px-4 py-2 rounded-xl">
+            <span class="inline-flex items-center gap-2 text-xs text-emerald-400 font-semibold">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400/50"></span>
+              Authenticated Recycler
+            </span>
+            <button onclick="logout()" class="text-xs text-slate-400 hover:text-slate-200 font-medium underline transition">Logout</button>
+          </div>
         `;
       }
     }
@@ -258,26 +308,26 @@
 
         const container = document.getElementById('oppContainer');
         if (!items.length) {
-          container.innerHTML = `<div class="p-6 text-center text-slate-600 text-xs bg-slate-900/60 rounded-xl border border-slate-800">No active broadcast opportunities right now.</div>`;
+          container.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs bg-slate-950/50 rounded-xl border border-slate-800/50">No active broadcast opportunities right now.</div>`;
           return;
         }
 
         container.innerHTML = items.map(entry => {
           const lot = entry.lot || entry;
           return `
-            <div class="p-4 rounded-xl border border-slate-800 bg-slate-900 flex justify-between items-center hover:border-slate-700 transition">
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
+            <div class="p-4 rounded-xl border border-slate-800/80 bg-slate-950/60 hover:bg-slate-950 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:border-slate-700 transition shadow-sm">
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2.5">
                   <span class="font-bold text-sm text-slate-100">${lot.material_category}</span>
-                  <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase bg-blue-950 text-blue-300 border border-blue-800">${lot.status}</span>
+                  <span class="text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider bg-blue-950 text-blue-300 border border-blue-800/60">${lot.status}</span>
                 </div>
-                <div class="text-xs text-slate-400 flex gap-4">
+                <div class="text-xs text-slate-400 flex flex-wrap gap-4">
                   <span>Weight: <b class="text-slate-200">${lot.estimated_weight_kg} kg</b></span>
                   <span>City: <b class="text-slate-200">${lot.city || 'Cuttack'}</b></span>
                   <span>ID: <span class="font-mono text-slate-300 text-[11px]">${lot.id.slice(0, 8)}...</span></span>
                 </div>
               </div>
-              <button onclick='claimLot("${lot.id}")' class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3 py-1.5 rounded transition">
+              <button onclick='claimLot("${lot.id}")' class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 py-2 rounded-xl transition shadow-md shadow-emerald-600/20 active:scale-95 flex items-center justify-center gap-1.5">
                 Accept & Claim (30m)
               </button>
             </div>
@@ -301,25 +351,25 @@
 
         const container = document.getElementById('claimedContainer');
         if (!lots.length) {
-          container.innerHTML = `<div class="p-6 text-center text-slate-600 text-xs bg-slate-900/60 rounded-xl border border-slate-800">No active claimed lots.</div>`;
+          container.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs bg-slate-950/50 rounded-xl border border-slate-800/50">No active claimed lots.</div>`;
           return;
         }
 
         container.innerHTML = lots.map(lot => {
           const isSelected = currentLot && currentLot.id === lot.id;
           return `
-            <div class="p-4 rounded-xl border ${isSelected ? 'border-emerald-500 bg-slate-800' : 'border-slate-800 bg-slate-900'} flex justify-between items-center hover:border-slate-700 transition">
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
+            <div class="p-4 rounded-xl border ${isSelected ? 'border-emerald-500 bg-slate-800/90 shadow-lg shadow-emerald-500/10' : 'border-slate-800/80 bg-slate-950/60 hover:bg-slate-950'} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:border-slate-700 transition shadow-sm">
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2.5">
                   <span class="font-bold text-sm text-slate-100">${lot.material_category}</span>
-                  <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase ${getStatusClass(lot.status)}">${lot.status}</span>
+                  <span class="text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${getStatusClass(lot.status)}">${lot.status}</span>
                 </div>
-                <div class="text-xs text-slate-400 flex gap-4">
+                <div class="text-xs text-slate-400 flex flex-wrap gap-4">
                   <span>Weight: <b class="text-slate-200">${lot.estimated_weight_kg} kg</b></span>
                   <span>ID: <span class="font-mono text-slate-300 text-[11px]">${lot.id.slice(0, 10)}...</span></span>
                 </div>
               </div>
-              <button onclick='selectLot(${JSON.stringify(lot).replace(/'/g, "&apos;")})' class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded border border-slate-700 font-semibold transition">
+              <button onclick='selectLot(${JSON.stringify(lot).replace(/'/g, "&apos;")})' class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-4 py-2 rounded-xl border border-slate-700 font-semibold transition active:scale-95 flex items-center justify-center gap-1.5 shadow-sm">
                 Load Deck →
               </button>
             </div>
@@ -332,12 +382,12 @@
 
     function getStatusClass(status) {
       switch (status) {
-        case 'LOCKED': return 'bg-amber-950 text-amber-300 border border-amber-800';
-        case 'SESSION_OPEN': return 'bg-blue-950 text-blue-300 border border-blue-800';
-        case 'WEIGHED': return 'bg-purple-950 text-purple-300 border border-purple-800';
-        case 'CONSENTED': return 'bg-teal-950 text-teal-300 border border-teal-800';
-        case 'VERIFIED_COMPLETED': return 'bg-emerald-950 text-emerald-300 border border-emerald-800';
-        default: return 'bg-slate-800 text-slate-300';
+        case 'LOCKED': return 'bg-amber-950 text-amber-300 border border-amber-800/60';
+        case 'SESSION_OPEN': return 'bg-blue-950 text-blue-300 border border-blue-800/60';
+        case 'WEIGHED': return 'bg-purple-950 text-purple-300 border border-purple-800/60';
+        case 'CONSENTED': return 'bg-teal-950 text-teal-300 border border-teal-800/60';
+        case 'VERIFIED_COMPLETED': return 'bg-emerald-950 text-emerald-300 border border-emerald-800/60';
+        default: return 'bg-slate-800 text-slate-300 border border-slate-700';
       }
     }
 
@@ -345,11 +395,11 @@
       currentLot = lot;
 
       document.getElementById('activeContextCard').innerHTML = `
-        <div class="font-bold text-slate-200 text-sm">${lot.material_category}</div>
-        <div class="font-mono text-[10px] text-slate-400 mt-0.5">Lot ID: ${lot.id}</div>
-        <div class="mt-2 flex items-center gap-2">
-          <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${getStatusClass(lot.status)}">${lot.status}</span>
-          ${lot.qr_token ? `<span class="text-[10px] font-mono text-slate-400">Token: ${lot.qr_token.slice(0, 12)}...</span>` : ''}
+        <div class="font-bold text-slate-100 text-sm">${lot.material_category}</div>
+        <div class="font-mono text-[11px] text-slate-400 mt-1 truncate">Lot ID: ${lot.id}</div>
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${getStatusClass(lot.status)}">${lot.status}</span>
+          ${lot.qr_token ? `<span class="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Token: ${lot.qr_token.slice(0, 12)}...</span>` : ''}
         </div>
       `;
 
@@ -501,8 +551,8 @@
       });
       new QRCode(container, {
         text: payload,
-        width: 150,
-        height: 150,
+        width: 140,
+        height: 140,
         colorDark: "#020617",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
