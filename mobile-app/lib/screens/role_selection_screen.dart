@@ -16,7 +16,7 @@ class RoleSelectionScreen extends StatefulWidget {
   // Navigator.of(context) can correctly find the Navigator.
   final void Function(BuildContext context) onScrapCollectorSelected;
 
-  final VoidCallback onRiderSelected;
+  final void Function(BuildContext context) onRiderSelected;
 
   const RoleSelectionScreen({
     super.key,
@@ -177,6 +177,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               // SCRAP COLLECTOR
               // ==================================================
 
+              // DO NOT CHANGE THIS SECTION.
               _RoleCard(
                 icon: Icons.recycling,
                 title: _t(
@@ -192,7 +193,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                 accentColor: activeAccent,
 
                 // IMPORTANT:
-                // Pass the current screen's context.
+                // Scrap Collector flow remains exactly the same.
                 onTap: (context) {
                   widget.onScrapCollectorSelected(context);
                 },
@@ -217,8 +218,20 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   'भंगार उचला आणि पोहोचवा',
                 ),
                 accentColor: activeAccent,
-                onTap: (_) {
-                  widget.onRiderSelected();
+
+                // ==================================================
+                // RIDER NAVIGATION
+                // ==================================================
+                //
+                // When the Rider card is tapped, this directly
+                // triggers the Rider callback supplied by main.dart.
+                //
+                // main.dart then opens RiderLoginScreen.
+                //
+                onTap: (context) {
+   
+
+         widget.onRiderSelected(context);
                 },
               ),
 
@@ -335,7 +348,7 @@ class _RoleCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        // Pass the RoleCard's context to the callback.
+        // The callback is triggered when this card is tapped.
         onTap: () => onTap(context),
 
         borderRadius: BorderRadius.circular(18),
