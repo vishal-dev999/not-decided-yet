@@ -16,8 +16,8 @@ def main():
 
     DATA_DIR = os.path.join(REPO_ROOT, "datasets", "images")
     VAL_DIR = os.path.join(DATA_DIR, "val")
-    WEIGHTS_PATH = os.path.join(SCRIPT_DIR, "mobilenet_ewaste.pth")
-    LABELS_PATH = os.path.join(SCRIPT_DIR, "labels.txt")
+    WEIGHTS_PATH = os.path.join(SCRIPT_DIR, "..", "artifacts", "mobilenet_ewaste.pth")
+    LABELS_PATH = os.path.join(SCRIPT_DIR, "..", "artifacts", "labels.txt")
 
     with open(LABELS_PATH, "r") as f:
         class_names = [line.strip() for line in f if line.strip()]
