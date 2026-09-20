@@ -5,6 +5,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -85,6 +86,32 @@ app.include_router(api_router, prefix=settings.api_prefix)
 Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
 app.mount("/storage", StaticFiles(directory="storage"), name="storage")
 
+# -------------------------------------------------------------
+# Static files & Recycler Portal Web Route
+# -------------------------------------------------------------
+static_path = Path("app/static")
+if not static_path.exists():
+    static_path = Path("static")
+static_path.mkdir(parents=True, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+
+
+@app.get("/admin", include_in_schema=False)
+@app.get("/recycler", include_in_schema=False)
+@app.get("/portal", include_in_schema=False)
+async def serve_recycler_portal():
+    portal_file = static_path / "admin_portal.html"
+    if not portal_file.exists():
+        portal_file = static_path / "recycler_portal.html"
+    
+    if portal_file.exists():
+        return FileResponse(str(portal_file))
+    return {
+        "ok": False,
+        "error": f"admin_portal.html not found in {static_path.resolve()}",
+    }
+
 
 @app.get("/health", tags=["Auth"])
 def health():
@@ -98,6 +125,7 @@ def root():
         "service": settings.app_name,
         "docs": "/docs",
         "redoc": "/redoc",
+        "admin_portal": "/admin",
         "api": settings.api_prefix,
         "health": "/health",
         "websocket_collector": f"{settings.api_prefix}/ws/collector?token=<JWT>",
