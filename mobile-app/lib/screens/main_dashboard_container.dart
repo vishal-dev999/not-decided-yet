@@ -1,15 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../constants/app_enums.dart';
 import '../main.dart';
 import '../services/storage_service.dart';
-import '../themes/app_colors.dart';
 import '../themes/app_theme.dart';
 import '../widgets/animated_bell_icon.dart';
-import '../widgets/theme_switch_button.dart';
 
 import 'classify_bulk_screen.dart';
 import 'safety_screen.dart';
@@ -21,7 +17,6 @@ import 'tabs/dashboard_tab.dart';
 import 'tabs/payment_tab.dart';
 import 'tabs/pickup_tab.dart';
 import 'tabs/pickup_upload_tab.dart';
-import 'tabs/recy_chatbot_sheet.dart';
 
 class MainDashboardContainer extends StatefulWidget {
   final String collectorName;
@@ -53,23 +48,13 @@ class _MainDashboardContainerState
   late String collectorName;
   late String location;
 
-  // 0 = Market Rates
-  // 1 = My Lots
-  // 2 = Payment
-  // 3 = Recyclers
-  // 4 = Classify
   int currentIndex = 0;
-
-  // Dashboard is now the Home screen.
   bool isHome = true;
 
   String paymentPreference = 'Cash';
   String? profileImagePath;
   String? uploadedPickupPath;
 
-  // -----------------------------------------------------------
-  // HOME / MENU ANIMATION
-  // -----------------------------------------------------------
   late AnimationController _homeMenuAnimationController;
   late Animation<double> _homeMenuScale;
   late Animation<double> _homeMenuRotation;
@@ -82,21 +67,12 @@ class _MainDashboardContainerState
     collectorName = widget.collectorName;
     location = widget.location;
 
-    paymentPreference =
-        widget.storage.paymentPreference ?? 'Cash';
+    paymentPreference = widget.storage.paymentPreference ?? 'Cash';
 
-    profileImagePath =
-        widget.storage.profileImagePath;
+    profileImagePath = widget.storage.profileImagePath;
 
-    uploadedPickupPath =
-        widget.storage.pickupImagePath;
+    uploadedPickupPath = widget.storage.pickupImagePath;
 
-    // ---------------------------------------------------------
-    // Three-line menu animation.
-    //
-    // This gives the hamburger button a quick scale + rotation
-    // animation whenever Home is opened.
-    // ---------------------------------------------------------
     _homeMenuAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
@@ -122,7 +98,6 @@ class _MainDashboardContainerState
       ),
     );
 
-    // Animate the Home/menu button when the dashboard starts.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _animateHomeMenu();
@@ -146,9 +121,6 @@ class _MainDashboardContainerState
     await _homeMenuAnimationController.reverse();
   }
 
-  // -----------------------------------------------------------
-  // HOME
-  // -----------------------------------------------------------
   String get homeText {
     switch (currentLanguage) {
       case AppLanguage.english:
@@ -178,7 +150,6 @@ class _MainDashboardContainerState
       case AppLanguage.marathi:
         return 'बाजार दर';
       case AppLanguage.english:
-      default:
         return 'Market Rates';
     }
   }
@@ -249,9 +220,6 @@ class _MainDashboardContainerState
     }
   }
 
-  // -----------------------------------------------------------
-  // CLASSIFY MODAL
-  // -----------------------------------------------------------
   void _showClassifyOptionsModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -266,9 +234,9 @@ class _MainDashboardContainerState
           child: Wrap(
             children: [
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.center_focus_strong,
-                  color: AppColors.primaryGold,
+                  color: AppThemeColors.primary(context),
                 ),
                 title: Text(classifyScrapText),
                 subtitle: const Text(
@@ -286,7 +254,6 @@ class _MainDashboardContainerState
               ListTile(
                 leading: const Icon(
                   Icons.apps,
-                  color: AppColors.primaryGold,
                 ),
                 title: Text(classifyBulkText),
                 subtitle: const Text(
@@ -321,52 +288,36 @@ class _MainDashboardContainerState
     );
   }
 
-  // -----------------------------------------------------------
-  // MARKET RATES
-  // -----------------------------------------------------------
-  void _openMarketRates() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MarketRatesTab(
-          language: currentLanguage,
-        ),
-      ),
-    );
-  }
-
-  // -----------------------------------------------------------
-  // GO HOME
-  // -----------------------------------------------------------
   void _goHome() {
     setState(() {
       isHome = true;
     });
 
-    // Quick hamburger/menu highlight animation.
     _animateHomeMenu();
+  }
+
+  void _selectBottomTab(int index) {
+    if (index == 4) {
+      _showClassifyOptionsModal(context);
+      return;
+    }
+
+    setState(() {
+      isHome = false;
+      currentIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final activeAccent =
-        AppThemeColors.isDark(context)
-            ? AppColors.primaryGold
-            : AppColors.featherGreen;
+    final activeAccent = AppThemeColors.primary(context);
 
-    // -------------------------------------------------------
-    // HOME / DASHBOARD
-    // -------------------------------------------------------
     final dashboard = DashboardTab(
       language: currentLanguage,
       storage: widget.storage,
       onNavigateTab: (index) {
         if (index == 4) {
           _showClassifyOptionsModal(context);
-        } else if (index == 0) {
-          // Rates shortcut on Home continues to open
-          // the complete Market Rates page.
-          _openMarketRates();
         } else {
           setState(() {
             isHome = false;
@@ -376,29 +327,22 @@ class _MainDashboardContainerState
       },
     );
 
-    // -------------------------------------------------------
-    // BOTTOM NAVIGATION TABS
-    // -------------------------------------------------------
     final tabs = [
       MarketRatesTab(
         language: currentLanguage,
       ),
-
       PickupTab(
         language: currentLanguage,
       ),
-
       PaymentTab(
         language: currentLanguage,
         paymentPreference: paymentPreference,
         onPaymentPreferenceChanged: _changePayment,
         storage: widget.storage,
       ),
-
       RecyclerNearbyScreen(
         language: currentLanguage,
       ),
-
       PickupUploadTab(
         savedPhotoPath: uploadedPickupPath,
         storage: widget.storage,
@@ -411,31 +355,9 @@ class _MainDashboardContainerState
       ),
     ];
 
-    // -------------------------------------------------------
-    // HOME MENU HIGHLIGHT
-    // -------------------------------------------------------
-    //
-    // When Home is active:
-    //   - Hamburger button gets highlighted.
-    //   - Bottom taskbar has NO highlighted destination.
-    //
-    // When another tab is active:
-    //   - Hamburger returns to normal.
-    //   - The selected taskbar destination is highlighted.
-    //
     final bool homeIsHighlighted = isHome;
 
     return PopScope(
-      // -------------------------------------------------------
-      // BACK BUTTON BEHAVIOR
-      // -------------------------------------------------------
-      //
-      // If already on Home:
-      //     normal system back behavior.
-      //
-      // If inside any taskbar tab:
-      //     Back -> Home/Dashboard.
-      // -------------------------------------------------------
       canPop: isHome,
       onPopInvoked: (didPop) {
         if (!didPop && !isHome) {
@@ -443,17 +365,18 @@ class _MainDashboardContainerState
             isHome = true;
           });
 
-          // Animate hamburger when returning Home.
           _animateHomeMenu();
         }
       },
-
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor:
+              Theme.of(context).scaffoldBackgroundColor,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
 
-          // ---------------------------------------------------
-          // TOP-LEFT THREE-LINE HOME BUTTON
-          // ---------------------------------------------------
+          // Small Home button instead of hamburger menu.
           leading: AnimatedBuilder(
             animation: _homeMenuAnimationController,
             builder: (context, child) {
@@ -465,14 +388,6 @@ class _MainDashboardContainerState
                 ),
               );
             },
-
-            // -------------------------------------------------
-            // HOME HIGHLIGHT
-            // -------------------------------------------------
-            //
-            // The hamburger button gets a subtle circular
-            // background when Dashboard/Home is active.
-            // -------------------------------------------------
             child: Container(
               margin: const EdgeInsets.all(7),
               decoration: BoxDecoration(
@@ -484,33 +399,26 @@ class _MainDashboardContainerState
               child: IconButton(
                 tooltip: homeText,
                 icon: Icon(
-                  Icons.menu,
+                  Icons.home_outlined,
                   color: activeAccent,
-                  size: homeIsHighlighted ? 29 : 28,
+                  size: homeIsHighlighted ? 28 : 26,
                 ),
                 onPressed: _goHome,
               ),
             ),
           ),
 
-          title: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.recycling,
-                  color: activeAccent,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'ReNova',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: activeAccent,
-                  ),
-                ),
-              ],
+          // Larger RecyLink logo and name.
+          title: Padding(
+            padding: const EdgeInsets.only(left: 2),
+            child: Image.asset(
+              widget.themeMode == ReNovaThemeMode.dark
+                  ? 'assets/images/recy_link_logo_dark.jpeg'
+                  : 'assets/images/recy_link_logo.png',
+              width: 185,
+              height: 62,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
             ),
           ),
 
@@ -558,33 +466,26 @@ class _MainDashboardContainerState
                       profileImagePath: profileImagePath,
                       paymentPreference: paymentPreference,
                       themeMode: widget.themeMode,
-                      onThemeChanged:
-                          widget.onThemeChanged,
+                      onThemeChanged: widget.onThemeChanged,
                       storage: widget.storage,
-                      onLanguageChanged:
-                          (lang) async {
+                      onLanguageChanged: (lang) async {
                         setState(() {
                           currentLanguage = lang;
                         });
 
-                        await widget.storage.prefs
-                            .setString(
+                        await widget.storage.prefs.setString(
                           'language',
                           lang.name,
                         );
 
                         final appState = context
-                            .findAncestorStateOfType<
-                                ReNovaAppState>();
+                            .findAncestorStateOfType<ReNovaAppState>();
 
                         if (appState != null) {
-                          await appState.changeLanguage(
-                            lang,
-                          );
+                          await appState.changeLanguage(lang);
                         }
                       },
-                      onProfileUpdated:
-                          (
+                      onProfileUpdated: (
                         newName,
                         newLoc,
                         newPay,
@@ -618,228 +519,183 @@ class _MainDashboardContainerState
             AnimatedBellIconButton(
               onPressed: _showNotifications,
             ),
-
-            themeSwitchButton(
-              context,
-              widget.themeMode,
-              widget.onThemeChanged,
-            ),
           ],
         ),
 
-        // -------------------------------------------------------
-        // BODY
-        // -------------------------------------------------------
         body: AnimatedSwitcher(
-          duration: const Duration(
-            milliseconds: 300,
-          ),
+          duration: const Duration(milliseconds: 300),
           child: isHome
               ? dashboard
               : tabs[currentIndex],
         ),
 
-        // -------------------------------------------------------
-        // BOTTOM TASKBAR
-        // -------------------------------------------------------
-        //
-        // Market Rates | My Lots | Payment | Recyclers | Classify
-        //
-        // HOME:
-        //   No taskbar destination is visually highlighted.
-        //
-        // OTHER TABS:
-        //   The currently selected destination is highlighted.
-        // -------------------------------------------------------
-        bottomNavigationBar: NavigationBarTheme(
-          data: NavigationBarThemeData(
-            height: 72,
+        // ------------------------------------------------------------
+        // RIDER DASHBOARD STYLE BOTTOM TASKBAR
+        // ------------------------------------------------------------
+        bottomNavigationBar: _buildBottomNavigationBar(
+          AppThemeColors.card(context),
+          activeAccent,
+          Theme.of(context).textTheme.bodyLarge?.color ??
+              Colors.black,
+          AppThemeColors.muted(context),
+        ),
+      ),
+    );
+  }
 
-            // -------------------------------------------------
-            // IMPORTANT:
-            // Hide the NavigationBar selection indicator while
-            // Dashboard/Home is active.
-            //
-            // When a real tab is selected, the normal indicator
-            // appears again.
-            // -------------------------------------------------
-            indicatorColor: isHome
-                ? Colors.transparent
-                : activeAccent.withValues(alpha: 0.15),
-
-            labelTextStyle:
-                WidgetStateProperty.resolveWith<TextStyle>(
-              (states) {
-                final selected =
-                    states.contains(
-                  WidgetState.selected,
-                );
-
-                // When on Home, suppress selected styling.
-                final shouldHighlight =
-                    !isHome && selected;
-
-                return TextStyle(
-                  fontSize: 11,
-                  fontWeight: shouldHighlight
-                      ? FontWeight.w700
-                      : FontWeight.w500,
-                  height: 1.0,
-                );
-              },
+  // ------------------------------------------------------------------
+  // BOTTOM NAVIGATION BAR
+  // Same visual design/proportions as Rider Dashboard.
+  // Existing 5 Main Dashboard destinations are preserved.
+  // ------------------------------------------------------------------
+  Widget _buildBottomNavigationBar(
+    Color cardColor,
+    Color primaryColor,
+    Color textColor,
+    Color secondaryTextColor,
+  ) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(
+          12,
+          0,
+          12,
+          10,
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 6,
+          vertical: 7,
+        ),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(
+                alpha: 0.07,
+              ),
+              blurRadius: 18,
+              offset: const Offset(0, 5),
             ),
-
-            iconTheme:
-                WidgetStateProperty.resolveWith<IconThemeData>(
-              (states) {
-                final selected =
-                    states.contains(
-                  WidgetState.selected,
-                );
-
-                // When on Home, suppress selected styling.
-                final shouldHighlight =
-                    !isHome && selected;
-
-                return IconThemeData(
-                  size: shouldHighlight ? 22 : 21,
-                  color: shouldHighlight
-                      ? activeAccent
-                      : AppThemeColors.muted(
-                          context,
-                        ),
-                );
-              },
+          ],
+        ),
+        child: Row(
+          children: [
+            _bottomNavItem(
+              index: 0,
+              icon: Icons.trending_up_outlined,
+              activeIcon: Icons.trending_up,
+              label: ratesText,
+              primaryColor: primaryColor,
+              textColor: textColor,
+              secondaryTextColor: secondaryTextColor,
             ),
+            _bottomNavItem(
+              index: 1,
+              icon: Icons.inventory_2_outlined,
+              activeIcon: Icons.inventory_2,
+              label: pickupText,
+              primaryColor: primaryColor,
+              textColor: textColor,
+              secondaryTextColor: secondaryTextColor,
+            ),
+            _bottomNavItem(
+              index: 2,
+              icon: Icons.account_balance_wallet_outlined,
+              activeIcon: Icons.account_balance_wallet,
+              label: paymentText,
+              primaryColor: primaryColor,
+              textColor: textColor,
+              secondaryTextColor: secondaryTextColor,
+            ),
+            _bottomNavItem(
+              index: 3,
+              icon: Icons.recycling_outlined,
+              activeIcon: Icons.recycling,
+              label: recyclerNearbyText,
+              primaryColor: primaryColor,
+              textColor: textColor,
+              secondaryTextColor: secondaryTextColor,
+            ),
+            _bottomNavItem(
+              index: 4,
+              icon: Icons.auto_awesome_outlined,
+              activeIcon: Icons.auto_awesome,
+              label: classifyText,
+              primaryColor: primaryColor,
+              textColor: textColor,
+              secondaryTextColor: secondaryTextColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomNavItem({
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required Color primaryColor,
+    required Color textColor,
+    required Color secondaryTextColor,
+  }) {
+    final isSelected = !isHome && currentIndex == index;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _selectBottomTab(index),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(
+            vertical: 7,
+            horizontal: 5,
           ),
-
-          child: NavigationBar(
-            height: 72,
-
-            // -------------------------------------------------
-            // Flutter requires a valid selectedIndex.
-            //
-            // We keep 0 internally while Home is active, but:
-            // - indicator is transparent
-            // - selected icon/text are muted
-            //
-            // Therefore Market Rates does NOT look selected.
-            // -------------------------------------------------
-            selectedIndex: isHome ? 0 : currentIndex,
-
-            onDestinationSelected: (index) {
-              // -------------------------------------------------
-              // MARKET RATES
-              // -------------------------------------------------
-              if (index == 0) {
-                setState(() {
-                  isHome = false;
-                  currentIndex = 0;
-                });
-              }
-
-              // -------------------------------------------------
-              // MY LOTS
-              // -------------------------------------------------
-              else if (index == 1) {
-                setState(() {
-                  isHome = false;
-                  currentIndex = 1;
-                });
-              }
-
-              // -------------------------------------------------
-              // PAYMENT
-              // -------------------------------------------------
-              else if (index == 2) {
-                setState(() {
-                  isHome = false;
-                  currentIndex = 2;
-                });
-              }
-
-              // -------------------------------------------------
-              // RECYCLERS
-              // -------------------------------------------------
-              else if (index == 3) {
-                setState(() {
-                  isHome = false;
-                  currentIndex = 3;
-                });
-              }
-
-              // -------------------------------------------------
-              // CLASSIFY
-              // -------------------------------------------------
-              else if (index == 4) {
-                _showClassifyOptionsModal(context);
-              }
-            },
-
-            destinations: [
-              // ------------------------------------------------
-              // MARKET RATES
-              // ------------------------------------------------
-              NavigationDestination(
-                icon: const Icon(
-                  Icons.trending_up_outlined,
+          decoration: BoxDecoration(
+            color: isSelected
+                ? primaryColor.withValues(
+                    alpha: 0.12,
+                  )
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(
+                  milliseconds: 180,
                 ),
-                selectedIcon: const Icon(
-                  Icons.trending_up,
+                child: Icon(
+                  isSelected ? activeIcon : icon,
+                  key: ValueKey(
+                    isSelected,
+                  ),
+                  size: 21,
+                  color: isSelected
+                      ? primaryColor
+                      : secondaryTextColor,
                 ),
-                label: ratesText,
               ),
-
-              // ------------------------------------------------
-              // MY LOTS
-              // ------------------------------------------------
-              NavigationDestination(
-                icon: const Icon(
-                  Icons.inventory_2_outlined,
+              const SizedBox(height: 3),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isSelected
+                      ? primaryColor
+                      : secondaryTextColor,
+                  fontSize: 9.5,
+                  fontWeight: isSelected
+                      ? FontWeight.w800
+                      : FontWeight.w500,
                 ),
-                selectedIcon: const Icon(
-                  Icons.inventory_2,
-                ),
-                label: pickupText,
-              ),
-
-              // ------------------------------------------------
-              // PAYMENT
-              // ------------------------------------------------
-              NavigationDestination(
-                icon: const Icon(
-                  Icons.account_balance_wallet_outlined,
-                ),
-                selectedIcon: const Icon(
-                  Icons.account_balance_wallet,
-                ),
-                label: paymentText,
-              ),
-
-              // ------------------------------------------------
-              // RECYCLERS
-              // ------------------------------------------------
-              NavigationDestination(
-                icon: const Icon(
-                  Icons.recycling_outlined,
-                ),
-                selectedIcon: const Icon(
-                  Icons.recycling,
-                ),
-                label: recyclerNearbyText,
-              ),
-
-              // ------------------------------------------------
-              // CLASSIFY
-              // ------------------------------------------------
-              NavigationDestination(
-                icon: const Icon(
-                  Icons.auto_awesome_outlined,
-                ),
-                selectedIcon: const Icon(
-                  Icons.auto_awesome,
-                ),
-                label: classifyText,
               ),
             ],
           ),
@@ -870,8 +726,7 @@ class _MainDashboardContainerState
     String? imagePath = profileImagePath;
 
     if (image != null) {
-      imagePath =
-          await widget.storage.saveImagePermanently(
+      imagePath = await widget.storage.saveImagePermanently(
         image,
         'renova_profile.jpg',
       );
@@ -896,15 +751,11 @@ class _MainDashboardContainerState
   }
 
   void _showNotifications() {
-    final activeAccent =
-        AppThemeColors.isDark(context)
-            ? AppColors.primaryGold
-            : AppColors.featherGreen;
+    final activeAccent = AppThemeColors.primary(context);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor:
-          AppThemeColors.card(context),
+      backgroundColor: AppThemeColors.card(context),
       showDragHandle: true,
       builder: (context) {
         return SafeArea(
@@ -921,21 +772,17 @@ class _MainDashboardContainerState
                     color: activeAccent,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 _notificationTile(
                   Icons.local_shipping,
                   'Pickup matched',
                   'EcoRecycle Ltd is 0.8 km away.',
                 ),
-
                 _notificationTile(
                   Icons.currency_rupee,
                   'Payment received',
                   '₹1,750 added to your wallet.',
                 ),
-
                 _notificationTile(
                   Icons.auto_awesome,
                   'AI classification',
@@ -954,10 +801,7 @@ class _MainDashboardContainerState
     String title,
     String subtitle,
   ) {
-    final activeAccent =
-        AppThemeColors.isDark(context)
-            ? AppColors.primaryGold
-            : AppColors.featherGreen;
+    final activeAccent = AppThemeColors.primary(context);
 
     return ListTile(
       leading: CircleAvatar(

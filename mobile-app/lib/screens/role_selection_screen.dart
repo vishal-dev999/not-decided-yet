@@ -11,11 +11,7 @@ class RoleSelectionScreen extends StatefulWidget {
   final ReNovaThemeMode themeMode;
   final ValueChanged<ReNovaThemeMode> onThemeChanged;
 
-  // IMPORTANT:
-  // The context comes from RoleSelectionScreen itself so that
-  // Navigator.of(context) can correctly find the Navigator.
   final void Function(BuildContext context) onScrapCollectorSelected;
-
   final void Function(BuildContext context) onRiderSelected;
 
   const RoleSelectionScreen({
@@ -33,406 +29,373 @@ class RoleSelectionScreen extends StatefulWidget {
       _RoleSelectionScreenState();
 }
 
-class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
-  // ============================================================
-  // TRANSLATION
-  // ============================================================
+class _RoleSelectionScreenState
+    extends State<RoleSelectionScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late AnimationController _taglineAnimationController;
 
-  String _t(
-    String en,
-    String hi,
-    String mr,
-  ) {
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  late Animation<double> _taglineScaleAnimation;
+  late Animation<double> _taglineFadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // ------------------------------------------------
+    // MAIN SCREEN ANIMATION
+    // ------------------------------------------------
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
+    _animationController.forward();
+
+    // ------------------------------------------------
+    // PREMIUM TAGLINE ANIMATION
+    // ------------------------------------------------
+
+    _taglineAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 850),
+    );
+
+    _taglineScaleAnimation = TweenSequence<double>(
+      [
+        TweenSequenceItem(
+          tween: Tween<double>(
+            begin: 0.72,
+            end: 1.10,
+          ).chain(
+            CurveTween(
+              curve: Curves.easeOutBack,
+            ),
+          ),
+          weight: 55,
+        ),
+        TweenSequenceItem(
+          tween: Tween<double>(
+            begin: 1.10,
+            end: 0.96,
+          ).chain(
+            CurveTween(
+              curve: Curves.easeInOut,
+            ),
+          ),
+          weight: 20,
+        ),
+        TweenSequenceItem(
+          tween: Tween<double>(
+            begin: 0.96,
+            end: 1.0,
+          ).chain(
+            CurveTween(
+              curve: Curves.easeOut,
+            ),
+          ),
+          weight: 25,
+        ),
+      ],
+    ).animate(_taglineAnimationController);
+
+    _taglineFadeAnimation = CurvedAnimation(
+      parent: _taglineAnimationController,
+      curve: const Interval(
+        0.0,
+        0.55,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    Future.delayed(
+      const Duration(milliseconds: 420),
+      () {
+        if (mounted) {
+          _taglineAnimationController.forward();
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _taglineAnimationController.dispose();
+    super.dispose();
+  }
+
+  String get welcomeText {
     switch (widget.language) {
-      case AppLanguage.hindi:
-        return hi;
-
-      case AppLanguage.marathi:
-        return mr;
-
       case AppLanguage.english:
-        return en;
+        return 'Welcome to ReNova';
+      case AppLanguage.hindi:
+        return 'ReNova में आपका स्वागत है';
+      case AppLanguage.marathi:
+        return 'ReNova मध्ये आपले स्वागत आहे';
     }
   }
 
-  // ============================================================
-  // BUILD
-  // ============================================================
+  String get subtitleText {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Connect • Collect • Recycle';
+      case AppLanguage.hindi:
+        return 'Connect • Collect • Recycle';
+      case AppLanguage.marathi:
+        return 'Connect • Collect • Recycle';
+    }
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final bool isDark = AppThemeColors.isDark(context);
+  String get chooseRoleText {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Select your role';
+      case AppLanguage.hindi:
+        return 'अपनी भूमिका चुनें';
+      case AppLanguage.marathi:
+        return 'तुमची भूमिका निवडा';
+    }
+  }
 
-    final Color activeAccent = isDark
-        ? AppColors.primaryGold
-        : AppColors.featherGreen;
+  String get collectorTitle {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Scrap Collector';
+      case AppLanguage.hindi:
+        return 'कबाड़ कलेक्टर';
+      case AppLanguage.marathi:
+        return 'भंगार कलेक्टर';
+    }
+  }
 
-    final Color textColor = AppThemeColors.text(context);
+  String get collectorDescription {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Collect, classify and sell scrap at fair prices';
+      case AppLanguage.hindi:
+        return 'कबाड़ इकट्ठा करें, वर्गीकृत करें और उचित कीमत पर बेचें';
+      case AppLanguage.marathi:
+        return 'भंगार गोळा करा, वर्गीकरण करा आणि योग्य किमतीत विका';
+    }
+  }
 
-    final Color mutedColor = AppThemeColors.muted(context);
+  String get riderTitle {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Rider';
+      case AppLanguage.hindi:
+        return 'राइडर';
+      case AppLanguage.marathi:
+        return 'रायडर';
+    }
+  }
 
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 32,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 35),
+  String get riderDescription {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Pick up e-waste from collectors and deliver it to recyclers';
+      case AppLanguage.hindi:
+        return 'कलेक्टर से ई-कचरा लेकर रीसाइक्लर तक पहुंचाएं';
+      case AppLanguage.marathi:
+        return 'कलेक्टरकडून ई-कचरा घेऊन रिसायकलरपर्यंत पोहोचवा';
+    }
+  }
 
-              // ==================================================
-              // RECYCLING SYMBOL
-              // ==================================================
+  String get languageText {
+    switch (widget.language) {
+      case AppLanguage.english:
+        return 'Language';
+      case AppLanguage.hindi:
+        return 'भाषा';
+      case AppLanguage.marathi:
+        return 'भाषा';
+    }
+  }
 
-              Container(
-                width: 86,
-                height: 86,
-                decoration: BoxDecoration(
-                  color: activeAccent.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.recycling,
-                  size: 52,
-                  color: activeAccent,
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // ==================================================
-              // RECYLINK
-              // ==================================================
-
-              Text(
-                'RecyLink',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                  letterSpacing: 0.3,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                _t(
-                  'Connect. Collect. Recycle.',
-                  'जुड़ें। एकत्र करें। पुनर्चक्रण करें।',
-                  'जोडा. संकलित करा. पुनर्वापर करा.',
-                ),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: mutedColor,
-                ),
-              ),
-
-              const SizedBox(height: 55),
-
-              // ==================================================
-              // SELECT ROLE
-              // ==================================================
-
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  _t(
-                    'Select Role',
-                    'भूमिका चुनें',
-                    'भूमिका निवडा',
-                  ),
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  _t(
-                    'Choose how you want to use RecyLink',
-                    'चुनें कि आप RecyLink का उपयोग कैसे करना चाहते हैं',
-                    'तुम्हाला RecyLink कसे वापरायचे आहे ते निवडा',
-                  ),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: mutedColor,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // ==================================================
-              // SCRAP COLLECTOR
-              // ==================================================
-
-              // DO NOT CHANGE THIS SECTION.
-              _RoleCard(
-                icon: Icons.recycling,
-                title: _t(
-                  'ScrapCollector',
-                  'कबाड़ संग्राहक',
-                  'भंगार संकलक',
-                ),
-                subtitle: _t(
-                  'Collect and manage scrap pickups',
-                  'कबाड़ संग्रह और पिकअप प्रबंधित करें',
-                  'भंगार संकलन आणि पिकअप व्यवस्थापित करा',
-                ),
-                accentColor: activeAccent,
-
-                // IMPORTANT:
-                // Scrap Collector flow remains exactly the same.
-                onTap: (context) {
-                  widget.onScrapCollectorSelected(context);
-                },
-              ),
-
-              const SizedBox(height: 16),
-
-              // ==================================================
-              // RIDER
-              // ==================================================
-
-              _RoleCard(
-                icon: Icons.delivery_dining,
-                title: _t(
-                  'Rider',
-                  'राइडर',
-                  'रायडर',
-                ),
-                subtitle: _t(
-                  'Pick up and deliver scrap',
-                  'कबाड़ उठाएं और वितरित करें',
-                  'भंगार उचला आणि पोहोचवा',
-                ),
-                accentColor: activeAccent,
-
-                // ==================================================
-                // RIDER NAVIGATION
-                // ==================================================
-                //
-                // When the Rider card is tapped, this directly
-                // triggers the Rider callback supplied by main.dart.
-                //
-                // main.dart then opens RiderLoginScreen.
-                //
-                onTap: (context) {
-   
-
-         widget.onRiderSelected(context);
-                },
-              ),
-
-              const SizedBox(height: 35),
-
-              // ==================================================
-              // LANGUAGE
-              // ==================================================
-
-              Text(
-                _t(
-                  'Language',
-                  'भाषा',
-                  'भाषा',
-                ),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: mutedColor,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                children: [
-                  // ==================================================
-                  // ENGLISH
-                  // ==================================================
-
-                  _LanguageButton(
-                    label: 'English',
-                    selected:
-                        widget.language == AppLanguage.english,
-                    accentColor: activeAccent,
-                    onTap: () {
-                      widget.onLanguageChanged(
-                        AppLanguage.english,
-                      );
-                    },
-                  ),
-
-                  // ==================================================
-                  // HINDI
-                  // ==================================================
-
-                  _LanguageButton(
-                    label: 'हिन्दी',
-                    selected:
-                        widget.language == AppLanguage.hindi,
-                    accentColor: activeAccent,
-                    onTap: () {
-                      widget.onLanguageChanged(
-                        AppLanguage.hindi,
-                      );
-                    },
-                  ),
-
-                  // ==================================================
-                  // MARATHI
-                  // ==================================================
-
-                  _LanguageButton(
-                    label: 'मराठी',
-                    selected:
-                        widget.language == AppLanguage.marathi,
-                    accentColor: activeAccent,
-                    onTap: () {
-                      widget.onLanguageChanged(
-                        AppLanguage.marathi,
-                      );
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
+  void _showLanguageSelector() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppThemeColors.card(context),
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
         ),
       ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              20,
+              8,
+              20,
+              24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  languageText,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppThemeColors.text(context),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _languageOption(
+                  title: 'English',
+                  language: AppLanguage.english,
+                ),
+                _languageOption(
+                  title: 'हिन्दी',
+                  language: AppLanguage.hindi,
+                ),
+                _languageOption(
+                  title: 'मराठी',
+                  language: AppLanguage.marathi,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
-}
 
-// ============================================================
-// ROLE CARD
-// ============================================================
+  Widget _languageOption({
+    required String title,
+    required AppLanguage language,
+  }) {
+    final bool selected = widget.language == language;
+    final accent = AppThemeColors.primary(context);
 
-class _RoleCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Color accentColor;
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 8,
+      ),
+      leading: Icon(
+        selected
+            ? Icons.radio_button_checked
+            : Icons.radio_button_off,
+        color: selected
+            ? accent
+            : AppThemeColors.muted(context),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight:
+              selected ? FontWeight.w700 : FontWeight.w500,
+          color: AppThemeColors.text(context),
+        ),
+      ),
+      onTap: () {
+        widget.onLanguageChanged(language);
+        Navigator.pop(context);
+      },
+    );
+  }
 
-  // IMPORTANT:
-  // This now receives BuildContext.
-  final void Function(BuildContext context) onTap;
-
-  const _RoleCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.accentColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDark = AppThemeColors.isDark(context);
+  Widget _roleCard({
+    required IconData icon,
+    required String title,
+    required String description,
+    required VoidCallback onTap,
+  }) {
+    final accent = AppThemeColors.primary(context);
+    final cardColor = AppThemeColors.card(context);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        // The callback is triggered when this card is tapped.
-        onTap: () => onTap(context),
-
-        borderRadius: BorderRadius.circular(18),
-
-        child: Ink(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
-
           decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.cardBg
-                : AppColors.lightCard,
-
-            borderRadius: BorderRadius.circular(18),
-
+            color: cardColor,
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: accentColor.withValues(alpha: 0.22),
+              color: accent.withValues(alpha: 0.14),
               width: 1,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-
           child: Row(
             children: [
-              // ==================================================
-              // ICON
-              // ==================================================
-
               Container(
-                width: 58,
-                height: 58,
-
+                width: 62,
+                height: 62,
                 decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.14),
-
-                  borderRadius: BorderRadius.circular(16),
+                  color: accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(18),
                 ),
-
                 child: Icon(
                   icon,
-                  size: 30,
-                  color: accentColor,
+                  size: 31,
+                  color: accent,
                 ),
               ),
-
               const SizedBox(width: 16),
-
-              // ==================================================
-              // TEXT
-              // ==================================================
-
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
                         color: AppThemeColors.text(context),
                       ),
                     ),
-
-                    const SizedBox(height: 5),
-
+                    const SizedBox(height: 6),
                     Text(
-                      subtitle,
+                      description,
                       style: TextStyle(
-                        fontSize: 12,
-                        color: AppThemeColors.muted(context),
+                        fontSize: 13,
+                        height: 1.4,
+                        color:
+                            AppThemeColors.muted(context),
                       ),
                     ),
                   ],
                 ),
               ),
-
-              // ==================================================
-              // ARROW
-              // ==================================================
-
+              const SizedBox(width: 8),
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 17,
-                color: accentColor,
+                color: accent,
               ),
             ],
           ),
@@ -440,57 +403,352 @@ class _RoleCard extends StatelessWidget {
       ),
     );
   }
-}
 
-// ============================================================
-// LANGUAGE BUTTON
-// ============================================================
+  // ------------------------------------------------
+  // PREMIUM TAGLINE
+  // ------------------------------------------------
 
-class _LanguageButton extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final Color accentColor;
-  final VoidCallback onTap;
+  Widget _buildPremiumTagline() {
+    final accent = AppThemeColors.primary(context);
+    final textColor = AppThemeColors.text(context);
 
-  const _LanguageButton({
-    required this.label,
-    required this.selected,
-    required this.accentColor,
-    required this.onTap,
-  });
+    return FadeTransition(
+      opacity: _taglineFadeAnimation,
+      child: ScaleTransition(
+        scale: _taglineScaleAnimation,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 8,
+          ),
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: accent.withValues(alpha: 0.24),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: accent.withValues(alpha: 0.08),
+                blurRadius: 14,
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: accent.withValues(alpha: 0.45),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 9),
+              Text(
+                subtitleText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.35,
+                ),
+              ),
+              const SizedBox(width: 9),
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: accent.withValues(alpha: 0.45),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onTap,
+    final accent = AppThemeColors.primary(context);
+    final bool isDark =
+        widget.themeMode == ReNovaThemeMode.dark;
 
-      style: OutlinedButton.styleFrom(
-        backgroundColor: selected
-            ? accentColor.withValues(alpha: 0.12)
-            : Colors.transparent,
+    return Scaffold(
+      backgroundColor:
+          Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(
+                22,
+                18,
+                22,
+                30,
+              ),
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.center,
+                children: [
+                  // ==================================================
+                  // TOP CONTROLS
+                  // ==================================================
 
-        side: BorderSide(
-          color: selected
-              ? accentColor
-              : AppThemeColors.muted(context)
-                  .withValues(alpha: 0.35),
-        ),
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.end,
+                    children: [
+                      // LANGUAGE BUTTON
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius:
+                              BorderRadius.circular(14),
+                          onTap: _showLanguageSelector,
+                          child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(
+                              horizontal: 13,
+                              vertical: 9,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppThemeColors.card(
+                                context,
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(14),
+                              border: Border.all(
+                                color: accent.withValues(
+                                  alpha: 0.12,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize:
+                                  MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.language_rounded,
+                                  size: 18,
+                                  color: accent,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  widget.language ==
+                                          AppLanguage.english
+                                      ? 'EN'
+                                      : widget.language ==
+                                              AppLanguage.hindi
+                                          ? 'HI'
+                                          : 'MR',
+                                  style: TextStyle(
+                                    fontWeight:
+                                        FontWeight.w700,
+                                    fontSize: 12,
+                                    color:
+                                        AppThemeColors.text(
+                                      context,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
 
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+                      const SizedBox(width: 10),
 
-      child: Text(
-        label,
-        style: TextStyle(
-          color: selected
-              ? accentColor
-              : AppThemeColors.text(context),
+                      // THEME SWITCH
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              AppThemeColors.card(context),
+                          borderRadius:
+                              BorderRadius.circular(14),
+                          border: Border.all(
+                            color: accent.withValues(
+                              alpha: 0.12,
+                            ),
+                          ),
+                        ),
+                        child: Switch(
+                          value: isDark,
+                          onChanged: (value) {
+                            widget.onThemeChanged(
+                              value
+                                  ? ReNovaThemeMode.dark
+                                  : ReNovaThemeMode.light,
+                            );
+                          },
+                          activeThumbColor: accent,
+                          activeTrackColor:
+                              accent.withValues(alpha: 0.30),
+                          inactiveThumbColor:
+                              AppThemeColors.muted(context),
+                          inactiveTrackColor:
+                              AppThemeColors.muted(context)
+                                  .withValues(alpha: 0.18),
+                        ),
+                      ),
+                    ],
+                  ),
 
-          fontWeight: selected
-              ? FontWeight.bold
-              : FontWeight.w500,
+                  const SizedBox(height: 34),
+
+                  // ==================================================
+                  // LOGO
+                  // ==================================================
+
+                  Image.asset(
+                    isDark
+                        ? 'assets/images/recy_link_logo_dark.jpeg'
+                        : 'assets/images/recy_link_logo.png',
+                    width: 220,
+                    height: 82,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // ==================================================
+                  // PREMIUM TAGLINE
+                  // ==================================================
+
+                  _buildPremiumTagline(),
+
+                  const SizedBox(height: 24),
+
+                  // ==================================================
+                  // WELCOME
+                  // ==================================================
+
+                  Text(
+                    welcomeText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 27,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                      color: AppThemeColors.text(context),
+                    ),
+                  ),
+
+                  const SizedBox(height: 34),
+
+                  // ==================================================
+                  // ROLE TITLE
+                  // ==================================================
+
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      chooseRoleText,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppThemeColors.text(context),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // ==================================================
+                  // SCRAP COLLECTOR
+                  // ==================================================
+
+                  _roleCard(
+                    icon: Icons.recycling_rounded,
+                    title: collectorTitle,
+                    description: collectorDescription,
+                    onTap: () {
+                      widget.onScrapCollectorSelected(
+                        context,
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ==================================================
+                  // RIDER
+                  // ==================================================
+
+                  _roleCard(
+                    icon: Icons.delivery_dining_rounded,
+                    title: riderTitle,
+                    description: riderDescription,
+                    onTap: () {
+                      widget.onRiderSelected(
+                        context,
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // ==================================================
+                  // BOTTOM INFO
+                  // ==================================================
+
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.eco_outlined,
+                        size: 17,
+                        color: accent,
+                      ),
+                      const SizedBox(width: 7),
+                      Flexible(
+                        child: Text(
+                          'Formal Recycling & Fair Price Bridge',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color:
+                                AppThemeColors.muted(context),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

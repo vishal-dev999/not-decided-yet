@@ -351,7 +351,7 @@ class _SettingsTabState extends State<SettingsTab> {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: currentPayment,
+                      initialValue: currentPayment,
                       items: ['Cash', 'UPI / Digital Wallet']
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
