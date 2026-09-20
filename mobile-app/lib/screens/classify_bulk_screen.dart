@@ -19,11 +19,7 @@ class ClassifyBulkScreen extends StatefulWidget {
   final ReNovaStorage? storage;
   final AppLanguage language;
 
-  const ClassifyBulkScreen({
-    super.key,
-    this.storage,
-    required this.language,
-  });
+  const ClassifyBulkScreen({super.key, this.storage, required this.language});
 
   @override
   State<ClassifyBulkScreen> createState() => _ClassifyBulkScreenState();
@@ -129,47 +125,21 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
     final buffer = StringBuffer();
 
     buffer.write(
-      _t(
-        'Create Scrap Lot. ',
-        'नया लॉट बनाएं। ',
-        'नवीन लॉट तयार करा। ',
-      ),
+      _t('Create Scrap Lot. ', 'नया लॉट बनाएं। ', 'नवीन लॉट तयार करा। '),
     );
 
     buffer.write(
-      _t(
-        'Material Category: ',
-        'सामग्री श्रेणी: ',
-        'साहित्य श्रेणी: ',
-      ),
+      _t('Material Category: ', 'सामग्री श्रेणी: ', 'साहित्य श्रेणी: '),
     );
     buffer.write('$selectedMaterial. ');
 
-    buffer.write(
-      _t(
-        'Approximate Weight: ',
-        'अनुमानित वजन: ',
-        'अंदाजे वजन: ',
-      ),
-    );
+    buffer.write(_t('Approximate Weight: ', 'अनुमानित वजन: ', 'अंदाजे वजन: '));
     buffer.write('${_enteredWeight.toStringAsFixed(1)} kilograms. ');
 
-    buffer.write(
-      _t(
-        'Benchmark Rate: ',
-        'बेंचमार्क दर: ',
-        'बेंचमार्क दर: ',
-      ),
-    );
+    buffer.write(_t('Benchmark Rate: ', 'बेंचमार्क दर: ', 'बेंचमार्क दर: '));
     buffer.write('$_ratePerKg rupees per kilogram. ');
 
-    buffer.write(
-      _t(
-        'Estimated Price: ',
-        'अनुमानित मूल्य: ',
-        'अंदाजे किंमत: ',
-      ),
-    );
+    buffer.write(_t('Estimated Price: ', 'अनुमानित मूल्य: ', 'अंदाजे किंमत: '));
     buffer.write('$_calculatedPrice rupees. ');
 
     buffer.write(
@@ -225,10 +195,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
   int get _calculatedPrice => (_enteredWeight * _ratePerKg).round();
 
   Future<void> _pickImage(ImageSource source) async {
-    final picked = await _picker.pickImage(
-      source: source,
-      imageQuality: 85,
-    );
+    final picked = await _picker.pickImage(source: source, imageQuality: 85);
 
     if (picked != null) {
       setState(() {
@@ -239,7 +206,8 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
 
   /// Opens the Single Item Scanner so the user can snap a close-up piece
   Future<void> _runAiDetection() async {
-    final detectedCode = await Navigator.push<String>(
+    // 1. Expect a Map<String, dynamic> result instead of a raw String
+    final scanResult = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
         builder: (_) => Scaffold(
@@ -261,11 +229,56 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
       ),
     );
 
-    if (detectedCode == null || !mounted) return;
+    if (scanResult == null || !mounted) return;
 
+    // 2. Extract validation flags and codes from the result map
+    final bool isValidEwaste = scanResult['isValidEwaste'] ?? true;
+    final bool isNonEwaste = scanResult['isNonEwaste'] ?? false;
+    final bool isLowConfidence = scanResult['isLowConfidence'] ?? false;
+    final String detectedCode =
+        scanResult['materialCode'] ?? scanResult['material'] ?? '';
+
+    // 3. 🛑 Guardrail: Block low confidence or non-e-waste items from bulk selection
+    if (!isValidEwaste) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(
+            isNonEwaste
+                ? _t('Not E-Waste', 'ई-कचरा नहीं', 'इ-कचरा नाही')
+                : _t('Low AI Confidence', 'कम एआई सटीकता', 'कमी एआय अचूकता'),
+          ),
+          content: Text(
+            isNonEwaste
+                ? _t(
+                    'The scanned item is not recognized as valid e-waste. Cannot add to bulk lot.',
+                    'स्कैन की गई वस्तु वैध ई-कचरा नहीं है। बल्क लॉट में नहीं जोड़ा जा सकता।',
+                    'स्कॅन केलेली वस्तू वैध इ-कचरा नाही. बल्क लॉटमध्ये जोडले जाऊ शकत नाही.',
+                  )
+                : _t(
+                    'AI confidence is too low to auto-select. Please retake a clearer picture.',
+                    'ऑटो-सेलेक्ट करने के लिए एआई सटीकता बहुत कम है। कृपया स्पष्ट तस्वीर लें.',
+                    'ऑटो-निवड करण्यासाठी एआय अचूकता खूप कमी आहे. कृपया स्पष्ट चित्र घ्या.',
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(_t('OK', 'ठीक है', 'ठीक आहे')),
+            ),
+          ],
+        ),
+      );
+      return; // Stop execution here!
+    }
+
+    // 4. Handle Wire & Cabling Sub-selection dialog
     if (detectedCode == 'CABLES_AND_WIRING' ||
         detectedCode == 'cables' ||
-        detectedCode == 'wire') {
+        detectedCode == 'wire' ||
+        detectedCode == 'COPPER_HEAVY_INSULATED' ||
+        detectedCode == 'ALUMINIUM_WIRE') {
       final chosenCategory = await _showWireSelectionDialog();
 
       if (chosenCategory != null && mounted) {
@@ -276,6 +289,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
       return;
     }
 
+    // 5. Select valid category if it exists in our list
     if (_categories.contains(detectedCode)) {
       setState(() => _selectedCategory = detectedCode);
       _notifyIdentified(detectedCode);
@@ -369,8 +383,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                   ),
                   style: const TextStyle(fontSize: 12),
                 ),
-                onTap: () =>
-                    Navigator.pop(ctx, 'COPPER_HEAVY_INSULATED'),
+                onTap: () => Navigator.pop(ctx, 'COPPER_HEAVY_INSULATED'),
               ),
               const Divider(),
               ListTile(
@@ -485,31 +498,17 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _t(
-            'Create Scrap Lot',
-            'नया लॉट बनाएं',
-            'नवीन लॉट तयार करा',
-          ),
+          _t('Create Scrap Lot', 'नया लॉट बनाएं', 'नवीन लॉट तयार करा'),
         ),
 
         // Audio button
         actions: [
           IconButton(
             tooltip: _isSpeaking
-                ? _t(
-                    'Stop Audio',
-                    'ऑडियो रोकें',
-                    'ऑडिओ थांबवा',
-                  )
-                : _t(
-                    'Read Aloud',
-                    'आवाज़ में सुनें',
-                    'आवाजात ऐका',
-                  ),
+                ? _t('Stop Audio', 'ऑडियो रोकें', 'ऑडिओ थांबवा')
+                : _t('Read Aloud', 'आवाज़ में सुनें', 'आवाजात ऐका'),
             icon: Icon(
-              _isSpeaking
-                  ? Icons.stop_circle_outlined
-                  : Icons.volume_up,
+              _isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up,
             ),
             onPressed: _toggleSpeech,
           ),
@@ -547,11 +546,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.camera_alt,
-                            size: 48,
-                            color: activeAccent,
-                          ),
+                          Icon(Icons.camera_alt, size: 48, color: activeAccent),
                           const SizedBox(height: 8),
                           Text(
                             _t(
@@ -575,9 +570,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => _pickImage(ImageSource.camera),
                     icon: const Icon(Icons.photo_camera),
-                    label: Text(
-                      _t('Camera', 'कैमरा', 'कॅमेरा'),
-                    ),
+                    label: Text(_t('Camera', 'कैमरा', 'कॅमेरा')),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -585,9 +578,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => _pickImage(ImageSource.gallery),
                     icon: const Icon(Icons.photo_library),
-                    label: Text(
-                      _t('Gallery', 'गैलरी', 'गॅलरी'),
-                    ),
+                    label: Text(_t('Gallery', 'गैलरी', 'गॅलरी')),
                   ),
                 ),
               ],
@@ -599,11 +590,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  _t(
-                    'Material Category',
-                    'सामग्री श्रेणी',
-                    'साहित्य श्रेणी',
-                  ),
+                  _t('Material Category', 'सामग्री श्रेणी', 'साहित्य श्रेणी'),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -615,20 +602,11 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                       ? const SizedBox(
                           width: 14,
                           height: 14,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(
-                          Icons.auto_awesome,
-                          size: 16,
-                        ),
+                      : const Icon(Icons.auto_awesome, size: 16),
                   label: Text(
-                    _t(
-                      'Detect with AI',
-                      'एआई से पहचानें',
-                      'एआय द्वारे ओळखा',
-                    ),
+                    _t('Detect with AI', 'एआई से पहचानें', 'एआय द्वारे ओळखा'),
                   ),
                 ),
               ],
@@ -685,10 +663,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                 'अनुमानित वजन (किग्रा)',
                 'अंदाजे वजन (किग्रॅ)',
               ),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -714,9 +689,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
               decoration: BoxDecoration(
                 color: activeAccent.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: activeAccent.withValues(alpha: 0.3),
-                ),
+                border: Border.all(color: activeAccent.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -725,11 +698,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _t(
-                          'Benchmark Rate',
-                          'बेंचमार्क दर',
-                          'बेंचमार्क दर',
-                        ),
+                        _t('Benchmark Rate', 'बेंचमार्क दर', 'बेंचमार्क दर'),
                         style: TextStyle(
                           fontSize: 12,
                           color: AppThemeColors.muted(context),
@@ -738,9 +707,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                       const SizedBox(height: 2),
                       Text(
                         '₹$_ratePerKg / kg',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -748,11 +715,7 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        _t(
-                          'Estimated Price',
-                          'अनुमानित मूल्य',
-                          'अंदाजे किंमत',
-                        ),
+                        _t('Estimated Price', 'अनुमानित मूल्य', 'अंदाजे किंमत'),
                         style: TextStyle(
                           fontSize: 12,
                           color: AppThemeColors.muted(context),

@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -76,9 +77,9 @@ class _PickupUploadTabState extends State<PickupUploadTab> {
       if (!mounted) return;
       setState(() => _isAnalyzing = false);
 
-      // In picker mode, return the detected code directly back to the lot creator
+      // In picker mode, return the FULL result map back to the lot creator
       if (widget.isPickerMode) {
-        Navigator.pop(context, result['materialCode']);
+        Navigator.pop(context, result); // ✅ Returns the complete result map!
         return;
       }
 
@@ -121,7 +122,11 @@ class _PickupUploadTabState extends State<PickupUploadTab> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.center_focus_strong, color: activeAccent, size: 28),
+                  Icon(
+                    Icons.center_focus_strong,
+                    color: activeAccent,
+                    size: 28,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -142,7 +147,11 @@ class _PickupUploadTabState extends State<PickupUploadTab> {
             ),
 
           Text(
-            _t('AI Single Item Scanner', 'एआई एकल वस्तु स्कैनर', 'एआय एकल वस्तू स्कॅनर'),
+            _t(
+              'AI Single Item Scanner',
+              'एआई एकल वस्तु स्कैनर',
+              'एआय एकल वस्तू स्कॅनर',
+            ),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -197,32 +206,36 @@ class _PickupUploadTabState extends State<PickupUploadTab> {
                     ),
                   )
                 : _imagePath != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(19),
-                        child: Image.file(
-                          File(_imagePath!),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        ),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.document_scanner, size: 56, color: activeAccent),
-                          const SizedBox(height: 12),
-                          Text(
-                            _t(
-                              'No item photo selected',
-                              'कोई फोटो चयनित नहीं',
-                              'कोणताही फोटो निवडलेला नाही',
-                            ),
-                            style: TextStyle(
-                              color: AppThemeColors.muted(context),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(19),
+                    child: Image.file(
+                      File(_imagePath!),
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.document_scanner,
+                        size: 56,
+                        color: activeAccent,
                       ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _t(
+                          'No item photo selected',
+                          'कोई फोटो चयनित नहीं',
+                          'कोणताही फोटो निवडलेला नाही',
+                        ),
+                        style: TextStyle(
+                          color: AppThemeColors.muted(context),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
           ),
           const SizedBox(height: 16),
 
@@ -238,7 +251,9 @@ class _PickupUploadTabState extends State<PickupUploadTab> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  onPressed: _isAnalyzing ? null : () => _pickImage(ImageSource.camera),
+                  onPressed: _isAnalyzing
+                      ? null
+                      : () => _pickImage(ImageSource.camera),
                   icon: const Icon(Icons.camera_alt),
                   label: Text(
                     _t('Take Photo', 'फोटो खींचें', 'फोटो काढा'),
@@ -255,7 +270,9 @@ class _PickupUploadTabState extends State<PickupUploadTab> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  onPressed: _isAnalyzing ? null : () => _pickImage(ImageSource.gallery),
+                  onPressed: _isAnalyzing
+                      ? null
+                      : () => _pickImage(ImageSource.gallery),
                   icon: const Icon(Icons.photo_library),
                   label: Text(
                     _t('Gallery', 'गैलरी', 'गॅलरी'),
