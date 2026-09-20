@@ -1,0 +1,17 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python Cache
+__pycache__/
+models/__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# Influx of test photos and misclassified edge cases
+misclassified_inbox/
+*.jpg
+*.jpeg
+*.png

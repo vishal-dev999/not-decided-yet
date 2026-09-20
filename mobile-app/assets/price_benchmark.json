@@ -1,0 +1,83 @@
+[
+  {
+    "material_category": "MOTHERBOARD_HIGH_GRADE",
+    "material_sub_category": "High Grade PCB",
+    "mandi_price_per_kg": 250.0,
+    "recycler_offered_price_per_kg": 305.0,
+    "min_market_price": 250.0,
+    "max_market_price": 380.0,
+    "location": "Bhubaneswar"
+  },
+  {
+    "material_category": "POWER_SUPPLY_LOW_GRADE",
+    "material_sub_category": "Low Grade PCB",
+    "mandi_price_per_kg": 40.0,
+    "recycler_offered_price_per_kg": 54.0,
+    "min_market_price": 40.0,
+    "max_market_price": 72.0,
+    "location": "Bhubaneswar"
+  },
+  {
+    "material_category": "BATTERY_LITHIUM_PORTABLE",
+    "material_sub_category": "Lithium Batteries",
+    "mandi_price_per_kg": 110.0,
+    "recycler_offered_price_per_kg": 142.0,
+    "min_market_price": 110.0,
+    "max_market_price": 185.0,
+    "location": "Bhubaneswar"
+  },
+  {
+    "material_category": "LEAD_ACID",
+    "material_sub_category": "Lead Batteries",
+    "mandi_price_per_kg": 75.0,
+    "recycler_offered_price_per_kg": 92.0,
+    "min_market_price": 75.0,
+    "max_market_price": 115.0,
+    "location": "Bhubaneswar"
+  },
+  {
+    "material_category": "CRT_MONITOR",
+    "material_sub_category": "CRT Monitors",
+    "mandi_price_per_kg": 14.0,
+    "recycler_offered_price_per_kg": 20.0,
+    "min_market_price": 14.0,
+    "max_market_price": 28.0,
+    "location": "Bhubaneswar"
+  },
+  {
+    "material_category": "LCD_PANEL_INTACT",
+    "material_sub_category": "LCD/LED Flat Panel",
+    "mandi_price_per_kg": 64.0,
+    "recycler_offered_price_per_kg": 82.0,
+    "min_market_price": 64.0,
+    "max_market_price": 108.0,
+    "location": "Bhubaneswar"
+  },
+  {
+    "material_category": "MIXED_EWASTE_CASING",
+    "material_sub_category": "Mixed Plastic",
+    "mandi_price_per_kg": 15.0,
+    "recycler_offered_price_per_kg": 22.0,
+    "min_market_price": 15.0,
+    "max_market_price": 32.0,
+    "location": "Bhubaneswar"
+  },
+  {
+    "material_category": "COPPER_HEAVY_INSULATED",
+    "material_sub_category": "Copper Wire",
+    "mandi_price_per_kg": 390.0,
+    "recycler_offered_price_per_kg": 455.0,
+    "min_market_price": 390.0,
+    "max_market_price": 540.0,
+    "location": "Bhubaneswar"
+  },
+  {
+    "material_category": "ALUMINIUM_WIRE",
+    "material_sub_category": "Aluminium Wire",
+    "mandi_price_per_kg": 96.0,
+    "recycler_offered_price_per_kg": 124.0,
+    "min_market_price": 96.0,
+    "max_market_price": 158.0,
+    "location": "Bhubaneswar"
+  }
+]
