@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'constants/app_enums.dart';
 import 'screens/collector_login_screen.dart';
 import 'screens/language_selection_screen.dart';
-import 'screens/main_dashboard_container.dart';
-import 'screens/role_selection_screen.dart';
+import 'screens/main_dashboard_container.dart' as dashboard;
+import 'screens/role_selection_screen.dart' as role_selection;
 import 'screens/rider/rider_login_screen.dart';
 import 'services/database_helper.dart';
 import 'services/storage_service.dart';
@@ -133,7 +133,7 @@ class ReNovaAppState extends State<ReNovaApp> {
     //
     // ==========================================================
 
-    return RoleSelectionScreen(
+    return role_selection.RoleSelectionScreen(
       language: language,
       onLanguageChanged: changeLanguage,
 
@@ -155,7 +155,7 @@ class ReNovaAppState extends State<ReNovaApp> {
         if (widget.storage.isLoggedIn) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (_) => MainDashboardContainer(
+              builder: (_) => dashboard.MainDashboardContainer(
                 collectorName:
                     widget.storage.collectorName ?? 'Collector',
 
@@ -204,19 +204,19 @@ class ReNovaAppState extends State<ReNovaApp> {
       // ========================================================
 
       onRiderSelected: (context) {
-  debugPrint('RIDER BUTTON PRESSED');
+        debugPrint('RIDER BUTTON PRESSED');
 
-  Navigator.of(context).push(
-    MaterialPageRoute(
-      builder: (_) => RiderLoginScreen(
-        language: language,
-        themeMode: themeMode,
-        onThemeChanged: changeTheme,
-        storage: widget.storage,
-      ),
-    ),
-  );
-},
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => RiderLoginScreen(
+              language: language,
+              themeMode: themeMode,
+              onThemeChanged: changeTheme,
+              storage: widget.storage,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -229,7 +229,7 @@ class ReNovaAppState extends State<ReNovaApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
 
-      title: 'ReNova',
+      title: 'RecyLink',
 
       // ========================================================
       // LIGHT THEME

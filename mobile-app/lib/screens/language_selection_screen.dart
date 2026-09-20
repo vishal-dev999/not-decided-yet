@@ -89,23 +89,27 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 ),
               ),
               const SizedBox(height: 35),
-              // Front Logo Updated
+
+              // RecycLink Logo
               Container(
-                height: 95,
-                width: 95,
+                height: 110,
+                width: 110,
                 decoration: BoxDecoration(
                   color: activeAccent,
                   borderRadius: BorderRadius.circular(28),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.eco,
-                    size: 58,
-                    color: AppColors.darkBackground,
+                padding: const EdgeInsets.all(10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'assets/images/recy_link_logo.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
+
               const SizedBox(height: 24),
+
               Text(
                 'ReNova',
                 style: TextStyle(
@@ -114,7 +118,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   color: activeAccent,
                 ),
               ),
+
               const SizedBox(height: 8),
+
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
@@ -123,7 +129,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   color: AppThemeColors.muted(context),
                 ),
               ),
+
               const SizedBox(height: 40),
+
               Text(
                 title,
                 style: TextStyle(
@@ -132,11 +140,15 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   color: AppThemeColors.text(context),
                 ),
               ),
+
               const SizedBox(height: 20),
+
               _languageButton('English', AppLanguage.english),
               _languageButton('हिंदी', AppLanguage.hindi),
               _languageButton('मराठी', AppLanguage.marathi),
+
               const SizedBox(height: 20),
+
               SizedBox(
                 width: double.infinity,
                 height: 54,
@@ -157,7 +169,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       MaterialPageRoute(
                         builder: (_) => CollectorLoginScreen(
                           language: widget.language,
-                          storage: getStorage(context),
+                          storage: storage,
                           themeMode: widget.themeMode,
                           onThemeChanged: widget.onThemeChanged,
                         ),
@@ -182,6 +194,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
   Widget _languageButton(String text, AppLanguage language) {
     final selected = selectedLanguage == language;
+
     final activeAccent = AppThemeColors.isDark(context)
         ? AppColors.primaryGold
         : AppColors.featherGreen;
@@ -197,7 +210,10 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         duration: const Duration(milliseconds: 250),
         width: double.infinity,
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+        padding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 18,
+        ),
         decoration: BoxDecoration(
           color: selected
               ? activeAccent.withValues(alpha: 0.18)
@@ -211,8 +227,12 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         child: Row(
           children: [
             Icon(
-              selected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: selected ? activeAccent : AppThemeColors.faint(context),
+              selected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_off,
+              color: selected
+                  ? activeAccent
+                  : AppThemeColors.faint(context),
             ),
             const SizedBox(width: 14),
             Expanded(

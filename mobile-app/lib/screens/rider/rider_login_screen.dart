@@ -26,7 +26,8 @@ class RiderLoginScreen extends StatefulWidget {
 
 class _RiderLoginScreenState extends State<RiderLoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordController =
+      TextEditingController();
 
   bool _obscurePassword = true;
   bool _isLoading = false;
@@ -127,7 +128,7 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          padding: const EdgeInsets.fromLTRB(24, 42, 24, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -135,32 +136,21 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
               // TOP BRANDING
               // ------------------------------------------------
 
-              Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Icon(
-                      Icons.local_shipping_rounded,
-                      color: primaryColor,
-                      size: 27,
-                    ),
+              SizedBox(
+                height: 65,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Image.asset(
+                    isDark
+                        ? 'assets/images/recy_link_logo_dark.jpeg'
+                        : 'assets/images/recy_link_logo.png',
+                    width: 225,
+                    height: 65,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.centerLeft,
+                    filterQuality: FilterQuality.high,
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'ReNova',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 23,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ],
+                ),
               ),
 
               const SizedBox(height: 54),
@@ -319,9 +309,8 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                         onPressed: _isLoading ? null : _login,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
-                          foregroundColor: isDark
-                              ? Colors.black
-                              : Colors.white,
+                          foregroundColor:
+                              isDark ? Colors.black : Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
