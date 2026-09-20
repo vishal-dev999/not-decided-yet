@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../constants/app_enums.dart';
+import '../../services/database_helper.dart';
 import '../../services/storage_service.dart';
 import '../../themes/app_colors.dart';
 import '../../themes/app_theme.dart';
@@ -33,6 +36,7 @@ class _PaymentTabState extends State<PaymentTab> {
   bool saveUpiDetails = true;
   String cashStatus = 'received';
   bool qrGenerated = false;
+  bool _isLoadingHistory = true;
 
   String _t(String en, String hi, String mr) =>
       LanguageText.t(widget.language, en, hi, mr);
@@ -43,6 +47,76 @@ class _PaymentTabState extends State<PaymentTab> {
     selectedMode = widget.paymentPreference == 'UPI / Digital Wallet'
         ? 'UPI'
         : 'Cash';
+    _syncCompletedLotsToPaymentHistory();
+  }
+
+  /// 🛡️ SSOT Bridge: Pulls completed lots from local SQLite and ensures they exist in payment history
+  Future<void> _syncCompletedLotsToPaymentHistory() async {
+    final storage = widget.storage;
+    if (storage == null) {
+      if (mounted) setState(() => _isLoadingHistory = false);
+      return;
+    }
+
+    try {
+      final localLots = await DatabaseHelper.instance.getQueuedLots(limit: 100);
+      final completedLots = localLots.where((lot) {
+        final status = (lot['status'] ?? '').toString().toUpperCase();
+        return status == 'VERIFIED_COMPLETED';
+      }).toList();
+
+      final existingHistory = storage.paymentHistory;
+      // Track existing details to avoid duplicate entries
+      final existingDetails = existingHistory
+          .map((item) => (item['details'] ?? '').toString())
+          .toSet();
+
+      bool addedAny = false;
+      for (final lot in completedLots) {
+        final lotUid =
+            (lot['client_lot_id'] ?? lot['lot_uid'] ?? lot['id'] ?? '')
+                .toString();
+        final shortUid = lotUid.length > 8 ? lotUid.substring(0, 8) : lotUid;
+        final detailKey = 'Form-6 Lot $shortUid';
+
+        if (!existingDetails.contains(detailKey)) {
+          Map<String, dynamic>? txn = lot['transaction'] is Map
+              ? Map<String, dynamic>.from(lot['transaction'] as Map)
+              : null;
+          if (txn == null && lot['transaction_json'] != null) {
+            try {
+              final decoded = jsonDecode(lot['transaction_json'] as String);
+              if (decoded is Map) {
+                txn = Map<String, dynamic>.from(decoded);
+              }
+            } catch (_) {}
+          }
+          final double weight =
+              (txn?['certified_weight_kg'] ?? lot['estimated_weight_kg'] ?? 5.0)
+                  .toDouble();
+          final double rate = (txn?['offered_rate_per_kg'] ?? 100.0).toDouble();
+          final double totalAmount = (txn?['total_amount'] ?? (weight * rate))
+              .toDouble();
+          final String payMode = (txn?['payment_mode'] ?? 'Cash').toString();
+
+          await storage.savePayment({
+            'mode': payMode.toUpperCase() == 'UPI' ? 'UPI' : 'Cash',
+            'details': detailKey,
+            'amount': '₹${totalAmount.toStringAsFixed(0)}',
+            'date': lot['created_at'] ?? DateTime.now().toIso8601String(),
+          });
+          addedAny = true;
+        }
+      }
+
+      if (addedAny && mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      debugPrint('[PaymentTab] Error syncing completed lots to history: $e');
+    } finally {
+      if (mounted) setState(() => _isLoadingHistory = false);
+    }
   }
 
   @override
@@ -73,11 +147,19 @@ class _PaymentTabState extends State<PaymentTab> {
     final mode = selectedMode;
     final details = mode == 'Cash'
         ? (cashStatus == 'received'
-            ? _t('Cash received', 'नकद प्राप्त हुआ', 'रोख मिळाली')
-            : _t('Cash yet to receive', 'नकद प्राप्त होना बाकी है', 'रोख अजून मिळायची आहे'))
+              ? _t('Cash received', 'नकद प्राप्त हुआ', 'रोख मिळाली')
+              : _t(
+                  'Cash yet to receive',
+                  'नकद प्राप्त होना बाकी है',
+                  'रोख अजून मिळायची आहे',
+                ))
         : (upiController.text.trim().isEmpty
-            ? _t('UPI details not entered', 'UPI विवरण दर्ज नहीं किया गया', 'UPI तपशील दिलेला नाही')
-            : upiController.text.trim());
+              ? _t(
+                  'UPI details not entered',
+                  'UPI विवरण दर्ज नहीं किया गया',
+                  'UPI तपशील दिलेला नाही',
+                )
+              : upiController.text.trim());
 
     final item = {
       'mode': mode,
@@ -93,18 +175,22 @@ class _PaymentTabState extends State<PaymentTab> {
       mode == 'Cash' ? 'Cash' : 'UPI / Digital Wallet',
     );
 
-    if (mode == 'UPI' && saveUpiDetails && upiController.text.trim().isNotEmpty) {
+    if (mode == 'UPI' &&
+        saveUpiDetails &&
+        upiController.text.trim().isNotEmpty) {
       await widget.storage?.saveUpiId(upiController.text.trim());
     }
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(_t(
-          'Payment preference saved.',
-          'भुगतान पसंद सहेजी गई।',
-          'पेमेंट पसंती जतन झाली.',
-        )),
+        content: Text(
+          _t(
+            'Payment preference saved.',
+            'भुगतान पसंद सहेजी गई।',
+            'पेमेंट पसंती जतन झाली.',
+          ),
+        ),
       ),
     );
     setState(() {});
@@ -180,20 +266,46 @@ class _PaymentTabState extends State<PaymentTab> {
           child: ElevatedButton.icon(
             onPressed: _recordPayment,
             icon: const Icon(Icons.save),
-            label: Text(_t('Save Payment Mode', 'भुगतान तरीका सहेजें', 'पेमेंट पद्धत जतन करा')),
+            label: Text(
+              _t(
+                'Save Payment Mode',
+                'भुगतान तरीका सहेजें',
+                'पेमेंट पद्धत जतन करा',
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 26),
-        Text(
-          _t('Payment History', 'भुगतान इतिहास', 'पेमेंट इतिहास'),
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.bold,
-            color: AppThemeColors.text(context),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              _t('Payment History', 'भुगतान इतिहास', 'पेमेंट इतिहास'),
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: AppThemeColors.text(context),
+              ),
+            ),
+            IconButton(
+              tooltip: 'Refresh History',
+              icon: const Icon(Icons.refresh, size: 18),
+              onPressed: () {
+                setState(() => _isLoadingHistory = true);
+                _syncCompletedLotsToPaymentHistory();
+              },
+            ),
+          ],
         ),
         const SizedBox(height: 10),
-        if (history.isEmpty)
+        if (_isLoadingHistory)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          )
+        else if (history.isEmpty)
           Text(
             _t(
               'No payments recorded yet.',
@@ -204,9 +316,12 @@ class _PaymentTabState extends State<PaymentTab> {
           ),
         ...history.map(
           (item) => Card(
+            margin: const EdgeInsets.only(bottom: 10),
             child: ListTile(
               leading: Icon(
-                item['mode'] == 'UPI' ? Icons.qr_code_2 : Icons.payments_outlined,
+                item['mode'] == 'UPI'
+                    ? Icons.qr_code_2
+                    : Icons.payments_outlined,
                 color: accent,
               ),
               title: Text(
@@ -214,7 +329,7 @@ class _PaymentTabState extends State<PaymentTab> {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                '${_t('Mode', 'तरीका', 'पद्धत')}: ${item['mode']}\n'
+                '${item['details'] ?? ''}\n'
                 '${_t('Date', 'तारीख', 'तारीख')}: ${_formatDate(item['date'] as String?)}',
               ),
               isThreeLine: true,
@@ -306,13 +421,21 @@ class _PaymentTabState extends State<PaymentTab> {
             runSpacing: 8,
             children: [
               ChoiceChip(
-                label: Text(_t('Cash received', 'नकद प्राप्त हुआ', 'रोख मिळाली')),
+                label: Text(
+                  _t('Cash received', 'नकद प्राप्त हुआ', 'रोख मिळाली'),
+                ),
                 selected: cashStatus == 'received',
                 selectedColor: accent.withValues(alpha: 0.25),
                 onSelected: (_) => setState(() => cashStatus = 'received'),
               ),
               ChoiceChip(
-                label: Text(_t('Cash yet to receive', 'नकद प्राप्त होना बाकी है', 'रोख अजून मिळायची आहे')),
+                label: Text(
+                  _t(
+                    'Cash yet to receive',
+                    'नकद प्राप्त होना बाकी है',
+                    'रोख अजून मिळायची आहे',
+                  ),
+                ),
                 selected: cashStatus == 'pending',
                 selectedColor: accent.withValues(alpha: 0.25),
                 onSelected: (_) => setState(() => cashStatus = 'pending'),
@@ -366,7 +489,11 @@ class _PaymentTabState extends State<PaymentTab> {
             controller: accountController,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.account_balance),
-              labelText: _t('Bank / Wallet Reference (optional)', 'बैंक / वॉलेट संदर्भ (वैकल्पिक)', 'बँक / वॉलेट संदर्भ (पर्यायी)'),
+              labelText: _t(
+                'Bank / Wallet Reference (optional)',
+                'बैंक / वॉलेट संदर्भ (वैकल्पिक)',
+                'बँक / वॉलेट संदर्भ (पर्यायी)',
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -387,7 +514,9 @@ class _PaymentTabState extends State<PaymentTab> {
               child: ElevatedButton.icon(
                 onPressed: () => setState(() => qrGenerated = true),
                 icon: const Icon(Icons.qr_code_2),
-                label: Text(_t('Generate UPI', 'UPI जनरेट करें', 'UPI तयार करा')),
+                label: Text(
+                  _t('Generate UPI', 'UPI जनरेट करें', 'UPI तयार करा'),
+                ),
               ),
             ),
           if (qrGenerated && _upiQrData().isNotEmpty) ...[
@@ -409,7 +538,11 @@ class _PaymentTabState extends State<PaymentTab> {
           if (qrGenerated && _upiQrData().isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
-              _t('Scan with any UPI app', 'किसी भी UPI ऐप से स्कैन करें', 'कोणत्याही UPI अॅपने स्कॅन करा'),
+              _t(
+                'Scan with any UPI app',
+                'किसी भी UPI ऐप से स्कैन करें',
+                'कोणत्याही UPI अॅपने स्कॅन करा',
+              ),
               style: TextStyle(
                 color: AppThemeColors.muted(context),
                 fontSize: 12,
@@ -419,7 +552,11 @@ class _PaymentTabState extends State<PaymentTab> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                _t('Save UPI details?', 'UPI विवरण सहेजें?', 'UPI तपशील जतन करायचे?'),
+                _t(
+                  'Save UPI details?',
+                  'UPI विवरण सहेजें?',
+                  'UPI तपशील जतन करायचे?',
+                ),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppThemeColors.text(context),

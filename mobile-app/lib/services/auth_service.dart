@@ -5,8 +5,22 @@ import 'package:http/http.dart' as http;
 import 'storage_service.dart';
 
 class AuthService {
-  // Use http://10.0.2.2:8000 for Android emulator, or http://localhost:8000 for desktop/web/Linux
-  static const String baseUrl = 'http://localhost:8000';
+  // Hardcoded permanent Ngrok domain for your hackathon demo
+  static const String defaultBaseUrl =
+      'https://consonant-unequal-happening.ngrok-free.dev';
+
+  // 🛡️ Backward compatibility getter for files using AuthService.baseUrl
+  static String get baseUrl => defaultBaseUrl;
+
+  /// Dynamically resolves baseUrl from local storage if configured, otherwise falls back to default
+  static String getBaseUrl([ReNovaStorage? storage]) {
+    if (storage != null &&
+        storage.customBaseUrl != null &&
+        storage.customBaseUrl!.isNotEmpty) {
+      return storage.customBaseUrl!;
+    }
+    return defaultBaseUrl;
+  }
 
   static Future<Map<String, dynamic>> registerCollector({
     required String phone,
@@ -17,7 +31,8 @@ class AuthService {
     String? upiId,
     required ReNovaStorage storage,
   }) async {
-    final url = Uri.parse('$baseUrl/api/v1/auth/collector/register');
+    final currentBaseUrl = getBaseUrl(storage);
+    final url = Uri.parse('$currentBaseUrl/api/v1/auth/collector/register');
 
     try {
       final response = await http.post(
@@ -60,7 +75,7 @@ class AuthService {
     } catch (e) {
       return {
         'success': false,
-        'message': 'Cannot reach server at $baseUrl: $e',
+        'message': 'Cannot reach server at $currentBaseUrl: $e',
       };
     }
   }
@@ -70,7 +85,8 @@ class AuthService {
     required String pin,
     required ReNovaStorage storage,
   }) async {
-    final url = Uri.parse('$baseUrl/api/v1/auth/collector/login');
+    final currentBaseUrl = getBaseUrl(storage);
+    final url = Uri.parse('$currentBaseUrl/api/v1/auth/collector/login');
 
     try {
       final response = await http.post(
@@ -105,7 +121,7 @@ class AuthService {
     } catch (e) {
       return {
         'success': false,
-        'message': 'Cannot reach server at $baseUrl: $e',
+        'message': 'Cannot reach server at $currentBaseUrl: $e',
       };
     }
   }

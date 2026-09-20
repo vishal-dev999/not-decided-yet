@@ -28,14 +28,19 @@ class PickupTab extends StatefulWidget {
 class _PickupTabState extends State<PickupTab> {
   List<Map<String, dynamic>> _lots = [];
   bool _isLoading = true;
+  bool _showCompleted = false; // 👈 Add this toggle state
 
   @override
   void initState() {
     super.initState();
-    _loadLots();
+    _loadLotsFromLocalDb();
 
-    // Listen to background sync updates from SyncWorker
+    // Listen to background sync updates from SyncWorker (SSOT UI sync)
     SyncWorker.latestLotsNotifier.addListener(_onSyncWorkerUpdate);
+
+    // Trigger an immediate background sync run on tab open if online
+    final storage = widget.storage ?? getStorage(context);
+    SyncWorker.triggerImmediate(storage);
   }
 
   @override
@@ -48,27 +53,65 @@ class _PickupTabState extends State<PickupTab> {
     final remote = SyncWorker.latestLotsNotifier.value;
     if (remote.isNotEmpty && mounted) {
       setState(() {
-        _lots = remote;
+        _lots = remote.where((lot) {
+          final s = (lot['status'] ?? '').toString().toUpperCase();
+          return s != 'CANCELLED' && s != 'WITHDRAWN' && s != 'ARCHIVED';
+        }).toList();
         _isLoading = false;
       });
     }
   }
 
+  /// 🛡️ SSOT Principle: Load directly and exclusively from local SQLite database
+  Future<void> _loadLots() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final localQueued = await DatabaseHelper.instance.getQueuedLots(
+        limit: 100,
+      );
+      if (mounted) {
+        setState(() {
+          _lots = localQueued.where((lot) {
+            final s = (lot['status'] ?? '').toString().toUpperCase();
+            return s != 'CANCELLED' && s != 'WITHDRAWN' && s != 'ARCHIVED';
+          }).toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('[PickupTab] Error loading local lots: $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
+
+    // Trigger background sync worker to fetch fresh remote data asynchronously
+    if (mounted) {
+      final storage = widget.storage ?? getStorage(context);
+      SyncWorker.triggerImmediate(storage);
+    }
+  }
+
+  Future<void> _loadLotsFromLocalDb() async {
+    await _loadLots();
+  }
+
   Future<void> _handleCancelLot(Map<String, dynamic> lot) async {
     final status = (lot['status'] ?? 'PENDING').toString().toUpperCase();
     final clientUid = (lot['client_lot_id'] ?? lot['lot_uid'] ?? '').toString();
-    final backendId = (lot['id'] ?? '').toString();
+    final backendId = (lot['backend_id'] ?? lot['id'] ?? '').toString();
     final targetUid = clientUid.isNotEmpty ? clientUid : backendId;
 
-    // Prevent cancellation once physical weighing begins
-    if (status == 'SESSION_OPEN' || status == 'VERIFIED_COMPLETED') {
+    // 🛡️ OFFLINE & STATE RESTRICTION: Prevent cancelling if active/locked
+    if (status == 'SESSION_OPEN' ||
+        status == 'VERIFIED_COMPLETED' ||
+        status == 'LOCKED') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             _t(
-              'Cannot cancel lot during or after weigh-in',
-              'तौल के दौरान या बाद में लॉट रद्द नहीं कर सकते',
-              'वजन सुरू असताना किंवा नंतर लॉट रद्द करू शकत नाही',
+              'Cannot cancel a locked or active lot during pickup phase.',
+              'पिकअप चरण के दौरान लॉक या सक्रिय लॉट को रद्द नहीं किया जा सकता।',
+              'पिकअप दरम्यान लॉक किंवा सक्रिय लॉट रद्द केला जाऊ शकत नाही.',
             ),
           ),
         ),
@@ -82,17 +125,11 @@ class _PickupTabState extends State<PickupTab> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(_t('Cancel Lot?', 'लॉट रद्द करें?', 'लॉट रद्द करायचा?')),
         content: Text(
-          status == 'LOCKED'
-              ? _t(
-                  'A recycler has already accepted this lot. Are you sure you want to cancel the pickup?',
-                  'एक रिसाइकिलर ने पहले ही यह लॉट स्वीकार कर लिया है। क्या आप वाकई पिकअप रद्द करना चाहते हैं?',
-                  'एका रिसायकलरने हा लॉट आधीच स्वीकारला आहे. तुम्हाला खात्री आहे की तुम्ही पिकअप रद्द करू इच्छिता?',
-                )
-              : _t(
-                  'Are you sure you want to cancel and remove this lot?',
-                  'क्या आप वाकई इस लॉट को रद्द और हटाना चाहते हैं?',
-                  'तुम्हाला खात्री आहे की तुम्ही हा लॉट रद्द आणि काढून टाकू इच्छिता?',
-                ),
+          _t(
+            'Are you sure you want to cancel and remove this lot?',
+            'क्या आप वाकई इस लॉट को रद्द और हटाना चाहते हैं?',
+            'तुम्हाला खात्री आहे की तुम्ही हा लॉट रद्द आणि काढून टाकू इच्छिता?',
+          ),
         ),
         actions: [
           TextButton(
@@ -116,30 +153,40 @@ class _PickupTabState extends State<PickupTab> {
     setState(() => _isLoading = true);
 
     try {
-      final db = await DatabaseHelper.instance.database;
-
       if (status == 'PENDING') {
-        // Offline lot: purge directly from local SQLite
-        await db.delete(
-          'sync_queue',
-          where: 'lot_uid = ? OR lot_uid = ?',
-          whereArgs: [clientUid, targetUid],
-        );
+        // Purely local offline lot: safe to purge locally
+        await DatabaseHelper.instance.deleteLot(targetUid);
       } else {
-        // Online synced lot: notify backend
+        // Synced lot: attempt backend cancellation
         final storage = widget.storage ?? getStorage(context);
         final cancelTarget = backendId.isNotEmpty ? backendId : targetUid;
 
         if (storage.accessToken != null && storage.accessToken!.isNotEmpty) {
-          await SyncService.cancelLot(storage: storage, lotId: cancelTarget);
+          final success = await SyncService.cancelLot(
+            storage: storage,
+            lotId: cancelTarget,
+          );
+          if (!success) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.redAccent,
+                  content: Text(
+                    _t(
+                      'Offline: Cannot reach server to cancel synchronized lot.',
+                      'ऑफ़लाइन: सिंक्रनाइज़ लॉट को रद्द करने के लिए सर्वर तक नहीं पहुँच सकते।',
+                      'ऑफलाइन: सिंक केलेला लॉट रद्द करण्यासाठी सर्व्हरशी संपर्क साधता येत नाही.',
+                    ),
+                  ),
+                ),
+              );
+            }
+            setState(() => _isLoading = false);
+            return;
+          }
         }
 
-        // Drop from local SQLite cache so it disappears immediately
-        await db.delete(
-          'sync_queue',
-          where: 'lot_uid = ? OR lot_uid = ?',
-          whereArgs: [clientUid, targetUid],
-        );
+        await DatabaseHelper.instance.deleteLot(targetUid);
       }
     } catch (e) {
       debugPrint('[PickupTab] Error canceling lot: $e');
@@ -224,7 +271,6 @@ class _PickupTabState extends State<PickupTab> {
                           final scannedAmount =
                               (data['amount'] as num?)?.toDouble() ?? 0.0;
 
-                          // Verify payload matches this active transaction
                           if (scannedLotId == lotId &&
                               (scannedAmount - expectedAmount).abs() < 1.0) {
                             isProcessing = true;
@@ -246,7 +292,6 @@ class _PickupTabState extends State<PickupTab> {
                             );
                           }
                         } catch (_) {
-                          // Fallback: accept simple text token matching lotId
                           if (rawValue.contains(lotId)) {
                             isProcessing = true;
                             Navigator.pop(ctx);
@@ -277,143 +322,24 @@ class _PickupTabState extends State<PickupTab> {
     );
   }
 
-  Future<void> _loadLots() async {
-    setState(() => _isLoading = true);
-
-    // 1. Instant load from SQLite (Fast & offline-safe)
-    List<Map<String, dynamic>> localQueued = [];
-    try {
-      localQueued = await DatabaseHelper.instance.getQueuedLots(limit: 50);
-      if (mounted) {
-        setState(() {
-          _lots = localQueued.where((lot) {
-            final s = (lot['status'] ?? '').toString().toUpperCase();
-            return s != 'CANCELLED' && s != 'WITHDRAWN' && s != 'ARCHIVED';
-          }).toList();
-        });
-      }
-    } catch (_) {}
-
-    // 2. Resolve storage instance safely
-    final storage = widget.storage ?? getStorage(context);
-
-    // 3. Fetch from backend and reconcile local view
-    if (storage.accessToken != null && storage.accessToken!.isNotEmpty) {
-      try {
-        final remote = await SyncService.fetchCollectorLots(storage: storage);
-
-        if (mounted) {
-          // Keep local PENDING lots that haven't reached the server yet
-          final unsyncedLocal = localQueued.where((lot) {
-            final s = (lot['status'] ?? '').toString().toUpperCase();
-            return s == 'PENDING';
-          }).toList();
-
-          // Filter out CANCELLED / ARCHIVED records from remote
-          final activeRemote = remote.where((lot) {
-            final s = (lot['status'] ?? '').toString().toUpperCase();
-            return s != 'CANCELLED' && s != 'WITHDRAWN' && s != 'ARCHIVED';
-          }).toList();
-
-          // Build a lookup map of local image paths keyed by both lot_uid and client_lot_id
-          final Map<String, String> localImageMap = {};
-          for (final row in localQueued) {
-            final img =
-                (row['image_path'] ?? row['photo_path'] ?? '') as String;
-            if (img.isNotEmpty) {
-              final uid = (row['lot_uid'] ?? '').toString();
-              final clientUid = (row['client_lot_id'] ?? '').toString();
-              if (uid.isNotEmpty) localImageMap[uid] = img;
-              if (clientUid.isNotEmpty) localImageMap[clientUid] = img;
-            }
-          }
-
-          // Enrich remote lots with both local image_path and live transaction details
-          final enrichedRemote = await Future.wait(
-            activeRemote.map((lot) async {
-              final status = (lot['status'] ?? '').toString().toUpperCase();
-              final backendId = (lot['id'] ?? '').toString();
-              final clientUid = (lot['client_lot_id'] ?? '').toString();
-              final lotUid = (lot['lot_uid'] ?? '').toString();
-
-              final mutable = Map<String, dynamic>.from(lot);
-
-              // Restore the local on-device image path if present
-              if (clientUid.isNotEmpty &&
-                  localImageMap.containsKey(clientUid)) {
-                mutable['image_path'] = localImageMap[clientUid];
-              } else if (lotUid.isNotEmpty &&
-                  localImageMap.containsKey(lotUid)) {
-                mutable['image_path'] = localImageMap[lotUid];
-              } else if (backendId.isNotEmpty &&
-                  localImageMap.containsKey(backendId)) {
-                mutable['image_path'] = localImageMap[backendId];
-              }
-
-              if (status == 'WEIGHED' && backendId.isNotEmpty) {
-                final details = await SyncService.fetchLotStatus(
-                  storage: storage,
-                  lotId: backendId,
-                );
-                if (details != null && details['transaction'] != null) {
-                  mutable['transaction'] = details['transaction'];
-                }
-              }
-              return mutable;
-            }),
-          );
-
-          // Merge without duplicates (favoring fresh remote data)
-          final activeUids = enrichedRemote
-              .map(
-                (r) => (r['client_lot_id'] ?? r['lot_uid'] ?? r['id'] ?? '')
-                    .toString(),
-              )
-              .toSet();
-
-          final merged = [
-            ...unsyncedLocal.where((l) {
-              final uid = (l['client_lot_id'] ?? l['lot_uid'] ?? l['id'] ?? '')
-                  .toString();
-              return !activeUids.contains(uid);
-            }),
-            ...enrichedRemote,
-          ];
-
-          setState(() {
-            _lots = merged;
-          });
-        }
-      } catch (e) {
-        debugPrint('[PickupTab] Manual refresh failed: $e');
-      }
-    }
-
-    if (mounted) setState(() => _isLoading = false);
-  }
-
   Future<void> _showConsentSheet(
     BuildContext context,
     Map<String, dynamic> row,
   ) async {
     final lotUid = (row['client_lot_id'] ?? row['lot_uid'] ?? row['id'] ?? '')
         .toString();
-    final backendId = (row['id'] ?? '').toString();
+    final backendId = (row['backend_id'] ?? row['id'] ?? '').toString();
     final targetId = backendId.isNotEmpty ? backendId : lotUid;
     final storage = widget.storage ?? getStorage(context);
 
-    // 1. Fetch live transaction data from backend
-    Map<String, dynamic>? liveDetails;
-    if (storage.accessToken != null &&
-        storage.accessToken!.isNotEmpty &&
-        backendId.isNotEmpty) {
-      liveDetails = await SyncService.fetchLotStatus(
-        storage: storage,
-        lotId: backendId,
-      );
+    Map<String, dynamic>? txn = row['transaction'] as Map<String, dynamic>?;
+    if (txn == null && row['transaction_json'] != null) {
+      try {
+        txn = jsonDecode(
+          row['transaction_json'] as String,
+        ) as Map<String, dynamic>;
+      } catch (_) {}
     }
-
-    final txn = liveDetails?['transaction'] as Map<String, dynamic>?;
 
     final certifiedWeight =
         (txn?['certified_weight_kg'] ??
@@ -429,8 +355,7 @@ class _PickupTabState extends State<PickupTab> {
     final totalAmount =
         (txn?['total_amount'] ?? (certifiedWeight * offeredRate)).toDouble();
 
-    final recyclerName =
-        liveDetails?['recycler']?['company_name'] ?? 'Recycler';
+    final recyclerName = 'Authorized Recycler';
 
     String selectedPaymentMode = 'UPI';
     final TextEditingController upiRefController = TextEditingController();
@@ -631,7 +556,6 @@ class _PickupTabState extends State<PickupTab> {
                 ],
               ),
 
-              // Optional UPI UTR / Ref ID Input
               if (selectedPaymentMode == 'UPI') ...[
                 const SizedBox(height: 12),
                 TextField(
@@ -695,7 +619,6 @@ class _PickupTabState extends State<PickupTab> {
                         Navigator.pop(ctx);
 
                         if (selectedPaymentMode == 'CASH') {
-                          // 1. Launch Cash QR scanner for cryptographic physical verification
                           await _showCashQrScanner(
                             context: context,
                             lotId: targetId,
@@ -710,7 +633,6 @@ class _PickupTabState extends State<PickupTab> {
                               );
 
                               if (ok) {
-                                // Record in local storage payment history
                                 await storage.savePayment({
                                   'mode': 'Cash',
                                   'details': 'Form-6 Lot $lotUid',
@@ -738,7 +660,6 @@ class _PickupTabState extends State<PickupTab> {
                             },
                           );
                         } else {
-                          // 2. UPI settlement flow
                           setState(() => _isLoading = true);
                           final enteredUpiRef = upiRefController.text.trim();
                           final ok = await SyncService.submitConsent(
@@ -752,7 +673,6 @@ class _PickupTabState extends State<PickupTab> {
                           );
 
                           if (ok) {
-                            // Record in local storage payment history
                             await storage.savePayment({
                               'mode': 'UPI',
                               'details': enteredUpiRef.isNotEmpty
@@ -917,6 +837,19 @@ class _PickupTabState extends State<PickupTab> {
         ? AppColors.primaryGold
         : AppColors.featherGreen;
 
+    // Split lots into Active (Current) and Completed categories
+    final activeLots = _lots.where((lot) {
+      final status = (lot['status'] ?? '').toString().toUpperCase();
+      return status != 'VERIFIED_COMPLETED' &&
+          status != 'CANCELLED' &&
+          status != 'WITHDRAWN';
+    }).toList();
+
+    final completedLots = _lots.where((lot) {
+      final status = (lot['status'] ?? '').toString().toUpperCase();
+      return status == 'VERIFIED_COMPLETED';
+    }).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_t('My Scrap Lots', 'मेरे कबाड़ लॉट', 'माझे भंगार लॉट')),
@@ -952,12 +885,100 @@ class _PickupTabState extends State<PickupTab> {
             ? const Center(child: CircularProgressIndicator())
             : _lots.isEmpty
             ? _emptyState(context, activeAccent)
-            : ListView.builder(
+            : ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-                itemCount: _lots.length,
-                itemBuilder: (context, index) {
-                  return _lotCard(context, _lots[index], activeAccent);
-                },
+                children: [
+                  // SECTION 1: ACTIVE / CURRENT LOTS
+                  if (activeLots.isNotEmpty) ...[
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.local_shipping_outlined,
+                          size: 16,
+                          color: Colors.orange,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _t(
+                            'Current Pickups & Active Lots',
+                            'वर्तमान पिकअप और सक्रिय लॉट',
+                            'सध्याचे पिकअप आणि सक्रिय लॉट',
+                          ),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ...activeLots.map(
+                      (lot) => _lotCard(context, lot, activeAccent),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+
+                  // SECTION 2: COMPLETED LOTS (COLLAPSIBLE / CLOSED BY DEFAULT)
+                  if (completedLots.isNotEmpty) ...[
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppThemeColors.card(context),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.featherGreen.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: ExpansionTile(
+                        initiallyExpanded: false, // 👈 Closed by default
+                        onExpansionChanged: (expanded) {
+                          setState(() => _showCompleted = expanded);
+                        },
+                        leading: const Icon(
+                          Icons.verified_rounded,
+                          color: AppColors.featherGreen,
+                        ),
+                        title: Text(
+                          _t(
+                            'Completed & Sealed Lots (${completedLots.length})',
+                            'पूर्ण और सील किए गए लॉट (${completedLots.length})',
+                            'पूर्ण आणि सील केलेले लॉट (${completedLots.length})',
+                          ),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        subtitle: Text(
+                          _t(
+                            'Tap to view history & Form-6 receipts',
+                            'इतिहास और फॉर्म-6 रसीदें देखने के लिए टैप करें',
+                            'इतिहास आणि पावत्या पाहण्यासाठी टॅप करा',
+                          ),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppThemeColors.muted(context),
+                          ),
+                        ),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                            child: Column(
+                              children: completedLots
+                                  .map(
+                                    (lot) =>
+                                        _lotCard(context, lot, activeAccent),
+                                  )
+                                  .toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  if (activeLots.isEmpty && completedLots.isEmpty)
+                    _emptyState(context, activeAccent),
+                ],
               ),
       ),
     );
@@ -1036,8 +1057,15 @@ class _PickupTabState extends State<PickupTab> {
                 'MIXED_EWASTE_CASING')
             .toString();
 
-    // Certified weighbridge data if available, otherwise original estimate
-    final txn = row['transaction'] as Map<String, dynamic>?;
+    Map<String, dynamic>? txn = row['transaction'] as Map<String, dynamic>?;
+    if (txn == null && row['transaction_json'] != null) {
+      try {
+        txn = jsonDecode(
+          row['transaction_json'] as String,
+        ) as Map<String, dynamic>;
+      } catch (_) {}
+    }
+
     final double? certifiedWeight = (txn?['certified_weight_kg'] as num?)
         ?.toDouble();
     final double estWeight =

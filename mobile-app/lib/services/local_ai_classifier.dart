@@ -47,7 +47,10 @@ class LocalAiClassifier {
   static List<String> _labels = [];
   static bool _isInitialized = false;
 
-  /// The 9 canonical backend categories (Source of Truth)
+  /// Confidence threshold (e.g., 65%). Anything below triggers "can't identify" UX.
+  static const double confidenceThreshold = 0.65;
+
+  /// The 9 canonical backend categories (Source of Truth including NON_E_WASTE)
   static const List<String> canonicalCategories = [
     'MOTHERBOARD_HIGH_GRADE',
     'POWER_SUPPLY_LOW_GRADE',
@@ -58,6 +61,7 @@ class LocalAiClassifier {
     'MIXED_EWASTE_CASING',
     'COPPER_HEAVY_INSULATED',
     'ALUMINIUM_WIRE',
+    'NON_E_WASTE',
   ];
 
   /// Static baseline benchmarks matching the database seed rates
@@ -107,6 +111,11 @@ class LocalAiClassifier {
       'min_rate': 96,
       'max_rate': 158,
     },
+    'NON_E_WASTE': {
+      'rate_per_kg': 0,
+      'min_rate': 0,
+      'max_rate': 0,
+    },
   };
 
   static Map<String, dynamic> getAllBenchmarks() => benchmarks;
@@ -141,6 +150,12 @@ class LocalAiClassifier {
 
   static String getLocalizedMaterialName(String rawCode, AppLanguage language) {
     switch (rawCode) {
+      case 'NON_E_WASTE':
+        return language == AppLanguage.hindi
+            ? 'अमान्य वस्तु (ई-कचरा नहीं)'
+            : language == AppLanguage.marathi
+                ? 'अवैध वस्तू (इ-कचरा नाही)'
+                : 'Non-E-Waste Item';
       case 'BATTERY_LITHIUM_PORTABLE':
         return language == AppLanguage.hindi
             ? 'लिथियम-आयन बैटरी'
@@ -148,11 +163,12 @@ class LocalAiClassifier {
                 ? 'लिथियम-आयन बॅटरी'
                 : 'Lithium Batteries';
       case 'CABLES_AND_WIRING':
+      case 'COPPER_HEAVY_INSULATED':
         return language == AppLanguage.hindi
-            ? 'तार व केबल'
+            ? 'तांबे का तार'
             : language == AppLanguage.marathi
-                ? 'तारा आणि केबल'
-                : 'Cables & Wiring';
+                ? 'तांब्याची तार'
+                : 'Copper Wire';
       case 'CRT_MONITOR':
         return language == AppLanguage.hindi
             ? 'सीआरटी मॉनिटर'
@@ -189,14 +205,8 @@ class LocalAiClassifier {
         return language == AppLanguage.hindi
             ? 'मिश्रित ई-कचरा प्लास्टिक'
             : language == AppLanguage.marathi
-                ? 'मिश्र ई-कचरा प्लास्टिक'
+                ? 'मिश्र इ-कचरा प्लास्टिक'
                 : 'Mixed Plastic';
-      case 'COPPER_HEAVY_INSULATED':
-        return language == AppLanguage.hindi
-            ? 'तांबे का तार'
-            : language == AppLanguage.marathi
-                ? 'तांब्याची तार'
-                : 'Copper Wire';
       case 'ALUMINIUM_WIRE':
         return language == AppLanguage.hindi
             ? 'एल्युमिनियम तार'
@@ -210,6 +220,8 @@ class LocalAiClassifier {
 
   static IconData getMaterialIcon(String code) {
     switch (code) {
+      case 'NON_E_WASTE':
+        return Icons.block;
       case 'BATTERY_LITHIUM_PORTABLE':
       case 'LEAD_ACID':
         return Icons.battery_charging_full;
@@ -294,23 +306,35 @@ class LocalAiClassifier {
     if (predictedCode == 'FLAT_PANEL_DISPLAY') predictedCode = 'LCD_PANEL_INTACT';
     if (predictedCode == 'MIXED_PLASTICS') predictedCode = 'MIXED_EWASTE_CASING';
 
+    // --- Validation Flags ---
+    final bool isNonEwaste = (predictedCode == 'NON_E_WASTE');
+    final bool isLowConfidence = (confidenceValue < confidenceThreshold);
+
+    // If it's non-e-waste or confidence is too low, flag it for UI handling
+    final bool isValidEwaste = !isNonEwaste && !isLowConfidence;
+
     final benchmark = benchmarks[predictedCode] ?? {
       'rate_per_kg': 100,
       'min_rate': 80,
       'max_rate': 120,
     };
 
-    final int ratePerKg = (benchmark['rate_per_kg'] as num? ?? 100).toInt();
+    final int ratePerKg = isValidEwaste ? (benchmark['rate_per_kg'] as num? ?? 100).toInt() : 0;
 
     return {
       'materialCode': predictedCode,
       'material': predictedCode,
       'confidence': '${(confidenceValue * 100).toStringAsFixed(0)}%',
       'confidencePct': '${(confidenceValue * 100).toStringAsFixed(1)}%',
+      'confidenceValue': confidenceValue,
       'ratePerKg': ratePerKg,
       'price': '₹$ratePerKg/kg',
       'imagePath': imagePath,
       'date': DateTime.now().toIso8601String(),
+      // 🛡️ Extra Flags for UI Guardrails
+      'isNonEwaste': isNonEwaste,
+      'isLowConfidence': isLowConfidence,
+      'isValidEwaste': isValidEwaste,
     };
   }
 

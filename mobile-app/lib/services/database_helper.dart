@@ -11,7 +11,7 @@ import '../constants/app_enums.dart';
 
 class DatabaseHelper {
   static const _databaseName = "renova_offline.db";
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 3;
 
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -32,6 +32,7 @@ class DatabaseHelper {
       path,
       version: _databaseVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -50,7 +51,7 @@ class DatabaseHelper {
       )
     ''');
 
-    // 2. Price History Table (Mapped from unified benchmark JSON)
+    // 2. Price History Table
     await db.execute('''
       CREATE TABLE price_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,21 +66,322 @@ class DatabaseHelper {
       )
     ''');
 
-    // 3. Offline Lot Sync Queue
+    // 3. Offline Lot Single Source of Truth
     await db.execute('''
       CREATE TABLE sync_queue (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         lot_uid TEXT NOT NULL UNIQUE,
-        image_path TEXT NOT NULL,
-        json_payload TEXT NOT NULL,
+        backend_id TEXT,
+        image_path TEXT,
+        json_payload TEXT,
+        material_category TEXT,
+        estimated_weight_kg REAL DEFAULT 1.0,
+        qr_token TEXT,
+        transaction_json TEXT,
+        pending_action TEXT,
         status TEXT DEFAULT 'PENDING',
         created_at TEXT NOT NULL
       )
     ''');
   }
 
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      try {
+        await db.execute("ALTER TABLE sync_queue ADD COLUMN backend_id TEXT;");
+      } catch (_) {}
+      try {
+        await db.execute(
+          "ALTER TABLE sync_queue ADD COLUMN material_category TEXT;",
+        );
+      } catch (_) {}
+      try {
+        await db.execute(
+          "ALTER TABLE sync_queue ADD COLUMN estimated_weight_kg REAL DEFAULT 1.0;",
+        );
+      } catch (_) {}
+      try {
+        await db.execute("ALTER TABLE sync_queue ADD COLUMN qr_token TEXT;");
+      } catch (_) {}
+    }
+    if (oldVersion < 3) {
+      try {
+        await db.execute(
+          "ALTER TABLE sync_queue ADD COLUMN transaction_json TEXT;",
+        );
+      } catch (_) {}
+      try {
+        await db.execute(
+          "ALTER TABLE sync_queue ADD COLUMN pending_action TEXT;",
+        );
+      } catch (_) {}
+    }
+  }
+
   // ==========================================================
-  // SEEDING & BENCHMARK OPERATIONS
+  // SYNC QUEUE / LOT CRUD OPERATIONS
+  // ==========================================================
+
+  Future<int> enqueueLot({
+    required String lotUid,
+    required String imagePath,
+    required String jsonPayload,
+    String? materialCategory,
+    double? estimatedWeightKg,
+    String? qrToken,
+  }) async {
+    final db = await database;
+
+    String category = materialCategory ?? 'MIXED_EWASTE_CASING';
+    double weight = estimatedWeightKg ?? 1.0;
+    String qr = qrToken ?? '';
+
+    try {
+      final decoded = jsonDecode(jsonPayload) as Map<String, dynamic>;
+      category = materialCategory ?? decoded['material_category'] ?? category;
+      weight =
+          estimatedWeightKg ??
+          (decoded['estimated_weight_kg'] as num?)?.toDouble() ??
+          weight;
+      qr = qrToken ?? decoded['qr_token'] ?? qr;
+    } catch (_) {}
+
+    return await db.insert('sync_queue', {
+      'lot_uid': lotUid,
+      'backend_id': null,
+      'image_path': imagePath,
+      'json_payload': jsonPayload,
+      'material_category': category,
+      'estimated_weight_kg': weight,
+      'qr_token': qr,
+      'transaction_json': null,
+      'pending_action': null,
+      'status': 'PENDING',
+      'created_at': DateTime.now().toIso8601String(),
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<Map<String, dynamic>>> getQueuedLots({int limit = 100}) async {
+    final db = await database;
+    final rows = await db.query(
+      'sync_queue',
+      orderBy: 'created_at DESC',
+      limit: limit,
+    );
+
+    return rows.map((row) {
+      final mutable = Map<String, dynamic>.from(row);
+      if (mutable['transaction_json'] != null &&
+          (mutable['transaction_json'] as String).isNotEmpty) {
+        try {
+          mutable['transaction'] = jsonDecode(
+            mutable['transaction_json'] as String,
+          );
+        } catch (_) {}
+      }
+      return mutable;
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getPendingQueue() async {
+    final db = await database;
+    return await db.query(
+      'sync_queue',
+      where: 'status = ?',
+      whereArgs: ['PENDING'],
+      orderBy: 'created_at ASC',
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getLotsWithPendingAction() async {
+    final db = await database;
+    return await db.query(
+      'sync_queue',
+      where: 'pending_action IS NOT NULL AND pending_action != ?',
+      whereArgs: [''],
+    );
+  }
+
+  /// Fetches a single lot by matching either backend_id or lot_uid
+  Future<Map<String, dynamic>?> getLotById(String id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> results = await db.query(
+      'sync_queue',
+      where: 'backend_id = ? OR lot_uid = ?',
+      whereArgs: [id, id],
+      limit: 1,
+    );
+
+    if (results.isNotEmpty) {
+      final mutable = Map<String, dynamic>.from(results.first);
+      if (mutable['transaction_json'] != null &&
+          (mutable['transaction_json'] as String).isNotEmpty) {
+        try {
+          mutable['transaction'] = jsonDecode(
+            mutable['transaction_json'] as String,
+          );
+        } catch (_) {}
+      }
+      return mutable;
+    }
+    return null;
+  }
+
+  Future<int> updateLotStatus(
+    String lotUidOrBackendId,
+    String status, {
+    String? backendId,
+    Map<String, dynamic>? transaction,
+    String? pendingAction,
+  }) async {
+    final db = await database;
+    final Map<String, dynamic> updateValues = {'status': status};
+
+    if (backendId != null && backendId.isNotEmpty) {
+      updateValues['backend_id'] = backendId;
+    }
+    if (transaction != null) {
+      updateValues['transaction_json'] = jsonEncode(transaction);
+    }
+    if (pendingAction != null) {
+      updateValues['pending_action'] = pendingAction;
+    }
+
+    return await db.update(
+      'sync_queue',
+      updateValues,
+      where: 'lot_uid = ? OR backend_id = ?',
+      whereArgs: [lotUidOrBackendId, lotUidOrBackendId],
+    );
+  }
+
+  Future<int> clearPendingAction(String lotUidOrBackendId) async {
+    final db = await database;
+    return await db.update(
+      'sync_queue',
+      {'pending_action': null},
+      where: 'lot_uid = ? OR backend_id = ?',
+      whereArgs: [lotUidOrBackendId, lotUidOrBackendId],
+    );
+  }
+
+  Future<int> deleteLot(String identifier) async {
+    final db = await database;
+    return await db.delete(
+      'sync_queue',
+      where: 'lot_uid = ? OR backend_id = ?',
+      whereArgs: [identifier, identifier],
+    );
+  }
+
+  /// Single Source of Truth Reconciler:
+  /// Merges server feed into SQLite while preserving device-only images and un-pushed actions.
+  Future<void> reconcileSyncedLots(
+    List<Map<String, dynamic>> remoteLots,
+  ) async {
+    final db = await database;
+
+    final activeRemoteLots = remoteLots.where((r) {
+      final status = (r['status'] ?? '').toString().toUpperCase();
+      return status != 'CANCELLED' &&
+          status != 'WITHDRAWN' &&
+          status != 'ARCHIVED';
+    }).toList();
+
+    final remoteIds = activeRemoteLots
+        .map((r) => (r['id'] ?? '').toString())
+        .where((id) => id.isNotEmpty)
+        .toSet();
+    final remoteClientUids = activeRemoteLots
+        .map((r) => (r['client_lot_id'] ?? r['lot_uid'] ?? '').toString())
+        .where((uid) => uid.isNotEmpty)
+        .toSet();
+
+    await db.transaction((txn) async {
+      // 1. Remove synced records that no longer exist on server (unless local PENDING upload)
+      final localRows = await txn.query('sync_queue');
+      for (final row in localRows) {
+        final localUid = (row['lot_uid'] ?? '').toString();
+        final localBackendId = (row['backend_id'] ?? '').toString();
+        final localStatus = (row['status'] ?? '').toString().toUpperCase();
+
+        if (localStatus != 'PENDING' &&
+            !remoteClientUids.contains(localUid) &&
+            !remoteIds.contains(localBackendId)) {
+          await txn.delete(
+            'sync_queue',
+            where: 'id = ?',
+            whereArgs: [row['id']],
+          );
+        }
+      }
+
+      // 2. Upsert each remote lot
+      for (final r in activeRemoteLots) {
+        final clientUid = (r['client_lot_id'] ?? r['lot_uid'] ?? '').toString();
+        final backendId = (r['id'] ?? '').toString();
+        final status = (r['status'] ?? 'SYNCED').toString().toUpperCase();
+        final qrToken = (r['qr_token'] ?? '').toString();
+        final category = (r['material_category'] ?? 'MIXED_EWASTE_CASING')
+            .toString();
+        final weight = (r['estimated_weight_kg'] as num?)?.toDouble() ?? 1.0;
+
+        final existing = await txn.query(
+          'sync_queue',
+          where: 'lot_uid = ? OR (backend_id IS NOT NULL AND backend_id = ?)',
+          whereArgs: [clientUid.isNotEmpty ? clientUid : backendId, backendId],
+        );
+
+        if (existing.isNotEmpty) {
+          final row = existing.first;
+          final localImage = (row['image_path'] ?? '') as String;
+          final localPendingAction = row['pending_action'] as String?;
+
+          // Don't downgrade status if we have an un-pushed local action pending
+          final effectiveStatus =
+              (localPendingAction != null && localPendingAction.isNotEmpty)
+              ? (row['status'] as String)
+              : status;
+
+          await txn.update(
+            'sync_queue',
+            {
+              'status': effectiveStatus,
+              if (backendId.isNotEmpty) 'backend_id': backendId,
+              if (qrToken.isNotEmpty) 'qr_token': qrToken,
+              'material_category': category,
+              'estimated_weight_kg': weight,
+              if (localImage.isNotEmpty) 'image_path': localImage,
+              'json_payload': jsonEncode(r),
+            },
+            where: 'id = ?',
+            whereArgs: [row['id']],
+          );
+        } else {
+          await txn.insert('sync_queue', {
+            'lot_uid': clientUid.isNotEmpty ? clientUid : backendId,
+            'backend_id': backendId,
+            'image_path': '',
+            'json_payload': jsonEncode(r),
+            'material_category': category,
+            'estimated_weight_kg': weight,
+            'qr_token': qrToken,
+            'transaction_json': null,
+            'pending_action': null,
+            'status': status,
+            'created_at':
+                (r['created_at_local'] ??
+                        r['synced_at'] ??
+                        DateTime.now().toIso8601String())
+                    .toString(),
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+      }
+    });
+  }
+
+  // ==========================================================
+  // BENCHMARKS, PROFILE & PRICE OPERATIONS
   // ==========================================================
 
   Future<void> seedInitialPricesIfNeeded() async {
@@ -90,7 +392,6 @@ class DatabaseHelper {
 
     if (count == null || count == 0) {
       final today = DateTime.now().toIso8601String().substring(0, 10);
-
       try {
         String jsonString = '';
         try {
@@ -110,8 +411,8 @@ class DatabaseHelper {
           final List<dynamic> list = decoded is List
               ? decoded
               : (decoded is Map
-                    ? (decoded['benchmarks'] as List<dynamic>? ?? [])
-                    : []);
+                  ? (decoded['benchmarks'] as List<dynamic>? ?? [])
+                  : []);
 
           for (final item in list) {
             final map = Map<String, dynamic>.from(item as Map);
@@ -137,7 +438,6 @@ class DatabaseHelper {
         debugPrint('Error reading benchmark assets: $e');
       }
 
-      // Check if rows were successfully inserted; if not, insert canonical categories directly
       final checkCount = Sqflite.firstIntValue(
         await db.rawQuery('SELECT COUNT(*) FROM price_history'),
       );
@@ -163,10 +463,6 @@ class DatabaseHelper {
       }
     }
   }
-
-  // ==========================================================
-  // USER PROFILE OPERATIONS
-  // ==========================================================
 
   Future<int> saveUserProfile({
     required String name,
@@ -195,95 +491,10 @@ class DatabaseHelper {
     return res.isNotEmpty ? res.first : null;
   }
 
-  // ==========================================================
-  // SYNC QUEUE OPERATIONS
-  // ==========================================================
-
-  Future<int> enqueueLot({
-    required String lotUid,
-    required String imagePath,
-    required String jsonPayload,
-  }) async {
-    final db = await database;
-    return await db.insert('sync_queue', {
-      'lot_uid': lotUid,
-      'image_path': imagePath,
-      'json_payload': jsonPayload,
-      'status': 'PENDING',
-      'created_at': DateTime.now().toIso8601String(),
-    });
-  }
-
-  Future<List<Map<String, dynamic>>> getQueuedLots({int limit = 50}) async {
-    final db = await database;
-    return await db.query(
-      'sync_queue',
-      orderBy: 'created_at DESC',
-      limit: limit,
-    );
-  }
-
-  Future<List<Map<String, dynamic>>> getPendingQueue() async {
-    final db = await database;
-    return await db.query(
-      'sync_queue',
-      where: 'status = ?',
-      whereArgs: ['PENDING'],
-      orderBy: 'created_at ASC',
-    );
-  }
-
-  Future<int> updateQueueStatus(int id, String status) async {
-    final db = await database;
-    return await db.update(
-      'sync_queue',
-      {'status': status},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  Future<int> updateQueueStatusByLotUid(String lotUid, String status) async {
-    final db = await database;
-    return await db.update(
-      'sync_queue',
-      {'status': status},
-      where: 'lot_uid = ?',
-      whereArgs: [lotUid],
-    );
-  }
-
-  // Clears user-specific offline lot cache and profile on logout
   Future<void> clearUserDataOnLogout() async {
     final db = await database;
     await db.delete('sync_queue');
     await db.delete('user_profile');
-    // Note: Keeps price_history intact so offline benchmark rates remain available
-  }
-
-  // ==========================================================
-  // PRICE HISTORY OPERATIONS
-  // ==========================================================
-
-  Future<void> insertPriceRecords(List<Map<String, dynamic>> records) async {
-    final db = await database;
-    final batch = db.batch();
-
-    for (final row in records) {
-      batch.insert('price_history', row);
-    }
-    await batch.commit(noResult: true);
-  }
-
-  /// Atomically refreshes prices when new rates arrive from backend sync
-  Future<void> refreshPriceRecords(List<Map<String, dynamic>> records) async {
-    final db = await database;
-    await db.transaction((txn) async {
-      await txn.delete('price_history');
-      for (final row in records) {
-        await txn.insert('price_history', row);
-      }
-    });
   }
 
   Future<List<Map<String, dynamic>>> getLatestPrices() async {
@@ -292,12 +503,11 @@ class DatabaseHelper {
   }
 
   Future<void> saveBackendQuotes(List<dynamic> quotes, String city) async {
-    final db = await instance.database;
+    final db = await database;
     final today = DateTime.now().toIso8601String().substring(0, 10);
 
     await db.transaction((txn) async {
       await txn.delete('price_history');
-
       for (final raw in quotes) {
         final quote = Map<String, dynamic>.from(raw as Map);
         final code = (quote['material_code'] ?? '').toString();
@@ -313,14 +523,9 @@ class DatabaseHelper {
         await txn.rawInsert(
           '''
           INSERT INTO price_history (
-            date,
-            material_category,
-            material_sub_category,
-            mandi_price_per_kg,
-            recycler_offered_price_per_kg,
-            min_market_price,
-            max_market_price,
-            location
+            date, material_category, material_sub_category,
+            mandi_price_per_kg, recycler_offered_price_per_kg,
+            min_market_price, max_market_price, location
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''',
           [today, code, nameEn, minRate, buyRate, minRate, maxRate, city],
@@ -329,60 +534,8 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> reconcileSyncedLots(
-    List<Map<String, dynamic>> remoteLots,
-  ) async {
-    final db = await database;
-
-    final activeRemoteLots = remoteLots.where((r) {
-      final status = (r['status'] ?? '').toString().toUpperCase();
-      return status != 'CANCELLED' &&
-          status != 'WITHDRAWN' &&
-          status != 'ARCHIVED';
-    }).toList();
-
-    final remoteUids = activeRemoteLots
-        .map((r) => (r['client_lot_id'] ?? r['lot_uid'] ?? '').toString())
-        .where((uid) => uid.isNotEmpty)
-        .toSet();
-
-    await db.transaction((txn) async {
-      // 1. Remove synced records no longer active on the backend
-      final localRows = await txn.query(
-        'sync_queue',
-        where: 'status != ?',
-        whereArgs: ['PENDING'],
-      );
-
-      for (final row in localRows) {
-        final localUid = row['lot_uid'] as String;
-        if (!remoteUids.contains(localUid)) {
-          await txn.delete(
-            'sync_queue',
-            where: 'lot_uid = ?',
-            whereArgs: [localUid],
-          );
-        }
-      }
-
-      // 2. Update status of active lots while preserving local image_path
-      for (final r in activeRemoteLots) {
-        final uid = (r['client_lot_id'] ?? r['lot_uid'] ?? '').toString();
-        final status = (r['status'] ?? 'SYNCED').toString();
-        if (uid.isNotEmpty) {
-          await txn.update(
-            'sync_queue',
-            {'status': status},
-            where: 'lot_uid = ?',
-            whereArgs: [uid],
-          );
-        }
-      }
-    });
-  }
-
   Future<void> clearAndReseedPrices() async {
-    final db = await instance.database;
+    final db = await database;
     final today = DateTime.now().toIso8601String().substring(0, 10);
 
     await db.transaction((txn) async {

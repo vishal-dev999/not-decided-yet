@@ -110,15 +110,12 @@ class _SettingsTabState extends State<SettingsTab> {
     );
 
     if (confirmed == true && mounted) {
-      // 1. Clear local SQLite user queue and profile
       await DatabaseHelper.instance.clearUserDataOnLogout();
 
-      // 2. Clear stored auth tokens/session
       if (widget.storage != null) {
         await widget.storage!.clearAuthSession();
       }
 
-      // 3. Navigate back to login
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(
@@ -135,8 +132,100 @@ class _SettingsTabState extends State<SettingsTab> {
     }
   }
 
+  // --- Backend Environment Selector Dialog ---
+  void _showBackendConfigDialog() {
+    final storage = widget.storage;
+    final TextEditingController urlController = TextEditingController(
+      text: AuthService.getBaseUrl(storage),
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppThemeColors.card(context),
+        title: Text(
+          _t('Configure Backend URL', 'बैकएंड यूआरएल कॉन्फ़िगर करें', 'बॅकएंड URL कॉन्फिगर करा'),
+          style: TextStyle(color: AppThemeColors.text(context)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _t(
+                'Enter Ngrok URL or select a preset for local testing:',
+                'स्थानीय परीक्षण के लिए Ngrok यूआरएल दर्ज करें या प्रीसेट चुनें:',
+                'स्थानिक चाचणीसाठी Ngrok URL प्रविष्ट करा किंवा प्रीसेट निवडा:',
+              ),
+              style: TextStyle(color: AppThemeColors.muted(context), fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: urlController,
+              decoration: const InputDecoration(
+                labelText: 'Base URL',
+                hintText: 'https://xxxx.ngrok-free.app or http://10.0.2.2:8000',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                ActionChip(
+                  label: const Text('Localhost'),
+                  onPressed: () => urlController.text = 'http://localhost:8000',
+                ),
+                ActionChip(
+                  label: const Text('Android Emulator'),
+                  onPressed: () => urlController.text = 'http://10.0.2.2:8000',
+                ),
+                ActionChip(
+                  label: const Text('Ngrok'),
+                  onPressed: () => urlController.text = 'https://your-ngrok-url.ngrok-free.app',
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(_t('Cancel', 'रद्द करें', 'रद्द करा')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.featherGreen),
+            onPressed: () async {
+              if (storage != null) {
+                await storage.setCustomBaseUrl(urlController.text.trim());
+              }
+              Navigator.pop(ctx);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.featherGreen,
+                    content: Text(
+                      _t(
+                        'Backend URL updated successfully!',
+                        'बैकएंड यूआरएल सफलतापूर्वक अपडेट किया गया!',
+                        'बॅकएंड URL यशस्वीरित्या अद्यतन केले!',
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+            child: Text(_t('Save', 'सहेजें', 'जतन करा'), style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   // --- Live Backend Diagnostic Info ---
   Future<void> _checkServerConnection() async {
+    final activeBaseUrl = AuthService.getBaseUrl(widget.storage);
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -148,7 +237,7 @@ class _SettingsTabState extends State<SettingsTab> {
 
     try {
       final response = await http
-          .get(Uri.parse('${AuthService.baseUrl}/health'))
+          .get(Uri.parse('$activeBaseUrl/health'))
           .timeout(const Duration(seconds: 3));
 
       if (response.statusCode == 200) {
@@ -156,7 +245,7 @@ class _SettingsTabState extends State<SettingsTab> {
         isConnected = true;
         statusText =
             'Backend is Online!\n'
-            'Endpoint: ${AuthService.baseUrl}\n'
+            'Endpoint: $activeBaseUrl\n'
             'Service: ${data['service'] ?? 'FastAPI'}\n'
             'Collector ID: ${widget.storage?.collectorId ?? 'N/A'}';
       } else {
@@ -165,9 +254,9 @@ class _SettingsTabState extends State<SettingsTab> {
       }
     } catch (e) {
       statusText =
-          'Unable to reach backend at ${AuthService.baseUrl}.\n\n'
+          'Unable to reach backend at $activeBaseUrl.\n\n'
           'Details: $e\n\n'
-          'Did you run `adb reverse tcp:8000 tcp:8000`?';
+          'Check if Ngrok is running or your device is on the same Wi-Fi hotspot.';
     }
 
     if (!mounted) return;
@@ -559,7 +648,7 @@ class _SettingsTabState extends State<SettingsTab> {
             _t(
               'Change app text and safety audio language',
               'ऐप का टेक्स्ट और सुरक्षा ऑडियो भाषा बदलें',
-              'अ‍ॅपचा मजकूर आणि सुरक्षा ऑडिओ भाषा बदला',
+              'अ‍ॅपचा मजकूर और सुरक्षा ऑडिओ भाषा बदला',
             ),
             _showLanguagePicker,
           ),
@@ -614,6 +703,14 @@ class _SettingsTabState extends State<SettingsTab> {
           ),
           const SizedBox(height: 12),
 
+          // 🌐 Backend URL Config Button
+          _settingsButton(
+            Icons.dns_outlined,
+            _t('Configure Backend URL', 'बैकएंड यूआरएल कॉन्फ़िगर करें', 'बॅकएंड URL कॉन्फिगर करा'),
+            _t('Change Ngrok tunnel or hotspot IP address', 'Ngrok टनल या हॉटस्पॉट IP पता बदलें', 'Ngrok टनल किंवा हॉटस्पॉट IP पत्ता बदला'),
+            _showBackendConfigDialog,
+          ),
+
           _settingsButton(
             Icons.network_check,
             _t(
@@ -622,7 +719,7 @@ class _SettingsTabState extends State<SettingsTab> {
               'सर्व्हर कनेक्शन चाचणी',
             ),
             _t(
-              'Verify status of FastAPI backend at ${AuthService.baseUrl}',
+              'Verify status of FastAPI backend',
               'FastAPI बैकएंड स्थिति की जाँच करें',
               'FastAPI बॅकएंड स्थिती तपासा',
             ),

@@ -9,7 +9,7 @@ import 'database_helper.dart';
 import 'storage_service.dart';
 
 class SyncService {
-  /// Canonical set of 9 backend-recognized material codes
+  /// Canonical set of backend-recognized material codes matching your trained model categories
   static const Set<String> canonicalCategories = {
     'MOTHERBOARD_HIGH_GRADE',
     'POWER_SUPPLY_LOW_GRADE',
@@ -70,7 +70,7 @@ class SyncService {
     return 'MIXED_EWASTE_CASING';
   }
 
-  /// Syncs all PENDING lots from local SQLite to FastAPI
+  /// Syncs all PENDING lots from local SQLite SSOT queue to FastAPI
   static Future<Map<String, dynamic>> syncPendingLots({
     required ReNovaStorage storage,
   }) async {
@@ -93,10 +93,10 @@ class SyncService {
     }
 
     final List<Map<String, dynamic>> lotsPayload = [];
-    final List<int> queuedDbIds = [];
+    final List<String> queuedLotUids = [];
 
     for (final row in pendingQueue) {
-      final dbId = row['id'] as int;
+      final lotUid = row['lot_uid'] as String;
       final imagePath = row['image_path'] as String?;
       final jsonStr = row['json_payload'] as String? ?? '{}';
 
@@ -115,23 +115,23 @@ class SyncService {
       }
 
       final rawCat =
+          row['material_category']?.toString() ??
           localData['material_category']?.toString() ??
           localData['category']?.toString();
       final canonicalCat = normalizeCategory(rawCat);
 
       final weight =
+          (row['estimated_weight_kg'] as num?)?.toDouble() ??
           (localData['approx_weight_kg'] as num? ??
                   localData['weight'] as num? ??
                   localData['estimated_weight_kg'] as num? ??
                   1.0)
               .toDouble();
 
-      final clientLotId =
-          localData['lot_uid']?.toString() ??
-          localData['client_lot_id']?.toString() ??
-          'lot_${DateTime.now().millisecondsSinceEpoch}_$dbId';
+      final clientLotId = lotUid.isNotEmpty ? lotUid : 'LOT_${DateTime.now().millisecondsSinceEpoch}';
 
       final qrToken =
+          row['qr_token']?.toString() ??
           localData['qr_token']?.toString() ??
           'QR_${clientLotId}_${storage.collectorId}';
 
@@ -140,14 +140,14 @@ class SyncService {
 
       lotsPayload.add({
         'client_lot_id': clientLotId,
-        'material_category': canonicalCat,
+        'material_category': canonicalCat.toLowerCase(), // FastAPI standard expects lowercase codes (e.g. pcb, cables) or exact match
         'estimated_weight_kg': weight,
         'classification': {
           'label': canonicalCat,
           'confidence': (localData['confidence'] as num? ?? 0.95).toDouble(),
           'model_version': 'mobile-v1',
         },
-        'city': storage.location ?? 'Bhubaneswar',
+        'city': storage.location ?? 'Cuttack',
         'latitude': lat,
         'longitude': lon,
         'qr_token': qrToken,
@@ -155,10 +155,11 @@ class SyncService {
         'created_at_local':
             localData['created_at']?.toString() ??
             localData['created_at_local']?.toString() ??
+            row['created_at']?.toString() ??
             DateTime.now().toIso8601String(),
       });
 
-      queuedDbIds.add(dbId);
+      queuedLotUids.add(lotUid);
     }
 
     final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/sync');
@@ -176,14 +177,32 @@ class SyncService {
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        for (final id in queuedDbIds) {
-          await DatabaseHelper.instance.updateQueueStatus(id, 'SYNCED');
+        final decodedRes = jsonDecode(response.body);
+        final List<dynamic> syncedReturns = decodedRes is List 
+            ? decodedRes : (decodedRes['data'] as List<dynamic>? ?? decodedRes['lots'] as List<dynamic>? ?? []);
+
+        // Update local status to BROADCASTED once successfully accepted by backend
+        for (final uid in queuedLotUids) {
+          // Find matching backend ID if returned in sync response
+          String? backendId;
+          for (final ret in syncedReturns) {
+            final map = Map<String, dynamic>.from(ret as Map);
+            if ((map['client_lot_id'] ?? map['lot_uid']) == uid) {
+              backendId = map['id']?.toString();
+              break;
+            }
+          }
+          await DatabaseHelper.instance.updateLotStatus(
+            uid,
+            'BROADCASTED',
+            backendId: backendId,
+          );
         }
 
         return {
           'success': true,
-          'syncedCount': queuedDbIds.length,
-          'message': 'Successfully synced ${queuedDbIds.length} scrap lots!',
+          'syncedCount': queuedLotUids.length,
+          'message': 'Successfully synced ${queuedLotUids.length} scrap lots!',
         };
       } else {
         try {
@@ -211,6 +230,7 @@ class SyncService {
     }
   }
 
+  /// Cancels a lot on the backend and updates local SSOT
   static Future<bool> cancelLot({
     required ReNovaStorage storage,
     required String lotId,
@@ -230,7 +250,11 @@ class SyncService {
           )
           .timeout(const Duration(seconds: 10));
 
-      return res.statusCode == 200;
+      if (res.statusCode == 200) {
+        await DatabaseHelper.instance.updateLotStatus(lotId, 'CANCELLED');
+        return true;
+      }
+      return false;
     } catch (e) {
       debugPrint('[SyncService] Failed to cancel lot: $e');
       return false;
@@ -242,7 +266,7 @@ class SyncService {
     required ReNovaStorage storage,
     required String lotId,
     required bool accepted,
-    String paymentMode = 'UPI',
+    String paymentMode = 'CASH',
     String? upiReference,
   }) async {
     final token = storage.accessToken;
@@ -268,7 +292,14 @@ class SyncService {
           )
           .timeout(const Duration(seconds: 10));
 
-      return res.statusCode == 200;
+      if (res.statusCode == 200) {
+        await DatabaseHelper.instance.updateLotStatus(
+          lotId,
+          accepted ? 'CONSENTED' : 'CANCELLED',
+        );
+        return true;
+      }
+      return false;
     } catch (e) {
       debugPrint('[SyncService] Failed to submit consent: $e');
       return false;
@@ -297,7 +328,15 @@ class SyncService {
 
       if (res.statusCode == 200) {
         final decoded = jsonDecode(res.body);
-        return decoded['data'] as Map<String, dynamic>?;
+        final data = decoded['data'] as Map<String, dynamic>?;
+        if (data != null && data['status'] != null) {
+          await DatabaseHelper.instance.updateLotStatus(
+            lotId,
+            data['status'].toString(),
+            transaction: data['transaction'] as Map<String, dynamic>?,
+          );
+        }
+        return data;
       }
     } catch (e) {
       debugPrint('[SyncService] Failed to fetch lot status: $e');
@@ -305,7 +344,7 @@ class SyncService {
     return null;
   }
 
-  /// Fetches latest lots from backend to pull lifecycle status (BROADCASTED, LOCKED, SESSION_OPEN, etc.)
+  /// Fetches latest lots from backend and reconciles them into local SQLite SSOT storage
   static Future<List<Map<String, dynamic>>> fetchCollectorLots({
     required ReNovaStorage storage,
   }) async {
@@ -327,22 +366,13 @@ class SyncService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> decoded = jsonDecode(response.body);
-        final List<dynamic> lotsData = decoded['data'] ?? [];
+        final List<dynamic> lotsData = decoded['data'] ?? decoded['lots'] ?? [];
         final remoteLots = lotsData
             .map((item) => Map<String, dynamic>.from(item as Map))
             .toList();
 
-        // Update local SQLite cache using the string UID
-        for (final rLot in remoteLots) {
-          final uid = rLot['client_lot_id'] ?? rLot['lot_uid'];
-          final status = rLot['status'];
-          if (uid != null && status != null) {
-            await DatabaseHelper.instance.updateQueueStatusByLotUid(
-              uid.toString(),
-              status.toString(),
-            );
-          }
-        }
+        // 🛡️ RECONCILIATION: Feed remote state into SQLite SSOT table
+        await DatabaseHelper.instance.reconcileSyncedLots(remoteLots);
 
         return remoteLots;
       }
@@ -350,6 +380,7 @@ class SyncService {
       debugPrint('[SyncService] Failed to fetch collector lots: $e');
     }
 
-    return [];
+    // Fallback: Return local cached rows if network fetch fails
+    return await DatabaseHelper.instance.getQueuedLots();
   }
 }

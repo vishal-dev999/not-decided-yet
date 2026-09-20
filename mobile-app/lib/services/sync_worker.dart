@@ -87,12 +87,12 @@ class SyncWorker {
     final localRows = await DatabaseHelper.instance.getQueuedLots(limit: 100);
     final Map<String, String> localImageMap = {};
     for (final row in localRows) {
-      final img = (row['image_path'] ?? row['photo_path'] ?? '') as String;
+      final img = (row['image_path'] ?? '') as String;
       if (img.isNotEmpty) {
         final uid = (row['lot_uid'] ?? '').toString();
-        final clientUid = (row['client_lot_id'] ?? '').toString();
+        final backendId = (row['backend_id'] ?? '').toString();
         if (uid.isNotEmpty) localImageMap[uid] = img;
-        if (clientUid.isNotEmpty) localImageMap[clientUid] = img;
+        if (backendId.isNotEmpty) localImageMap[backendId] = img;
       }
     }
 
@@ -105,7 +105,7 @@ class SyncWorker {
 
         final mutable = Map<String, dynamic>.from(lot);
 
-        // Check all possible identifiers for the image path
+        // Check all possible identifiers for the local image path
         if (clientUid.isNotEmpty && localImageMap.containsKey(clientUid)) {
           mutable['image_path'] = localImageMap[clientUid];
         } else if (lotUid.isNotEmpty && localImageMap.containsKey(lotUid)) {

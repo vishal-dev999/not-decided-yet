@@ -46,6 +46,93 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
     }
   }
 
+  // --- Backend Environment Selector Dialog ---
+  void _showBackendConfigDialog(BuildContext context) {
+    final TextEditingController urlController = TextEditingController(
+      text: AuthService.getBaseUrl(widget.storage),
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppThemeColors.card(context),
+        title: Text(
+          _t('Configure Backend URL', 'बैकएंड यूआरएल कॉन्फ़िगर करें', 'बॅकएंड URL कॉन्फिगर करा'),
+          style: TextStyle(color: AppThemeColors.text(context)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _t(
+                'Enter Ngrok URL or select a preset for local testing:',
+                'स्थानीय परीक्षण के लिए Ngrok यूआरएल दर्ज करें या प्रीसेट चुनें:',
+                'स्थानिक चाचणीसाठी Ngrok URL प्रविष्ट करा किंवा प्रीसेट निवडा:',
+              ),
+              style: TextStyle(color: AppThemeColors.muted(context), fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: urlController,
+              decoration: const InputDecoration(
+                labelText: 'Base URL',
+                hintText: 'https://xxxx.ngrok-free.app or http://10.0.2.2:8000',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                ActionChip(
+                  label: const Text('Localhost'),
+                  onPressed: () => urlController.text = 'http://localhost:8000',
+                ),
+                ActionChip(
+                  label: const Text('Android Emulator'),
+                  onPressed: () => urlController.text = 'http://10.0.2.2:8000',
+                ),
+                ActionChip(
+                  label: const Text('Ngrok Tunnel'),
+                  onPressed: () => urlController.text = 'https://your-ngrok-url.ngrok-free.app',
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(_t('Cancel', 'रद्द करें', 'रद्द करा')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.featherGreen),
+            onPressed: () async {
+              await widget.storage.setCustomBaseUrl(urlController.text.trim());
+              Navigator.pop(ctx);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.featherGreen,
+                    content: Text(
+                      _t(
+                        'Backend URL updated successfully!',
+                        'बैकएंड यूआरएल सफलतापूर्वक अपडेट किया गया!',
+                        'बॅकएंड URL यशस्वीरित्या अद्यतन केले!',
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+            child: Text(_t('Save', 'सहेजें', 'जतन करा'), style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _handleSubmit() async {
     final phone = _phoneController.text.trim();
     final pin = _pinController.text.trim();
@@ -129,13 +216,23 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
         : AppColors.featherGreen;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(_t('Collector Login', 'कलेक्टर लॉगिन', 'कलेक्टर लॉगिन')),
+        actions: [
+          IconButton(
+            tooltip: _t('Configure Backend URL', 'बैकएंड यूआरएल कॉन्फ़िगर करें', 'बॅकएंड URL कॉन्फिगर करा'),
+            icon: const Icon(Icons.settings_ethernet),
+            onPressed: () => _showBackendConfigDialog(context),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               CircleAvatar(
                 radius: 32,
                 backgroundColor: activeAccent.withValues(alpha: 0.15),
