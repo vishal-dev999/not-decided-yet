@@ -16,7 +16,7 @@ import 'tabs/market_rates_tab.dart';
 import 'tabs/dashboard_tab.dart';
 import 'tabs/payment_tab.dart';
 import 'tabs/inventory_tab.dart';
-import 'tabs/pickup_upload_tab.dart';
+import 'tabs/item_scanner_tab.dart';
 
 class MainDashboardContainer extends StatefulWidget {
   final String collectorName;

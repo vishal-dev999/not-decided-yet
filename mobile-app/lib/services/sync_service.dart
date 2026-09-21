@@ -70,6 +70,53 @@ class SyncService {
     return 'MIXED_EWASTE_CASING';
   }
 
+  static Future<void> syncCollectorLedger({
+    required ReNovaStorage storage,
+  }) async {
+    final token = storage.accessToken;
+    if (token == null || token.isEmpty) return;
+
+    final url = Uri.parse(
+      '${AuthService.getBaseUrl(storage)}/api/v1/collectors/me/ledger?limit=50',
+    );
+    try {
+      final response = await http
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'ngrok-skip-browser-warning': 'true',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        final list = decoded is List
+            ? decoded
+            : (decoded['data'] ?? decoded['ledger'] ?? []);
+
+        for (final item in list) {
+          final map = Map<String, dynamic>.from(item as Map);
+          // Persist permanently into local SSOT / payment history
+          await storage.savePayment({
+            'mode':
+                (map['payment_mode'] ?? 'UPI').toString().toUpperCase() == 'UPI'
+                ? 'UPI'
+                : 'Cash',
+            'details':
+                map['description'] ?? map['reference'] ?? 'Completed Payout',
+            'amount': '₹${map['amount'] ?? 0}',
+            'date': map['created_at'] ?? DateTime.now().toIso8601String(),
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('[SyncService] Failed to sync ledger: $e');
+    }
+  }
+
   /// Syncs all PENDING lots from local SQLite SSOT queue to FastAPI
   static Future<Map<String, dynamic>> syncPendingLots({
     required ReNovaStorage storage,
@@ -167,7 +214,6 @@ class SyncService {
       }
     }
 
-    // Verify endpoint matches your FastAPI router prefix (e.g., /api/v1/lots/sync)
     final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/sync');
 
     try {

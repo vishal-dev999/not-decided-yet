@@ -35,7 +35,8 @@ class AuthService {
     required String pin,
     required String fullName,
     required String language,
-    String city = 'Bhubaneswar',
+    required String
+    city, // 👈 Make city required or pass from screen without default override
     String? upiId,
     required ReNovaStorage storage,
   }) async {
@@ -47,15 +48,16 @@ class AuthService {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning':
-              'true', // 🛡️ Bypasses ngrok free tier HTML warning page
+          'ngrok-skip-browser-warning': 'true',
         },
         body: jsonEncode({
           'phone': phone,
           'pin': pin,
           'full_name': fullName,
           'language': language,
-          'city': city,
+          'city': city.isEmpty
+              ? 'Bhubaneswar'
+              : city, // 👈 Uses dynamic input cleanly
           'state': 'Odisha',
           'pincode': '751001',
           'upi_id': upiId ?? '$phone@upi',
@@ -74,7 +76,9 @@ class AuthService {
           collectorId: collector['id'] ?? '',
           name: collector['full_name'] ?? fullName,
           phone: collector['phone'] ?? phone,
-          city: collector['city'] ?? city,
+          city:
+              collector['city'] ??
+              city, // 👈 Saves the dynamic city to storage session
         );
 
         return {'success': true, 'data': data};
