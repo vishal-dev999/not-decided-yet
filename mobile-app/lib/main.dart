@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'constants/app_enums.dart';
 import 'screens/collector_login_screen.dart';
-import 'screens/language_selection_screen.dart';
 import 'screens/main_dashboard_container.dart' as dashboard;
 import 'screens/role_selection_screen.dart' as role_selection;
 import 'screens/rider/rider_login_screen.dart';

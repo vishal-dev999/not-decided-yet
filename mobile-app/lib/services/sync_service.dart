@@ -96,7 +96,7 @@ class SyncService {
     final List<String> queuedLotUids = [];
 
     for (final row in pendingQueue) {
-      final lotUid = row['lot_uid'] as String;
+      final lotUid = row['lot_uid'] as String? ?? '';
       final imagePath = row['image_path'] as String?;
       final jsonStr = row['json_payload'] as String? ?? '{}';
 
@@ -128,7 +128,9 @@ class SyncService {
                   1.0)
               .toDouble();
 
-      final clientLotId = lotUid.isNotEmpty ? lotUid : 'LOT_${DateTime.now().millisecondsSinceEpoch}';
+      final clientLotId = lotUid.isNotEmpty
+          ? lotUid
+          : 'LOT_${DateTime.now().millisecondsSinceEpoch}';
 
       final qrToken =
           row['qr_token']?.toString() ??
@@ -140,14 +142,15 @@ class SyncService {
 
       lotsPayload.add({
         'client_lot_id': clientLotId,
-        'material_category': canonicalCat.toLowerCase(), // FastAPI standard expects lowercase codes (e.g. pcb, cables) or exact match
+        'material_category':
+            canonicalCat, // Ensure exact uppercase match with backend enums
         'estimated_weight_kg': weight,
         'classification': {
           'label': canonicalCat,
           'confidence': (localData['confidence'] as num? ?? 0.95).toDouble(),
           'model_version': 'mobile-v1',
         },
-        'city': storage.location ?? 'Cuttack',
+        'city': storage.location ?? 'Bhubaneswar',
         'latitude': lat,
         'longitude': lon,
         'qr_token': qrToken,
@@ -159,9 +162,12 @@ class SyncService {
             DateTime.now().toIso8601String(),
       });
 
-      queuedLotUids.add(lotUid);
+      if (lotUid.isNotEmpty) {
+        queuedLotUids.add(lotUid);
+      }
     }
 
+    // Verify endpoint matches your FastAPI router prefix (e.g., /api/v1/lots/sync)
     final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/sync');
 
     try {
@@ -178,12 +184,13 @@ class SyncService {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final decodedRes = jsonDecode(response.body);
-        final List<dynamic> syncedReturns = decodedRes is List 
-            ? decodedRes : (decodedRes['data'] as List<dynamic>? ?? decodedRes['lots'] as List<dynamic>? ?? []);
+        final List<dynamic> syncedReturns = decodedRes is List
+            ? decodedRes
+            : (decodedRes['data'] as List<dynamic>? ??
+                  decodedRes['lots'] as List<dynamic>? ??
+                  []);
 
-        // Update local status to BROADCASTED once successfully accepted by backend
         for (final uid in queuedLotUids) {
-          // Find matching backend ID if returned in sync response
           String? backendId;
           for (final ret in syncedReturns) {
             final map = Map<String, dynamic>.from(ret as Map);
@@ -205,13 +212,18 @@ class SyncService {
           'message': 'Successfully synced ${queuedLotUids.length} scrap lots!',
         };
       } else {
+        debugPrint(
+          '[SyncService] Sync failed with status: ${response.statusCode}, body: ${response.body}',
+        );
         try {
           final err = jsonDecode(response.body);
           return {
             'success': false,
             'syncedCount': 0,
             'message':
-                err['message'] ?? 'Server error (${response.statusCode})',
+                err['detail']?.toString() ??
+                err['message'] ??
+                'Server error (${response.statusCode})',
           };
         } catch (_) {
           return {
@@ -222,6 +234,7 @@ class SyncService {
         }
       }
     } catch (e) {
+      debugPrint('[SyncService] Network error during lot sync: $e');
       return {
         'success': false,
         'syncedCount': 0,
