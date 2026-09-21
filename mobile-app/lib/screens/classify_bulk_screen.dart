@@ -454,11 +454,13 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    // 1. Enqueue lot in local SQLite database for background sync
+    // 1. Enqueue lot in local SQLite database with explicit weight!
     await DatabaseHelper.instance.enqueueLot(
       lotUid: lotUid,
       imagePath: _selectedImagePath!,
       jsonPayload: jsonEncode(payload),
+      materialCategory: _selectedCategory!,
+      estimatedWeightKg: _enteredWeight, // 👈 Pass the entered weight here!
     );
 
     // 2. Trigger automatic background sync if device is online

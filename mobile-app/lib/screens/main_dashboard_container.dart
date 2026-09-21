@@ -15,7 +15,7 @@ import 'recycler_nearby.dart';
 import 'tabs/market_rates_tab.dart';
 import 'tabs/dashboard_tab.dart';
 import 'tabs/payment_tab.dart';
-import 'tabs/pickup_tab.dart';
+import 'tabs/inventory_tab.dart';
 import 'tabs/pickup_upload_tab.dart';
 
 class MainDashboardContainer extends StatefulWidget {
