@@ -13,7 +13,7 @@ import '../services/sync_worker.dart';
 import '../themes/app_colors.dart';
 import '../themes/app_theme.dart';
 import 'classify_result_screen.dart';
-import 'tabs/pickup_upload_tab.dart';
+import 'tabs/item_scanner_tab.dart';
 
 class ClassifyBulkScreen extends StatefulWidget {
   final ReNovaStorage? storage;
@@ -234,7 +234,6 @@ class _ClassifyBulkScreenState extends State<ClassifyBulkScreen> {
     // 2. Extract validation flags and codes from the result map
     final bool isValidEwaste = scanResult['isValidEwaste'] ?? true;
     final bool isNonEwaste = scanResult['isNonEwaste'] ?? false;
-    final bool isLowConfidence = scanResult['isLowConfidence'] ?? false;
     final String detectedCode =
         scanResult['materialCode'] ?? scanResult['material'] ?? '';
 

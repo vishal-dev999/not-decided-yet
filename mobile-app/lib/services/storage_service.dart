@@ -15,6 +15,10 @@ class ReNovaStorage {
 
   ReNovaStorage._(this.prefs, this.documentsDirectory);
 
+  static Future<ReNovaStorage> getInstance() async {
+    return await create();
+  }
+
   static Future<ReNovaStorage> create() async {
     final prefs = await SharedPreferences.getInstance();
     final directory = await getApplicationDocumentsDirectory();
@@ -34,7 +38,7 @@ class ReNovaStorage {
   String? get paymentPreference => prefs.getString('payment_preference');
   String? get userType => prefs.getString('user_type');
   String? get savedUpiId => prefs.getString('saved_upi_id');
-  
+
   // 🌐 Custom Backend URL (Ngrok / Hotspot / Localhost support)
   String? get customBaseUrl => prefs.getString('custom_base_url');
 
