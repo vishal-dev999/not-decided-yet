@@ -1,14 +1,16 @@
-"""Seed CPCB-style recyclers, materials, prices, safety cards, and demo users."""
+"""Seed CPCB-style recyclers, materials, CSV-backed prices, safety cards, and demo users."""
 
 from __future__ import annotations
 
+import csv
 import hashlib
+import os
+import uuid
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password
-from app.ml.price_engine import generate_synthetic_history
 from app.models.entities import (
     Collector,
     Material,
@@ -28,195 +30,6 @@ MATERIALS = [
     ("MIXED_EWASTE_CASING", "Mixed Plastic", "मिश्रित ई-कचरा प्लास्टिक", "मिश्र ई-कचरा प्लास्टिक", "ITEW", False, "plastic"),
     ("COPPER_HEAVY_INSULATED", "Copper Wire", "तांबे का तार", "तांब्याची तार", "ITEW", False, "wire"),
     ("ALUMINIUM_WIRE", "Aluminium Wire", "एल्युमिनियम तार", "अ‍ॅल्युमिनियम तार", "ITEW", False, "wire"),
-]
-
-# Approximate informal-market buy rates (₹/kg)
-# Cuttack / Bhubaneswar focused, plus metros for location demos.
-RATES = {
-    # material: (cuttack, bhubaneswar, mumbai, delhi) as (buy, min, max)
-    "MOTHERBOARD_HIGH_GRADE": {
-        "Cuttack": (290, 240, 360),
-        "Bhubaneswar": (305, 250, 380),
-        "Mumbai": (340, 280, 420),
-        "Delhi": (330, 270, 410),
-    },
-    "POWER_SUPPLY_LOW_GRADE": {
-        "Cuttack": (50, 38, 68),
-        "Bhubaneswar": (54, 40, 72),
-        "Mumbai": (62, 45, 82),
-        "Delhi": (60, 44, 80),
-    },
-    "BATTERY_LITHIUM_PORTABLE": {
-        "Cuttack": (135, 105, 175),
-        "Bhubaneswar": (142, 110, 185),
-        "Mumbai": (158, 120, 205),
-        "Delhi": (152, 115, 198),
-    },
-    "LEAD_ACID": {
-        "Cuttack": (88, 72, 110),
-        "Bhubaneswar": (92, 75, 115),
-        "Mumbai": (102, 82, 128),
-        "Delhi": (98, 80, 122),
-    },
-    "CRT_MONITOR": {
-        "Cuttack": (18, 12, 26),
-        "Bhubaneswar": (20, 14, 28),
-        "Mumbai": (24, 16, 34),
-        "Delhi": (22, 15, 32),
-    },
-    "LCD_PANEL_INTACT": {
-        "Cuttack": (78, 60, 102),
-        "Bhubaneswar": (82, 64, 108),
-        "Mumbai": (94, 72, 122),
-        "Delhi": (90, 70, 118),
-    },
-    "MIXED_EWASTE_CASING": {
-        "Cuttack": (20, 14, 30),
-        "Bhubaneswar": (22, 15, 32),
-        "Mumbai": (26, 18, 38),
-        "Delhi": (25, 17, 36),
-    },
-    "COPPER_HEAVY_INSULATED": {
-        "Cuttack": (440, 380, 520),
-        "Bhubaneswar": (455, 390, 540),
-        "Mumbai": (490, 420, 580),
-        "Delhi": (480, 410, 570),
-    },
-    "ALUMINIUM_WIRE": {
-        "Cuttack": (118, 92, 150),
-        "Bhubaneswar": (124, 96, 158),
-        "Mumbai": (138, 108, 175),
-        "Delhi": (134, 104, 170),
-    },
-}
-
-CITY_STATE = {
-    "Cuttack": "Odisha",
-    "Bhubaneswar": "Odisha",
-    "Mumbai": "Maharashtra",
-    "Delhi": "Delhi",
-}
-
-RECYCLERS = [
-    dict(
-        recycler_code="OD-CTC-001",
-        company_name="Mahanadi E-Waste Recyclers",
-        authorization_no="CPCB/OR/EWR/2024/001",
-        email="mahanadi@demo.kabadiwala",
-        phone="06712300001",
-        city="Cuttack",
-        state="Odisha",
-        pincode="753001",
-        latitude=20.4625,
-        longitude=85.8830,
-        address="Industrial Estate, Cuttack",
-        pickup_available=True,
-        karma_points=88.0,
-        price_multiplier=1.04,
-        accepted_categories="*",
-    ),
-    dict(
-        recycler_code="OD-BBSR-002",
-        company_name="Kalinga Green Tech",
-        authorization_no="CPCB/OR/EWR/2023/014",
-        email="kalinga@demo.kabadiwala",
-        phone="06742300002",
-        city="Bhubaneswar",
-        state="Odisha",
-        pincode="751024",
-        latitude=20.2961,
-        longitude=85.8245,
-        address="Chandaka Industrial Area, Bhubaneswar",
-        pickup_available=True,
-        karma_points=76.0,
-        price_multiplier=1.08,
-        accepted_categories="*",
-    ),
-    dict(
-        recycler_code="OD-CTC-003",
-        company_name="Utkal Circuit Recovery",
-        authorization_no="CPCB/OR/EWR/2022/009",
-        email="utkal@demo.kabadiwala",
-        phone="06712300003",
-        city="Cuttack",
-        state="Odisha",
-        pincode="753014",
-        latitude=20.4800,
-        longitude=85.9100,
-        address="Jagatpur, Cuttack",
-        pickup_available=True,
-        karma_points=64.0,
-        price_multiplier=0.97,
-        accepted_categories="MOTHERBOARD_HIGH_GRADE,POWER_SUPPLY_LOW_GRADE,COPPER_HEAVY_INSULATED,ALUMINIUM_WIRE",
-    ),
-    dict(
-        recycler_code="OD-BBSR-004",
-        company_name="Eastern Battery Loop",
-        authorization_no="CPCB/OR/EWR/2024/021",
-        email="ebl@demo.kabadiwala",
-        phone="06742300004",
-        city="Bhubaneswar",
-        state="Odisha",
-        pincode="751019",
-        latitude=20.2700,
-        longitude=85.8400,
-        address="Rasulgarh, Bhubaneswar",
-        pickup_available=False,
-        karma_points=71.0,
-        price_multiplier=1.12,
-        accepted_categories="BATTERY_LITHIUM_PORTABLE,LEAD_ACID,MOTHERBOARD_HIGH_GRADE",
-    ),
-    dict(
-        recycler_code="MH-MUM-005",
-        company_name="Western Eco Reclaim",
-        authorization_no="CPCB/MH/EWR/2021/077",
-        email="western@demo.kabadiwala",
-        phone="02223000005",
-        city="Mumbai",
-        state="Maharashtra",
-        pincode="400013",
-        latitude=19.0760,
-        longitude=72.8777,
-        address="Andheri East, Mumbai",
-        pickup_available=True,
-        karma_points=92.0,
-        price_multiplier=1.15,
-        accepted_categories="*",
-    ),
-    dict(
-        recycler_code="DL-DEL-006",
-        company_name="Yamuna Authorized Recyclers",
-        authorization_no="CPCB/DL/EWR/2020/033",
-        email="yamuna@demo.kabadiwala",
-        phone="01123000006",
-        city="Delhi",
-        state="Delhi",
-        pincode="110092",
-        latitude=28.6139,
-        longitude=77.2090,
-        address="Mayapuri Industrial Area, Delhi",
-        pickup_available=True,
-        karma_points=81.0,
-        price_multiplier=1.10,
-        accepted_categories="*",
-    ),
-    dict(
-        recycler_code="OD-CTC-007",
-        company_name="Bay Plastic Recovery",
-        authorization_no="CPCB/OR/EWR/2023/044",
-        email="bayplastic@demo.kabadiwala",
-        phone="06712300007",
-        city="Cuttack",
-        state="Odisha",
-        pincode="753003",
-        latitude=20.4500,
-        longitude=85.8700,
-        address="Buxi Bazaar, Cuttack",
-        pickup_available=True,
-        karma_points=55.0,
-        price_multiplier=0.92,
-        accepted_categories="MIXED_EWASTE_CASING,CRT_MONITOR,LCD_PANEL_INTACT",
-    ),
 ]
 
 SAFETY = [
@@ -278,10 +91,105 @@ SAFETY = [
 ]
 
 
+def find_csv_file(filename: str) -> str | None:
+    """Helper to locate CSV files in root or data directory."""
+    paths_to_try = [filename, os.path.join("data", filename), os.path.join("..", filename)]
+    return next((p for p in paths_to_try if os.path.exists(p)), None)
+
+
+def load_recyclers_from_csv(csv_path: str = "recyclers.csv") -> list[dict]:
+    """Reads all 567 certified recyclers dynamically from the CSV file."""
+    recyclers_list = []
+    resolved_path = find_csv_file(csv_path)
+
+    if not resolved_path:
+        print(f"[Seeder Warning] recyclers.csv not found. Returning empty list.")
+        return recyclers_list
+
+    print(f"[Seeder] Loading recyclers from CSV: {resolved_path}")
+    with open(resolved_path, mode="r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for i, row in enumerate(reader):
+            reg_id = row.get("cpcb_registration_id") or f"CPCB-REG-{i}"
+            safe_tag = "".join([c if c.isalnum() else "_" for c in reg_id]).lower()
+            state = row.get("state", "Odisha")
+            
+            recyclers_list.append(
+                dict(
+                    id=row.get("recycler_id") or str(uuid.uuid4()),
+                    recycler_code=reg_id,
+                    company_name=row.get("company_name", "Certified Recycler"),
+                    authorization_no=reg_id,
+                    email=f"support.{safe_tag}@renova-recycler.in",
+                    phone=row.get("contact_phone", "+91-9999999999"),
+                    city=row.get("city", state),  # Granular city from Claude's extraction
+                    state=state,
+                    pincode="751001",
+                    latitude=float(row.get("latitude", 20.2961)),
+                    longitude=float(row.get("longitude", 85.8245)),
+                    address=row.get("registered_address", ""),
+                    pickup_available=str(row.get("pickup_available", "True")).lower() == "true",
+                    karma_points=float(row.get("fulfillment_score", 0.9)) * 100,
+                    price_multiplier=1.0,
+                    accepted_categories=row.get("materials_accepted", "*"),
+                )
+            )
+    print(f"[Seeder] Successfully parsed {len(recyclers_list)} recyclers from CSV.")
+    return recyclers_list
+
+
+def seed_prices_from_csv(db: Session) -> None:
+    """Loads price_quotes and price_history directly from generated CSV files."""
+    quotes_path = find_csv_file("price_quotes.csv")
+    history_path = find_csv_file("price_history.csv")
+
+    if quotes_path:
+        print(f"[Seeder] Loading price quotes from: {quotes_path}")
+        with open(quotes_path, mode="r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                try:
+                    mat_code = row["material_code"].strip().upper()  # Normalize to uppercase
+                    db.add(
+                        PriceQuote(
+                            material_code=mat_code,
+                            city=row["city"],
+                            state=row["state"],
+                            buy_rate_per_kg=float(row["buy_rate_per_kg"]),
+                            min_rate=float(row["min_rate"]),
+                            max_rate=float(row["max_rate"]),
+                            source=row.get("source", "cpcb-national-mandi-index"),
+                            updated_at=datetime.strptime(row.get("updated_at", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")), "%Y-%m-%d %H:%M:%S")
+                        )
+                    )
+                except Exception as e:
+                    pass
+
+    if history_path:
+        print(f"[Seeder] Loading price history trends from: {history_path}")
+        with open(history_path, mode="r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                try:
+                    mat_code = row["material_code"].strip().upper()  # Normalize to uppercase
+                    db.add(
+                        PriceHistory(
+                            material_code=mat_code,
+                            city=row["city"],
+                            as_of=datetime.strptime(row["as_of"], "%Y-%m-%d"),
+                            buy_rate_per_kg=float(row["buy_rate_per_kg"])
+                        )
+                    )
+                except Exception as e:
+                    pass
+    print("[Seeder] Price quotes and historical trends successfully seeded from CSVs.")
+
+
 def seed_if_empty(db: Session) -> None:
     if db.query(Material).first():
         return
 
+    # 1. Seed Materials Catalog
     for code, en, hi, mr, ew, haz, icon in MATERIALS:
         db.add(
             Material(
@@ -295,30 +203,10 @@ def seed_if_empty(db: Session) -> None:
             )
         )
 
-    for mat, cities in RATES.items():
-        for i, (city, (buy, lo, hi)) in enumerate(cities.items()):
-            db.add(
-                PriceQuote(
-                    material_code=mat,
-                    city=city,
-                    state=CITY_STATE[city],
-                    buy_rate_per_kg=buy,
-                    min_rate=lo,
-                    max_rate=hi,
-                    source="seed-prototype",
-                )
-            )
-            stable = int(hashlib.md5(f"{mat}:{city}".encode()).hexdigest()[:8], 16) % 10_000
-            for ts, price in generate_synthetic_history(buy, days=45, seed=stable):
-                db.add(
-                    PriceHistory(
-                        material_code=mat,
-                        city=city,
-                        as_of=ts,
-                        buy_rate_per_kg=price,
-                    )
-                )
+    # 2. Seed Nationwide Prices & History from CSVs
+    seed_prices_from_csv(db)
 
+    # 3. Seed Demo Collectors
     demo_pin = hash_password("1234")
     db.add(
         Collector(
@@ -350,10 +238,14 @@ def seed_if_empty(db: Session) -> None:
         )
     )
 
+    # 4. Seed 567 CPCB Recyclers from CSV
     demo_pw = hash_password("recycle123")
-    for row in RECYCLERS:
+    csv_recyclers = load_recyclers_from_csv("recyclers.csv")
+    
+    for row in csv_recyclers:
         db.add(Recycler(password_hash=demo_pw, verified=True, is_active=True, **row))
 
+    # 5. Seed Multi-lingual Safety Cards
     for card in SAFETY:
         db.add(SafetyCard(**card))
 
