@@ -62,11 +62,25 @@ def rank_recyclers(
         raw_accepted = getattr(r, "accepted_categories", "*") or "*"
         accepted_set = {c.strip().upper() for c in raw_accepted.split(",") if c.strip()}
 
-        # Match wildcard '*' or exact code or wire aliases
+        # Match wildcard '*' or exact code
         matches = "*" in accepted_set or norm_mat in accepted_set
-        if not matches and ("WIRE" in norm_mat or "CABLE" in norm_mat):
-            # Compatibility alias between wire sub-categories
-            matches = any(w in accepted_set for w in ("CABLES_AND_WIRING", "COPPER_HEAVY_INSULATED", "ALUMINIUM_WIRE"))
+        
+        # 🚀 Expanded compatibility aliases mapping specific codes to broad CPCB categories
+        if not matches:
+            if "PCB" in norm_mat or "MOTHERBOARD" in norm_mat or "POWER_SUPPLY" in norm_mat:
+                matches = "PCB" in accepted_set
+            elif "BATTERY" in norm_mat or "BATT" in norm_mat or "ACID" in norm_mat:
+                matches = any(b in accepted_set for b in ("BATTERY", "BATT"))
+            elif "CRT" in norm_mat or "LCD" in norm_mat or "DISPLAY" in norm_mat or "MONITOR" in norm_mat or "PANEL" in norm_mat:
+                matches = any(d in accepted_set for d in ("CRT", "LCD", "DISPLAY"))
+            elif "PLASTIC" in norm_mat or "CASING" in norm_mat:
+                matches = any(p in accepted_set for p in ("MIXED_PLASTIC", "PLASTIC"))
+            elif "WIRE" in norm_mat or "CABLE" in norm_mat:
+                matches = any(w in accepted_set for w in ("CABLE", "CABLES_AND_WIRING", "COPPER_HEAVY_INSULATED", "ALUMINIUM_WIRE"))
+            elif "STEEL" in norm_mat or "METAL" in norm_mat:
+                matches = any(m in accepted_set for m in ("METALS", "STEEL"))
+            elif "MOTOR" in norm_mat:
+                matches = "MOTORS" in accepted_set
 
         if not matches:
             continue

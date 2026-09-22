@@ -7,13 +7,19 @@ import '../../constants/app_enums.dart';
 import '../../services/auth_service.dart';
 import '../../services/database_helper.dart';
 import '../../services/local_ai_classifier.dart';
+import '../../services/storage_service.dart'; // Make sure storage service is imported
 import '../../themes/app_colors.dart';
 import '../../themes/app_theme.dart';
 
 class MarketRatesTab extends StatefulWidget {
   final AppLanguage language;
+  final ReNovaStorage storage; // 🆕 Added storage parameter to grab dynamic base URL & city
 
-  const MarketRatesTab({super.key, required this.language});
+  const MarketRatesTab({
+    super.key,
+    required this.language,
+    required this.storage,
+  });
 
   @override
   State<MarketRatesTab> createState() => _MarketRatesTabState();
@@ -34,9 +40,13 @@ class _MarketRatesTabState extends State<MarketRatesTab> {
     setState(() => _isLoading = true);
     bool liveSuccess = false;
 
+    // 🚀 Use dynamic city from storage (fallback to Bhubaneswar if not set)
+    final city = widget.storage.location ?? 'Bhubaneswar';
+    final baseUrl = AuthService.getBaseUrl(widget.storage);
+
     try {
       final url = Uri.parse(
-        '${AuthService.baseUrl}/api/v1/prices/board?city=Bhubaneswar',
+        '$baseUrl/api/v1/prices/board?city=$city',
       );
       final res = await http.get(url).timeout(const Duration(seconds: 4));
 
@@ -47,7 +57,7 @@ class _MarketRatesTabState extends State<MarketRatesTab> {
           if (quotes.isNotEmpty) {
             await DatabaseHelper.instance.saveBackendQuotes(
               quotes,
-              'Bhubaneswar',
+              city,
             );
             liveSuccess = true;
           }
@@ -98,6 +108,7 @@ class _MarketRatesTabState extends State<MarketRatesTab> {
     final activeAccent = AppThemeColors.isDark(context)
         ? AppColors.primaryGold
         : AppColors.featherGreen;
+    final currentCity = widget.storage.location ?? 'Bhubaneswar';
 
     return Scaffold(
       appBar: AppBar(
@@ -162,9 +173,9 @@ class _MarketRatesTabState extends State<MarketRatesTab> {
                       Text(
                         _isLive
                             ? _t(
-                                'Live Mandi Rates • Bhubaneswar',
-                                'लाइव मंडी दर • भुवनेश्वर',
-                                'थेट बाजार दर • भुवनेश्वर',
+                                'Live Mandi Rates • $currentCity',
+                                'लाइव मंडी दर • $currentCity',
+                                'थेट बाजार दर • $currentCity',
                               )
                             : _t(
                                 'Offline Cached Rates • SQLite Active',
@@ -347,7 +358,7 @@ class _MarketRatesTabState extends State<MarketRatesTab> {
                                   ),
                                 ),
                                 Text(
-                                  item['location'] ?? 'Bhubaneswar',
+                                  item['location'] ?? currentCity,
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: AppThemeColors.muted(context),

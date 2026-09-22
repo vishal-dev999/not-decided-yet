@@ -330,6 +330,7 @@ class _MainDashboardContainerState
     final tabs = [
       MarketRatesTab(
         language: currentLanguage,
+        storage: widget.storage,
       ),
       PickupTab(
         language: currentLanguage,

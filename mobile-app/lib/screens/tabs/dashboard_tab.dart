@@ -17,13 +17,13 @@ import 'recy_chatbot_sheet.dart';
 
 class DashboardTab extends StatefulWidget {
   final AppLanguage language;
-  final ReNovaStorage? storage;
+  final ReNovaStorage storage; 
   final ValueChanged<int> onNavigateTab;
 
   const DashboardTab({
     super.key,
     required this.language,
-    this.storage,
+    required this.storage,
     required this.onNavigateTab,
   });
 
@@ -32,12 +32,12 @@ class DashboardTab extends StatefulWidget {
 }
 
 class _DashboardTabState extends State<DashboardTab> {
-  final int _totalLotsCount = 0;
-  final int _pendingSyncCount = 0;
-  final double _totalQueuedWeightKg = 0.0;
-  final double _totalQueuedValue = 0.0;
+  int _totalLotsCount = 0;
+  int _pendingSyncCount = 0;
+  double _totalQueuedWeightKg = 0.0;
+  double _totalQueuedValue = 0.0;
   List<Map<String, dynamic>> _topMovers = [];
-  final bool _isLoading = true;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -46,13 +46,11 @@ class _DashboardTabState extends State<DashboardTab> {
   }
 
   Future<void> _triggerManualSync() async {
-    if (widget.storage == null) return;
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Syncing lots with central backend...')),
     );
 
-    final res = await SyncService.syncPendingLots(storage: widget.storage!);
+    final res = await SyncService.syncPendingLots(storage: widget.storage);
 
     if (!mounted) return;
 
@@ -70,7 +68,28 @@ class _DashboardTabState extends State<DashboardTab> {
 
   Future<void> _loadDashboardData() async {
     try {
-      // 1. Fetch latest rates sorted by highest recycler offer
+      // 🚀 1. Fetch local SQLite lots to compute Collection Pulse metrics
+      final localLots = await DatabaseHelper.instance.getQueuedLots();
+      int lotsCount = localLots.length;
+      int pendingCount = 0;
+      double totalWeight = 0.0;
+      double totalVal = 0.0;
+
+      for (final lot in localLots) {
+        final status = (lot['status'] ?? '').toString().toUpperCase();
+        // Count as pending if not fully completed or synced yet
+        if (status == 'PENDING' || status == 'SYNCED' || status.isEmpty) {
+          pendingCount++;
+        }
+        
+        final weight = (lot['estimated_weight_kg'] as num?)?.toDouble() ?? 1.0;
+        totalWeight += weight;
+
+        // Estimate value using default fallback rate or benchmark pricing (~₹180/kg average)
+        totalVal += weight * 180.0;
+      }
+
+      // 2. Fetch latest rates sorted by highest recycler offer from database
       final db = await DatabaseHelper.instance.database;
       final rows = await db.rawQuery('''
         SELECT material_category, recycler_offered_price_per_kg
@@ -79,17 +98,24 @@ class _DashboardTabState extends State<DashboardTab> {
         LIMIT 4
       ''');
 
-      if (rows.isNotEmpty && mounted) {
+      if (mounted) {
         setState(() {
-          _topMovers = List<Map<String, dynamic>>.from(rows);
+          _totalLotsCount = lotsCount;
+          _pendingSyncCount = pendingCount;
+          _totalQueuedWeightKg = totalWeight;
+          _totalQueuedValue = totalVal;
+          if (rows.isNotEmpty) {
+            _topMovers = List<Map<String, dynamic>>.from(rows);
+          }
+          _isLoading = false;
         });
         return;
       }
     } catch (e) {
-      debugPrint('Error loading top rates from DB: $e');
+      debugPrint('Error loading dashboard data from DB: $e');
     }
 
-    // 2. Fallback to LocalAiClassifier benchmarks if DB hasn't populated yet
+    // 3. Fallback to LocalAiClassifier benchmarks if DB hasn't populated yet
     if (mounted) {
       final fallback =
           LocalAiClassifier.benchmarks.entries.map((e) {
@@ -102,12 +128,13 @@ class _DashboardTabState extends State<DashboardTab> {
             ..sort(
               (a, b) =>
                   (b['recycler_offered_price_per_kg'] as double).compareTo(
-                a['recycler_offered_price_per_kg'] as double,
-              ),
+                    a['recycler_offered_price_per_kg'] as double,
+                  ),
             );
 
       setState(() {
         _topMovers = fallback.take(4).toList();
+        _isLoading = false;
       });
     }
   }
@@ -140,6 +167,7 @@ class _DashboardTabState extends State<DashboardTab> {
       MaterialPageRoute(
         builder: (_) => MarketRatesTab(
           language: widget.language,
+          storage: widget.storage, 
         ),
       ),
     );
@@ -163,9 +191,9 @@ class _DashboardTabState extends State<DashboardTab> {
         ? AppColors.primaryGold
         : AppColors.featherGreen;
 
-    final collectorName = widget.storage?.collectorName ?? 'Collector';
-    final location = widget.storage?.location ?? 'Bhubaneswar';
-    final profileImagePath = widget.storage?.profileImagePath;
+    final collectorName = widget.storage.collectorName ?? 'Collector';
+    final location = widget.storage.location ?? 'Bhubaneswar';
+    final profileImagePath = widget.storage.profileImagePath;
 
     final hasValidImage =
         profileImagePath != null &&
@@ -325,6 +353,7 @@ class _DashboardTabState extends State<DashboardTab> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ClassifyBulkScreen(
+                            storage: widget.storage,
                             language: widget.language,
                           ),
                         ),

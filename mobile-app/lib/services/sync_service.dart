@@ -214,7 +214,7 @@ class SyncService {
       }
     }
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/sync');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/lots/sync');
 
     try {
       final response = await http
@@ -297,7 +297,7 @@ class SyncService {
     final token = storage.accessToken;
     if (token == null || token.isEmpty) return false;
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/$lotId/cancel');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/lots/$lotId/cancel');
     try {
       final res = await http
           .post(
@@ -331,7 +331,7 @@ class SyncService {
     final token = storage.accessToken;
     if (token == null || token.isEmpty) return false;
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/$lotId/consent');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/lots/$lotId/consent');
 
     try {
       final res = await http
@@ -373,7 +373,7 @@ class SyncService {
     final token = storage.accessToken;
     if (token == null || token.isEmpty) return null;
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/$lotId/status');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/lots/$lotId/status');
     try {
       final res = await http
           .get(
@@ -410,7 +410,7 @@ class SyncService {
     final token = storage.accessToken;
     if (token == null || token.isEmpty) return [];
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/collectors/me/lots');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/collectors/me/lots');
 
     try {
       final response = await http
