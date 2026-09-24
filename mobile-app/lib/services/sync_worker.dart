@@ -57,11 +57,14 @@ class SyncWorker {
     _isSyncing = true;
 
     try {
-      // 1. Upload any pending local lots
+      // 1. Upload pending local lots
       await SyncService.syncPendingLots(storage: storage);
 
-      // 2. Fetch latest backend statuses (BROADCASTED, LOCKED, etc.)
+      // 2. Fetch latest lot statuses
       await refreshRemoteStatus(storage);
+
+      // 3. 🆕 Fetch and cache permanent financial ledger/payouts
+      await SyncService.syncCollectorLedger(storage: storage);
     } finally {
       _isSyncing = false;
     }
@@ -115,12 +118,22 @@ class SyncWorker {
           mutable['image_path'] = localImageMap[backendId];
         }
 
-        if (status == 'WEIGHED' && backendId.isNotEmpty) {
-          // Check in-memory cache first
-          if (_txnCache.containsKey(backendId)) {
+        // 🛠️ FIX: Include VERIFIED_COMPLETED and CONSENTED alongside WEIGHED so transaction data is preserved!
+        bool needsTransaction =
+            status == 'WEIGHED' ||
+            status == 'CONSENTED' ||
+            status == 'VERIFIED_COMPLETED';
+
+        if (needsTransaction && backendId.isNotEmpty) {
+          // If the backend already included transaction data in the lot object, use it directly
+          if (mutable.containsKey('transaction') &&
+              mutable['transaction'] != null) {
+            _txnCache[backendId] =
+                mutable['transaction'] as Map<String, dynamic>;
+          } else if (_txnCache.containsKey(backendId)) {
             mutable['transaction'] = _txnCache[backendId];
           } else {
-            // Fetch once from backend, then store in cache
+            // Fetch from backend /status endpoint if missing
             final details = await SyncService.fetchLotStatus(
               storage: storage,
               lotId: backendId,
@@ -132,7 +145,6 @@ class SyncWorker {
             }
           }
         } else {
-          // Clean up cache entry if the lot moved past WEIGHED (e.g., VERIFIED_COMPLETED)
           _txnCache.remove(backendId);
         }
 

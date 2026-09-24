@@ -5,9 +5,8 @@ import 'package:http/http.dart' as http;
 import 'storage_service.dart';
 
 class AuthService {
-  // Hardcoded permanent Ngrok domain for your hackathon demo
-  static const String defaultBaseUrl =
-      'https://consonant-unequal-happening.ngrok-free.dev';
+  // 🛠️ Mutable runtime default URL (easily toggleable between localhost and ngrok)
+  static String defaultBaseUrl = 'http://localhost:8000';
 
   // 🛡️ Backward compatibility getter for files using AuthService.baseUrl
   static String get baseUrl => defaultBaseUrl;
@@ -22,12 +21,22 @@ class AuthService {
     return defaultBaseUrl;
   }
 
+  /// Allows updating the default URL dynamically at runtime
+  static void setBaseUrl(String newUrl) {
+    if (newUrl.isNotEmpty) {
+      defaultBaseUrl = newUrl.endsWith('/')
+          ? newUrl.substring(0, newUrl.length - 1)
+          : newUrl;
+    }
+  }
+
   static Future<Map<String, dynamic>> registerCollector({
     required String phone,
     required String pin,
     required String fullName,
     required String language,
-    String city = 'Bhubaneswar',
+    required String
+    city, // 👈 Make city required or pass from screen without default override
     String? upiId,
     required ReNovaStorage storage,
   }) async {
@@ -37,13 +46,18 @@ class AuthService {
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
         body: jsonEncode({
           'phone': phone,
           'pin': pin,
           'full_name': fullName,
           'language': language,
-          'city': city,
+          'city': city.isEmpty
+              ? 'Bhubaneswar'
+              : city, // 👈 Uses dynamic input cleanly
           'state': 'Odisha',
           'pincode': '751001',
           'upi_id': upiId ?? '$phone@upi',
@@ -62,7 +76,9 @@ class AuthService {
           collectorId: collector['id'] ?? '',
           name: collector['full_name'] ?? fullName,
           phone: collector['phone'] ?? phone,
-          city: collector['city'] ?? city,
+          city:
+              collector['city'] ??
+              city, // 👈 Saves the dynamic city to storage session
         );
 
         return {'success': true, 'data': data};
@@ -91,7 +107,11 @@ class AuthService {
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning':
+              'true', // 🛡️ Bypasses ngrok free tier HTML warning page
+        },
         body: jsonEncode({'phone': phone, 'pin': pin}),
       );
 

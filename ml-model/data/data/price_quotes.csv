@@ -1,0 +1,289 @@
+material_code,city,state,buy_rate_per_kg,min_rate,max_rate,source,updated_at
+MOTHERBOARD_HIGH_GRADE,Delhi,Delhi,286.89,252.46,329.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Delhi,Delhi,36.89,32.46,42.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Delhi,Delhi,426.89,375.66,490.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Delhi,Delhi,101.89,89.66,117.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Delhi,Delhi,76.89,67.66,88.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Delhi,Delhi,116.89,102.86,134.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Delhi,Delhi,146.89,129.26,168.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Delhi,Delhi,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Delhi,Delhi,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Mumbai,Maharashtra,291.89,256.86,335.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Mumbai,Maharashtra,41.89,36.86,48.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Mumbai,Maharashtra,431.89,380.06,496.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Mumbai,Maharashtra,106.89,94.06,122.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Mumbai,Maharashtra,81.89,72.06,94.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Mumbai,Maharashtra,121.89,107.26,140.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Mumbai,Maharashtra,151.89,133.66,174.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Mumbai,Maharashtra,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Mumbai,Maharashtra,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Pune,Maharashtra,297.89,262.14,342.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Pune,Maharashtra,47.89,42.14,55.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Pune,Maharashtra,437.89,385.34,503.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Pune,Maharashtra,112.89,99.34,129.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Pune,Maharashtra,87.89,77.34,101.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Pune,Maharashtra,127.89,112.54,147.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Pune,Maharashtra,157.89,138.94,181.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Pune,Maharashtra,17.89,15.74,20.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Pune,Maharashtra,17.89,15.74,20.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Nagpur,Maharashtra,292.89,257.74,336.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Nagpur,Maharashtra,42.89,37.74,49.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Nagpur,Maharashtra,432.89,380.94,497.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Nagpur,Maharashtra,107.89,94.94,124.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Nagpur,Maharashtra,82.89,72.94,95.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Nagpur,Maharashtra,122.89,108.14,141.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Nagpur,Maharashtra,152.89,134.54,175.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Nagpur,Maharashtra,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Nagpur,Maharashtra,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Bengaluru,Karnataka,298.89,263.02,343.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Bengaluru,Karnataka,48.89,43.02,56.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Bengaluru,Karnataka,438.89,386.22,504.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Bengaluru,Karnataka,113.89,100.22,130.97,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Bengaluru,Karnataka,88.89,78.22,102.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Bengaluru,Karnataka,128.89,113.42,148.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Bengaluru,Karnataka,158.89,139.82,182.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Bengaluru,Karnataka,18.89,16.62,21.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Bengaluru,Karnataka,18.89,16.62,21.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Mysuru,Karnataka,291.89,256.86,335.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Mysuru,Karnataka,41.89,36.86,48.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Mysuru,Karnataka,431.89,380.06,496.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Mysuru,Karnataka,106.89,94.06,122.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Mysuru,Karnataka,81.89,72.06,94.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Mysuru,Karnataka,121.89,107.26,140.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Mysuru,Karnataka,151.89,133.66,174.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Mysuru,Karnataka,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Mysuru,Karnataka,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Chennai,Tamil Nadu,299.89,263.9,344.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Chennai,Tamil Nadu,49.89,43.9,57.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Chennai,Tamil Nadu,439.89,387.1,505.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Chennai,Tamil Nadu,114.89,101.1,132.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Chennai,Tamil Nadu,89.89,79.1,103.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Chennai,Tamil Nadu,129.89,114.3,149.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Chennai,Tamil Nadu,159.89,140.7,183.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Chennai,Tamil Nadu,19.89,17.5,22.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Chennai,Tamil Nadu,19.89,17.5,22.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Coimbatore,Tamil Nadu,295.89,260.38,340.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Coimbatore,Tamil Nadu,45.89,40.38,52.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Coimbatore,Tamil Nadu,435.89,383.58,501.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Coimbatore,Tamil Nadu,110.89,97.58,127.52,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Coimbatore,Tamil Nadu,85.89,75.58,98.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Coimbatore,Tamil Nadu,125.89,110.78,144.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Coimbatore,Tamil Nadu,155.89,137.18,179.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Coimbatore,Tamil Nadu,15.89,13.98,18.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Coimbatore,Tamil Nadu,15.89,13.98,18.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Hyderabad,Telangana,288.89,254.22,332.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Hyderabad,Telangana,38.89,34.22,44.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Hyderabad,Telangana,428.89,377.42,493.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Hyderabad,Telangana,103.89,91.42,119.47,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Hyderabad,Telangana,78.89,69.42,90.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Hyderabad,Telangana,118.89,104.62,136.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Hyderabad,Telangana,148.89,131.02,171.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Hyderabad,Telangana,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Hyderabad,Telangana,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Ahmedabad,Gujarat,295.89,260.38,340.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Ahmedabad,Gujarat,45.89,40.38,52.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Ahmedabad,Gujarat,435.89,383.58,501.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Ahmedabad,Gujarat,110.89,97.58,127.52,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Ahmedabad,Gujarat,85.89,75.58,98.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Ahmedabad,Gujarat,125.89,110.78,144.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Ahmedabad,Gujarat,155.89,137.18,179.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Ahmedabad,Gujarat,15.89,13.98,18.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Ahmedabad,Gujarat,15.89,13.98,18.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Surat,Gujarat,293.89,258.62,337.97,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Surat,Gujarat,43.89,38.62,50.47,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Surat,Gujarat,433.89,381.82,498.97,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Surat,Gujarat,108.89,95.82,125.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Surat,Gujarat,83.89,73.82,96.47,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Surat,Gujarat,123.89,109.02,142.47,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Surat,Gujarat,153.89,135.42,176.97,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Surat,Gujarat,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Surat,Gujarat,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Kolkata,West Bengal,296.89,261.26,341.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Kolkata,West Bengal,46.89,41.26,53.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Kolkata,West Bengal,436.89,384.46,502.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Kolkata,West Bengal,111.89,98.46,128.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Kolkata,West Bengal,86.89,76.46,99.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Kolkata,West Bengal,126.89,111.66,145.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Kolkata,West Bengal,156.89,138.06,180.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Kolkata,West Bengal,16.89,14.86,19.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Kolkata,West Bengal,16.89,14.86,19.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Lucknow,Uttar Pradesh,294.89,259.5,339.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Lucknow,Uttar Pradesh,44.89,39.5,51.62,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Lucknow,Uttar Pradesh,434.89,382.7,500.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Lucknow,Uttar Pradesh,109.89,96.7,126.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Lucknow,Uttar Pradesh,84.89,74.7,97.62,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Lucknow,Uttar Pradesh,124.89,109.9,143.62,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Lucknow,Uttar Pradesh,154.89,136.3,178.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Lucknow,Uttar Pradesh,14.89,13.1,17.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Lucknow,Uttar Pradesh,14.89,13.1,17.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Noida,Uttar Pradesh,291.89,256.86,335.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Noida,Uttar Pradesh,41.89,36.86,48.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Noida,Uttar Pradesh,431.89,380.06,496.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Noida,Uttar Pradesh,106.89,94.06,122.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Noida,Uttar Pradesh,81.89,72.06,94.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Noida,Uttar Pradesh,121.89,107.26,140.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Noida,Uttar Pradesh,151.89,133.66,174.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Noida,Uttar Pradesh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Noida,Uttar Pradesh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Kanpur,Uttar Pradesh,292.89,257.74,336.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Kanpur,Uttar Pradesh,42.89,37.74,49.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Kanpur,Uttar Pradesh,432.89,380.94,497.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Kanpur,Uttar Pradesh,107.89,94.94,124.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Kanpur,Uttar Pradesh,82.89,72.94,95.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Kanpur,Uttar Pradesh,122.89,108.14,141.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Kanpur,Uttar Pradesh,152.89,134.54,175.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Kanpur,Uttar Pradesh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Kanpur,Uttar Pradesh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Bhubaneswar,Odisha,296.89,261.26,341.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Bhubaneswar,Odisha,46.89,41.26,53.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Bhubaneswar,Odisha,436.89,384.46,502.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Bhubaneswar,Odisha,111.89,98.46,128.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Bhubaneswar,Odisha,86.89,76.46,99.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Bhubaneswar,Odisha,126.89,111.66,145.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Bhubaneswar,Odisha,156.89,138.06,180.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Bhubaneswar,Odisha,16.89,14.86,19.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Bhubaneswar,Odisha,16.89,14.86,19.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Cuttack,Odisha,296.89,261.26,341.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Cuttack,Odisha,46.89,41.26,53.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Cuttack,Odisha,436.89,384.46,502.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Cuttack,Odisha,111.89,98.46,128.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Cuttack,Odisha,86.89,76.46,99.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Cuttack,Odisha,126.89,111.66,145.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Cuttack,Odisha,156.89,138.06,180.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Cuttack,Odisha,16.89,14.86,19.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Cuttack,Odisha,16.89,14.86,19.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Patna,Bihar,287.89,253.34,331.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Patna,Bihar,37.89,33.34,43.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Patna,Bihar,427.89,376.54,492.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Patna,Bihar,102.89,90.54,118.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Patna,Bihar,77.89,68.54,89.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Patna,Bihar,117.89,103.74,135.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Patna,Bihar,147.89,130.14,170.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Patna,Bihar,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Patna,Bihar,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Jaipur,Rajasthan,291.89,256.86,335.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Jaipur,Rajasthan,41.89,36.86,48.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Jaipur,Rajasthan,431.89,380.06,496.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Jaipur,Rajasthan,106.89,94.06,122.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Jaipur,Rajasthan,81.89,72.06,94.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Jaipur,Rajasthan,121.89,107.26,140.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Jaipur,Rajasthan,151.89,133.66,174.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Jaipur,Rajasthan,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Jaipur,Rajasthan,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Jodhpur,Rajasthan,296.89,261.26,341.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Jodhpur,Rajasthan,46.89,41.26,53.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Jodhpur,Rajasthan,436.89,384.46,502.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Jodhpur,Rajasthan,111.89,98.46,128.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Jodhpur,Rajasthan,86.89,76.46,99.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Jodhpur,Rajasthan,126.89,111.66,145.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Jodhpur,Rajasthan,156.89,138.06,180.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Jodhpur,Rajasthan,16.89,14.86,19.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Jodhpur,Rajasthan,16.89,14.86,19.42,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Bhopal,Madhya Pradesh,288.89,254.22,332.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Bhopal,Madhya Pradesh,38.89,34.22,44.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Bhopal,Madhya Pradesh,428.89,377.42,493.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Bhopal,Madhya Pradesh,103.89,91.42,119.47,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Bhopal,Madhya Pradesh,78.89,69.42,90.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Bhopal,Madhya Pradesh,118.89,104.62,136.72,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Bhopal,Madhya Pradesh,148.89,131.02,171.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Bhopal,Madhya Pradesh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Bhopal,Madhya Pradesh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Indore,Madhya Pradesh,289.89,255.1,333.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Indore,Madhya Pradesh,39.89,35.1,45.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Indore,Madhya Pradesh,429.89,378.3,494.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Indore,Madhya Pradesh,104.89,92.3,120.62,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Indore,Madhya Pradesh,79.89,70.3,91.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Indore,Madhya Pradesh,119.89,105.5,137.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Indore,Madhya Pradesh,149.89,131.9,172.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Indore,Madhya Pradesh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Indore,Madhya Pradesh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Chandigarh,Punjab,289.89,255.1,333.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Chandigarh,Punjab,39.89,35.1,45.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Chandigarh,Punjab,429.89,378.3,494.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Chandigarh,Punjab,104.89,92.3,120.62,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Chandigarh,Punjab,79.89,70.3,91.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Chandigarh,Punjab,119.89,105.5,137.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Chandigarh,Punjab,149.89,131.9,172.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Chandigarh,Punjab,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Chandigarh,Punjab,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Ludhiana,Punjab,297.89,262.14,342.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Ludhiana,Punjab,47.89,42.14,55.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Ludhiana,Punjab,437.89,385.34,503.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Ludhiana,Punjab,112.89,99.34,129.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Ludhiana,Punjab,87.89,77.34,101.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Ludhiana,Punjab,127.89,112.54,147.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Ludhiana,Punjab,157.89,138.94,181.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Ludhiana,Punjab,17.89,15.74,20.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Ludhiana,Punjab,17.89,15.74,20.57,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Dehradun,Uttarakhand,294.89,259.5,339.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Dehradun,Uttarakhand,44.89,39.5,51.62,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Dehradun,Uttarakhand,434.89,382.7,500.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Dehradun,Uttarakhand,109.89,96.7,126.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Dehradun,Uttarakhand,84.89,74.7,97.62,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Dehradun,Uttarakhand,124.89,109.9,143.62,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Dehradun,Uttarakhand,154.89,136.3,178.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Dehradun,Uttarakhand,14.89,13.1,17.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Dehradun,Uttarakhand,14.89,13.1,17.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Raipur,Chhattisgarh,291.89,256.86,335.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Raipur,Chhattisgarh,41.89,36.86,48.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Raipur,Chhattisgarh,431.89,380.06,496.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Raipur,Chhattisgarh,106.89,94.06,122.92,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Raipur,Chhattisgarh,81.89,72.06,94.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Raipur,Chhattisgarh,121.89,107.26,140.17,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Raipur,Chhattisgarh,151.89,133.66,174.67,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Raipur,Chhattisgarh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Raipur,Chhattisgarh,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Ranchi,Jharkhand,295.89,260.38,340.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Ranchi,Jharkhand,45.89,40.38,52.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Ranchi,Jharkhand,435.89,383.58,501.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Ranchi,Jharkhand,110.89,97.58,127.52,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Ranchi,Jharkhand,85.89,75.58,98.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Ranchi,Jharkhand,125.89,110.78,144.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Ranchi,Jharkhand,155.89,137.18,179.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Ranchi,Jharkhand,15.89,13.98,18.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Ranchi,Jharkhand,15.89,13.98,18.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Guwahati,Assam,285.89,251.58,328.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Guwahati,Assam,35.89,31.58,41.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Guwahati,Assam,425.89,374.78,489.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Guwahati,Assam,100.89,88.78,116.02,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Guwahati,Assam,75.89,66.78,87.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Guwahati,Assam,115.89,101.98,133.27,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Guwahati,Assam,145.89,128.38,167.77,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Guwahati,Assam,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Guwahati,Assam,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Thiruvananthapuram,Kerala,299.89,263.9,344.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Thiruvananthapuram,Kerala,49.89,43.9,57.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Thiruvananthapuram,Kerala,439.89,387.1,505.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Thiruvananthapuram,Kerala,114.89,101.1,132.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Thiruvananthapuram,Kerala,89.89,79.1,103.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Thiruvananthapuram,Kerala,129.89,114.3,149.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Thiruvananthapuram,Kerala,159.89,140.7,183.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Thiruvananthapuram,Kerala,19.89,17.5,22.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Thiruvananthapuram,Kerala,19.89,17.5,22.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Panaji,Goa,293.89,258.62,337.97,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Panaji,Goa,43.89,38.62,50.47,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Panaji,Goa,433.89,381.82,498.97,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Panaji,Goa,108.89,95.82,125.22,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Panaji,Goa,83.89,73.82,96.47,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Panaji,Goa,123.89,109.02,142.47,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Panaji,Goa,153.89,135.42,176.97,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Panaji,Goa,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Panaji,Goa,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Jammu,Jammu & Kashmir,292.89,257.74,336.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Jammu,Jammu & Kashmir,42.89,37.74,49.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Jammu,Jammu & Kashmir,432.89,380.94,497.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Jammu,Jammu & Kashmir,107.89,94.94,124.07,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Jammu,Jammu & Kashmir,82.89,72.94,95.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Jammu,Jammu & Kashmir,122.89,108.14,141.32,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Jammu,Jammu & Kashmir,152.89,134.54,175.82,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Jammu,Jammu & Kashmir,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Jammu,Jammu & Kashmir,14.0,12.32,16.1,cpcb-national-mandi-index,2026-09-22 02:17:50
+MOTHERBOARD_HIGH_GRADE,Shimla,Himachal Pradesh,299.89,263.9,344.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+POWER_SUPPLY_LOW_GRADE,Shimla,Himachal Pradesh,49.89,43.9,57.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+COPPER_HEAVY_INSULATED,Shimla,Himachal Pradesh,439.89,387.1,505.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+ALUMINIUM_WIRE,Shimla,Himachal Pradesh,114.89,101.1,132.12,cpcb-national-mandi-index,2026-09-22 02:17:50
+LEad_ACID,Shimla,Himachal Pradesh,89.89,79.1,103.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+BATTERY_LITHIUM_PORTABLE,Shimla,Himachal Pradesh,129.89,114.3,149.37,cpcb-national-mandi-index,2026-09-22 02:17:50
+LCD_PANEL_INTACT,Shimla,Himachal Pradesh,159.89,140.7,183.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+CRT_MONITOR,Shimla,Himachal Pradesh,19.89,17.5,22.87,cpcb-national-mandi-index,2026-09-22 02:17:50
+MIXED_EWASTE_CASING,Shimla,Himachal Pradesh,19.89,17.5,22.87,cpcb-national-mandi-index,2026-09-22 02:17:50

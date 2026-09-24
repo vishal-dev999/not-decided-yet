@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../constants/app_enums.dart';
 import '../../services/database_helper.dart';
+import '../../services/sync_service.dart';
 import '../../services/storage_service.dart';
 import '../../themes/app_colors.dart';
 import '../../themes/app_theme.dart';
@@ -48,6 +49,23 @@ class _PaymentTabState extends State<PaymentTab> {
         ? 'UPI'
         : 'Cash';
     _syncCompletedLotsToPaymentHistory();
+  }
+
+  Future<void> _handleManualRefresh() async {
+    setState(() => _isLoadingHistory = true);
+
+    final storage = widget.storage;
+    if (storage != null && storage.accessToken != null) {
+      // Trigger backend ledger sync when online
+      await SyncService.syncCollectorLedger(storage: storage);
+    }
+
+    // Also re-run local SSOT reconciliation for completed lots
+    await _syncCompletedLotsToPaymentHistory();
+
+    if (mounted) {
+      setState(() => _isLoadingHistory = false);
+    }
   }
 
   /// 🛡️ SSOT Bridge: Pulls completed lots from local SQLite and ensures they exist in payment history
@@ -275,45 +293,58 @@ class _PaymentTabState extends State<PaymentTab> {
             ),
           ),
         ),
-        const SizedBox(height: 26),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              _t('Payment History', 'भुगतान इतिहास', 'पेमेंट इतिहास'),
-              style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-                color: AppThemeColors.text(context),
-              ),
-            ),
-            IconButton(
-              tooltip: 'Refresh History',
-              icon: const Icon(Icons.refresh, size: 18),
-              onPressed: () {
-                setState(() => _isLoadingHistory = true);
-                _syncCompletedLotsToPaymentHistory();
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        if (_isLoadingHistory)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          )
-        else if (history.isEmpty)
+const SizedBox(height: 26),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
           Text(
-            _t(
-              'No payments recorded yet.',
-              'अभी कोई भुगतान दर्ज नहीं है।',
-              'अजून कोणतेही पेमेंट नोंदलेले नाही.',
+            _t('Payment History', 'भुगतान इतिहास', 'पेमेंट इतिहास'),
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.text(context),
             ),
-            style: TextStyle(color: AppThemeColors.muted(context)),
           ),
+          IconButton(
+            tooltip: 'Refresh Ledger',
+            icon: const Icon(Icons.refresh, size: 18),
+            onPressed: _handleManualRefresh,
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+
+      if (_isLoadingHistory)
+        const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        )
+      else if (history.isEmpty)
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppThemeColors.card(context),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            children: [
+              Icon(Icons.receipt_long_outlined, size: 36, color: AppThemeColors.muted(context)),
+              const SizedBox(height: 8),
+              Text(
+                _t(
+                  'No completed payments yet.\nPull down to sync or check connection.',
+                  'अभी कोई भुगतान दर्ज नहीं है। सिंक करने के लिए नीचे खींचें।',
+                  'अजून कोणतेही पेमेंट नोंदलेले नाही.',
+                ),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppThemeColors.muted(context)),
+              ),
+            ],
+          ),
+        )
+      else
         ...history.map(
           (item) => Card(
             margin: const EdgeInsets.only(bottom: 10),

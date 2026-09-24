@@ -57,7 +57,11 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppThemeColors.card(context),
         title: Text(
-          _t('Configure Backend URL', 'बैकएंड यूआरएल कॉन्फ़िगर करें', 'बॅकएंड URL कॉन्फिगर करा'),
+          _t(
+            'Configure Backend URL',
+            'बैकएंड यूआरएल कॉन्फ़िगर करें',
+            'बॅकएंड URL कॉन्फिगर करा',
+          ),
           style: TextStyle(color: AppThemeColors.text(context)),
         ),
         content: Column(
@@ -69,7 +73,10 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
                 'स्थानीय परीक्षण के लिए Ngrok यूआरएल दर्ज करें या प्रीसेट चुनें:',
                 'स्थानिक चाचणीसाठी Ngrok URL प्रविष्ट करा किंवा प्रीसेट निवडा:',
               ),
-              style: TextStyle(color: AppThemeColors.muted(context), fontSize: 12),
+              style: TextStyle(
+                color: AppThemeColors.muted(context),
+                fontSize: 12,
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -95,7 +102,8 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
                 ),
                 ActionChip(
                   label: const Text('Ngrok Tunnel'),
-                  onPressed: () => urlController.text = 'https://your-ngrok-url.ngrok-free.app',
+                  onPressed: () => urlController.text =
+                      'https://your-ngrok-url.ngrok-free.app',
                 ),
               ],
             ),
@@ -107,7 +115,9 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
             child: Text(_t('Cancel', 'रद्द करें', 'रद्द करा')),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.featherGreen),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.featherGreen,
+            ),
             onPressed: () async {
               await widget.storage.setCustomBaseUrl(urlController.text.trim());
               Navigator.pop(ctx);
@@ -126,7 +136,10 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
                 );
               }
             },
-            child: Text(_t('Save', 'सहेजें', 'जतन करा'), style: const TextStyle(color: Colors.white)),
+            child: Text(
+              _t('Save', 'सहेजें', 'जतन करा'),
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -174,9 +187,9 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
             language: widget.language == AppLanguage.hindi
                 ? 'hi'
                 : widget.language == AppLanguage.marathi
-                    ? 'mr'
-                    : 'en',
-            city: city.isEmpty ? 'Bhubaneswar' : city,
+                ? 'mr'
+                : 'en',
+            city: city.isEmpty ? 'Bhubaneswar' : city, // 👈 Dynamically passed!
             storage: widget.storage,
           )
         : await AuthService.loginCollector(
@@ -193,8 +206,12 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => MainDashboardContainer(
-            collectorName: widget.storage.collectorName ?? (_isRegistering ? name : 'Collector'),
-            location: widget.storage.location ?? (city.isEmpty ? 'Bhubaneswar' : city),
+            collectorName:
+                widget.storage.collectorName ??
+                (_isRegistering ? name : 'Collector'),
+            location:
+                widget.storage.location ??
+                (city.isEmpty ? 'Bhubaneswar' : city),
             language: widget.language,
             themeMode: widget.themeMode,
             onThemeChanged: widget.onThemeChanged,
@@ -220,7 +237,11 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
         title: Text(_t('Collector Login', 'कलेक्टर लॉगिन', 'कलेक्टर लॉगिन')),
         actions: [
           IconButton(
-            tooltip: _t('Configure Backend URL', 'बैकएंड यूआरएल कॉन्फ़िगर करें', 'बॅकएंड URL कॉन्फिगर करा'),
+            tooltip: _t(
+              'Configure Backend URL',
+              'बैकएंड यूआरएल कॉन्फ़िगर करें',
+              'बॅकएंड URL कॉन्फिगर करा',
+            ),
             icon: const Icon(Icons.settings_ethernet),
             onPressed: () => _showBackendConfigDialog(context),
           ),
@@ -241,8 +262,16 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
               const SizedBox(height: 20),
               Text(
                 _isRegistering
-                    ? _t('Create Account', 'नया खाता बनाएं', 'नवीन खाते तयार करा')
-                    : _t('Collector Sign-In', 'कबाड़ीवाला प्रवेश', 'कबाडीवाला लॉगिन'),
+                    ? _t(
+                        'Create Account',
+                        'नया खाता बनाएं',
+                        'नवीन खाते तयार करा',
+                      )
+                    : _t(
+                        'Collector Sign-In',
+                        'कबाड़ीवाला प्रवेश',
+                        'कबाडीवाला लॉगिन',
+                      ),
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -252,9 +281,20 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
               const SizedBox(height: 6),
               Text(
                 _isRegistering
-                    ? _t('Register as a certified scrap collector', 'प्रमाणित कबाड़ संग्राहक के रूप में पंजीकरण करें', 'प्रमाणित भंगार संकलक म्हणून नोंदणी करा')
-                    : _t('Enter registered phone and 4-digit PIN', 'पंजीकृत फोन नंबर और 4 अंकों का पिन दर्ज करें', 'नोंदणीकृत फोन आणि 4 अंकी पिन टाका'),
-                style: TextStyle(fontSize: 13, color: AppThemeColors.muted(context)),
+                    ? _t(
+                        'Register as a certified scrap collector',
+                        'प्रमाणित कबाड़ संग्राहक के रूप में पंजीकरण करें',
+                        'प्रमाणित भंगार संकलक म्हणून नोंदणी करा',
+                      )
+                    : _t(
+                        'Enter registered phone and 4-digit PIN',
+                        'पंजीकृत फोन नंबर और 4 अंकों का पिन दर्ज करें',
+                        'नोंदणीकृत फोन आणि 4 अंकी पिन टाका',
+                      ),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppThemeColors.muted(context),
+                ),
               ),
               const SizedBox(height: 28),
 
@@ -265,16 +305,24 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
                   decoration: InputDecoration(
                     labelText: _t('Full Name', 'पूरा नाम', 'पूर्ण नाव'),
                     prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _cityController,
                   decoration: InputDecoration(
-                    labelText: _t('City / Mandi Area', 'शहर / मंडी क्षेत्र', 'शहर / बाजार परिसर'),
+                    labelText: _t(
+                      'City / Mandi Area',
+                      'शहर / मंडी क्षेत्र',
+                      'शहर / बाजार परिसर',
+                    ),
                     prefixIcon: const Icon(Icons.location_city_outlined),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -289,7 +337,9 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
                   labelText: _t('Phone Number', 'फ़ोन नंबर', 'फोन नंबर'),
                   prefixText: '+91 ',
                   prefixIcon: const Icon(Icons.phone),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -303,7 +353,9 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
                 decoration: InputDecoration(
                   labelText: _t('4-Digit PIN', '4-अंकीय पिन', '4-अंकी पिन'),
                   prefixIcon: const Icon(Icons.lock_outline),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
               ),
 
@@ -323,16 +375,29 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: activeAccent,
                     foregroundColor: AppColors.darkBackground,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                   onPressed: _isLoading ? null : _handleSubmit,
                   child: _isLoading
                       ? const CircularProgressIndicator()
                       : Text(
                           _isRegistering
-                              ? _t('Register & Start', 'पंजीकरण करें और शुरू करें', 'नोंदणी करा आणि सुरू करा')
-                              : _t('Login to Dashboard', 'डैशबोर्ड में प्रवेश करें', 'डॅशबोर्डवर जा'),
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ? _t(
+                                  'Register & Start',
+                                  'पंजीकरण करें और शुरू करें',
+                                  'नोंदणी करा आणि सुरू करा',
+                                )
+                              : _t(
+                                  'Login to Dashboard',
+                                  'डैशबोर्ड में प्रवेश करें',
+                                  'डॅशबोर्डवर जा',
+                                ),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                 ),
               ),
@@ -356,9 +421,20 @@ class _CollectorLoginScreenState extends State<CollectorLoginScreen> {
                   },
                   child: Text(
                     _isRegistering
-                        ? _t('Already registered? Login here', 'पहले से पंजीकृत हैं? यहाँ लॉगिन करें', 'आधीच नोंदणी केली आहे? येथे लॉगिन करा')
-                        : _t('New Collector? Create Account', 'नया कबाड़ी? खाता बनाएं', 'नवीन कबाडी? खाते तयार करा'),
-                    style: TextStyle(color: activeAccent, fontWeight: FontWeight.w600),
+                        ? _t(
+                            'Already registered? Login here',
+                            'पहले से पंजीकृत हैं? यहाँ लॉगिन करें',
+                            'आधीच नोंदणी केली आहे? येथे लॉगिन करा',
+                          )
+                        : _t(
+                            'New Collector? Create Account',
+                            'नया कबाड़ी? खाता बनाएं',
+                            'नवीन कबाडी? खाते तयार करा',
+                          ),
+                    style: TextStyle(
+                      color: activeAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

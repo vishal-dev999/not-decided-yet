@@ -384,7 +384,9 @@ class DatabaseHelper {
   // BENCHMARKS, PROFILE & PRICE OPERATIONS
   // ==========================================================
 
-  Future<void> seedInitialPricesIfNeeded() async {
+  Future<void> seedInitialPricesIfNeeded({
+    String defaultCity = 'Bhubaneswar',
+  }) async {
     final db = await database;
     final count = Sqflite.firstIntValue(
       await db.rawQuery('SELECT COUNT(*) FROM price_history'),
@@ -411,8 +413,8 @@ class DatabaseHelper {
           final List<dynamic> list = decoded is List
               ? decoded
               : (decoded is Map
-                  ? (decoded['benchmarks'] as List<dynamic>? ?? [])
-                  : []);
+                    ? (decoded['benchmarks'] as List<dynamic>? ?? [])
+                    : []);
 
           for (final item in list) {
             final map = Map<String, dynamic>.from(item as Map);
@@ -430,7 +432,8 @@ class DatabaseHelper {
                   (map['min_market_price'] as num?)?.toDouble() ?? 40.0,
               'max_market_price':
                   (map['max_market_price'] as num?)?.toDouble() ?? 60.0,
-              'location': map['location'] ?? 'Bhubaneswar',
+              'location':
+                  map['location'] ?? defaultCity, // 👈 Dynamic city parameter
             });
           }
         }
@@ -457,7 +460,7 @@ class DatabaseHelper {
                 .toDouble(),
             'min_market_price': (b['min_rate'] as num).toDouble(),
             'max_market_price': (b['max_rate'] as num).toDouble(),
-            'location': 'Bhubaneswar',
+            'location': defaultCity, // 👈 Dynamic city parameter
           });
         }
       }
@@ -534,7 +537,7 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> clearAndReseedPrices() async {
+  Future<void> clearAndReseedPrices({String city = 'Bhubaneswar'}) async {
     final db = await database;
     final today = DateTime.now().toIso8601String().substring(0, 10);
 
@@ -572,7 +575,7 @@ class DatabaseHelper {
             rate,
             minR,
             maxR,
-            'Bhubaneswar',
+            city, // 👈 Dynamic city parameter
           ],
         );
       }

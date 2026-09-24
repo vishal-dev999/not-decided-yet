@@ -70,6 +70,53 @@ class SyncService {
     return 'MIXED_EWASTE_CASING';
   }
 
+  static Future<void> syncCollectorLedger({
+    required ReNovaStorage storage,
+  }) async {
+    final token = storage.accessToken;
+    if (token == null || token.isEmpty) return;
+
+    final url = Uri.parse(
+      '${AuthService.getBaseUrl(storage)}/api/v1/collectors/me/ledger?limit=50',
+    );
+    try {
+      final response = await http
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'ngrok-skip-browser-warning': 'true',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        final list = decoded is List
+            ? decoded
+            : (decoded['data'] ?? decoded['ledger'] ?? []);
+
+        for (final item in list) {
+          final map = Map<String, dynamic>.from(item as Map);
+          // Persist permanently into local SSOT / payment history
+          await storage.savePayment({
+            'mode':
+                (map['payment_mode'] ?? 'UPI').toString().toUpperCase() == 'UPI'
+                ? 'UPI'
+                : 'Cash',
+            'details':
+                map['description'] ?? map['reference'] ?? 'Completed Payout',
+            'amount': '₹${map['amount'] ?? 0}',
+            'date': map['created_at'] ?? DateTime.now().toIso8601String(),
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('[SyncService] Failed to sync ledger: $e');
+    }
+  }
+
   /// Syncs all PENDING lots from local SQLite SSOT queue to FastAPI
   static Future<Map<String, dynamic>> syncPendingLots({
     required ReNovaStorage storage,
@@ -96,7 +143,7 @@ class SyncService {
     final List<String> queuedLotUids = [];
 
     for (final row in pendingQueue) {
-      final lotUid = row['lot_uid'] as String;
+      final lotUid = row['lot_uid'] as String? ?? '';
       final imagePath = row['image_path'] as String?;
       final jsonStr = row['json_payload'] as String? ?? '{}';
 
@@ -128,7 +175,9 @@ class SyncService {
                   1.0)
               .toDouble();
 
-      final clientLotId = lotUid.isNotEmpty ? lotUid : 'LOT_${DateTime.now().millisecondsSinceEpoch}';
+      final clientLotId = lotUid.isNotEmpty
+          ? lotUid
+          : 'LOT_${DateTime.now().millisecondsSinceEpoch}';
 
       final qrToken =
           row['qr_token']?.toString() ??
@@ -140,14 +189,15 @@ class SyncService {
 
       lotsPayload.add({
         'client_lot_id': clientLotId,
-        'material_category': canonicalCat.toLowerCase(), // FastAPI standard expects lowercase codes (e.g. pcb, cables) or exact match
+        'material_category':
+            canonicalCat, // Ensure exact uppercase match with backend enums
         'estimated_weight_kg': weight,
         'classification': {
           'label': canonicalCat,
           'confidence': (localData['confidence'] as num? ?? 0.95).toDouble(),
           'model_version': 'mobile-v1',
         },
-        'city': storage.location ?? 'Cuttack',
+        'city': storage.location ?? 'Bhubaneswar',
         'latitude': lat,
         'longitude': lon,
         'qr_token': qrToken,
@@ -159,10 +209,12 @@ class SyncService {
             DateTime.now().toIso8601String(),
       });
 
-      queuedLotUids.add(lotUid);
+      if (lotUid.isNotEmpty) {
+        queuedLotUids.add(lotUid);
+      }
     }
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/sync');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/lots/sync');
 
     try {
       final response = await http
@@ -178,12 +230,13 @@ class SyncService {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final decodedRes = jsonDecode(response.body);
-        final List<dynamic> syncedReturns = decodedRes is List 
-            ? decodedRes : (decodedRes['data'] as List<dynamic>? ?? decodedRes['lots'] as List<dynamic>? ?? []);
+        final List<dynamic> syncedReturns = decodedRes is List
+            ? decodedRes
+            : (decodedRes['data'] as List<dynamic>? ??
+                  decodedRes['lots'] as List<dynamic>? ??
+                  []);
 
-        // Update local status to BROADCASTED once successfully accepted by backend
         for (final uid in queuedLotUids) {
-          // Find matching backend ID if returned in sync response
           String? backendId;
           for (final ret in syncedReturns) {
             final map = Map<String, dynamic>.from(ret as Map);
@@ -205,13 +258,18 @@ class SyncService {
           'message': 'Successfully synced ${queuedLotUids.length} scrap lots!',
         };
       } else {
+        debugPrint(
+          '[SyncService] Sync failed with status: ${response.statusCode}, body: ${response.body}',
+        );
         try {
           final err = jsonDecode(response.body);
           return {
             'success': false,
             'syncedCount': 0,
             'message':
-                err['message'] ?? 'Server error (${response.statusCode})',
+                err['detail']?.toString() ??
+                err['message'] ??
+                'Server error (${response.statusCode})',
           };
         } catch (_) {
           return {
@@ -222,6 +280,7 @@ class SyncService {
         }
       }
     } catch (e) {
+      debugPrint('[SyncService] Network error during lot sync: $e');
       return {
         'success': false,
         'syncedCount': 0,
@@ -238,7 +297,7 @@ class SyncService {
     final token = storage.accessToken;
     if (token == null || token.isEmpty) return false;
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/$lotId/cancel');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/lots/$lotId/cancel');
     try {
       final res = await http
           .post(
@@ -272,7 +331,7 @@ class SyncService {
     final token = storage.accessToken;
     if (token == null || token.isEmpty) return false;
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/$lotId/consent');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/lots/$lotId/consent');
 
     try {
       final res = await http
@@ -314,7 +373,7 @@ class SyncService {
     final token = storage.accessToken;
     if (token == null || token.isEmpty) return null;
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/lots/$lotId/status');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/lots/$lotId/status');
     try {
       final res = await http
           .get(
@@ -351,7 +410,7 @@ class SyncService {
     final token = storage.accessToken;
     if (token == null || token.isEmpty) return [];
 
-    final url = Uri.parse('${AuthService.baseUrl}/api/v1/collectors/me/lots');
+    final url = Uri.parse('${AuthService.getBaseUrl(storage)}/api/v1/collectors/me/lots');
 
     try {
       final response = await http

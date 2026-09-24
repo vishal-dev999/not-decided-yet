@@ -133,14 +133,19 @@ def sync_lots(db: Session, collector: Collector, items: list) -> list[Lot]:
         db.add(lot)
         db.flush()
         out.append(lot)
+        
     db.commit()
+    
+    # 🚀 Automatically trigger broadcast for each newly synced lot in a separate try/except block
     for lot in out:
         db.refresh(lot)
         if lot.status == "SYNCED":
             try:
                 broadcast_lot(db, lot)
-            except AppError:
-                pass
+            except Exception as e:
+                # Log the error so it's not silent, but don't crash the sync response
+                print(f"[Broadcast Error] Failed to broadcast lot {lot.id}: {e}")
+                
     return out
 
 

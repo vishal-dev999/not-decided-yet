@@ -67,12 +67,11 @@ class _PickupTabState extends State<PickupTab> {
     setState(() => _isLoading = true);
 
     try {
-      final localQueued = await DatabaseHelper.instance.getQueuedLots(
-        limit: 100,
-      );
+      // 🔥 Fetch all cached local lots instead of just pending queue items
+      final allLocalLots = await DatabaseHelper.instance.getQueuedLots();
       if (mounted) {
         setState(() {
-          _lots = localQueued.where((lot) {
+          _lots = allLocalLots.where((lot) {
             final s = (lot['status'] ?? '').toString().toUpperCase();
             return s != 'CANCELLED' && s != 'WITHDRAWN' && s != 'ARCHIVED';
           }).toList();
@@ -84,7 +83,6 @@ class _PickupTabState extends State<PickupTab> {
       if (mounted) setState(() => _isLoading = false);
     }
 
-    // Trigger background sync worker to fetch fresh remote data asynchronously
     if (mounted) {
       final storage = widget.storage ?? getStorage(context);
       SyncWorker.triggerImmediate(storage);
